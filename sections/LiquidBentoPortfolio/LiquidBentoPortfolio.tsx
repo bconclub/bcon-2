@@ -203,6 +203,7 @@ export default function LiquidBentoPortfolio({
   const [vimeoLoadingMap, setVimeoLoadingMap] = useState<Record<string, boolean>>({});
   const [vimeoLoadingProgress, setVimeoLoadingProgress] = useState<Record<string, number>>({});
   const [vimeoThumbnails, setVimeoThumbnails] = useState<Record<string, string>>({});
+  const [vimeoPlayingMap, setVimeoPlayingMap] = useState<Record<string, boolean>>({});
   const [clickedVideos, setClickedVideos] = useState<Record<string, boolean>>({});
   const [inViewMap, setInViewMap] = useState<Record<string, boolean>>({});
   const [imageLoadReady, setImageLoadReady] = useState<Record<string, boolean>>({});
@@ -217,6 +218,7 @@ export default function LiquidBentoPortfolio({
   const [secondSectionVimeoLoadingMap, setSecondSectionVimeoLoadingMap] = useState<Record<string, boolean>>({});
   const [secondSectionVimeoLoadingProgress, setSecondSectionVimeoLoadingProgress] = useState<Record<string, number>>({});
   const [secondSectionVimeoThumbnails, setSecondSectionVimeoThumbnails] = useState<Record<string, string>>({});
+  const [secondSectionVimeoPlayingMap, setSecondSectionVimeoPlayingMap] = useState<Record<string, boolean>>({});
   const [secondSectionClickedVideos, setSecondSectionClickedVideos] = useState<Record<string, boolean>>({});
   const [secondSectionInViewMap, setSecondSectionInViewMap] = useState<Record<string, boolean>>({});
   const [secondSectionImageLoadReady, setSecondSectionImageLoadReady] = useState<Record<string, boolean>>({});
@@ -395,6 +397,17 @@ export default function LiquidBentoPortfolio({
     return arranged.slice(0, visibleCount);
   }, [items, columnCount, visibleCount]);
 
+  // Pre-fetch thumbnails for visible Vimeo videos
+  useEffect(() => {
+    visibleItems.forEach((item) => {
+      if (item.type === 'vimeo' && !vimeoThumbnails[item.src]) {
+        fetchVimeoThumbnail(item.src, setVimeoThumbnails).catch((error) => {
+          console.warn(`Failed to fetch thumbnail for ${item.src}:`, error);
+        });
+      }
+    });
+  }, [visibleItems, vimeoThumbnails]);
+
   const handlePlay = async (id: string | number, src: string) => {
     const idStr = String(id);
     if (playedMap[idStr]) {
@@ -525,6 +538,7 @@ export default function LiquidBentoPortfolio({
     setPlayedMap((prev) => ({ ...prev, [idStr]: false }));
     setVimeoLoadingMap((prev) => ({ ...prev, [idStr]: false }));
     setVimeoLoadingProgress((prev) => ({ ...prev, [idStr]: 0 }));
+    setVimeoPlayingMap((prev) => ({ ...prev, [idStr]: false }));
   };
 
   // Business Apps specific items - 16:9 and 9:16 videos
@@ -759,6 +773,7 @@ export default function LiquidBentoPortfolio({
     setSecondSectionPlayedMap((prev) => ({ ...prev, [idStr]: false }));
     setSecondSectionVimeoLoadingMap((prev) => ({ ...prev, [idStr]: false }));
     setSecondSectionVimeoLoadingProgress((prev) => ({ ...prev, [idStr]: 0 }));
+    setSecondSectionVimeoPlayingMap((prev) => ({ ...prev, [idStr]: false }));
   };
 
   // Preload first few items immediately
@@ -938,7 +953,9 @@ export default function LiquidBentoPortfolio({
     sectionHandlePlay: (id: string | number, src: string) => Promise<void>,
     sectionHandlePause: (id: string | number) => void,
     sectionInViewMap: Record<string, boolean>,
-    sectionImageLoadReady: Record<string, boolean>
+    sectionImageLoadReady: Record<string, boolean>,
+    sectionVimeoPlayingMap: Record<string, boolean>,
+    setSectionVimeoPlayingMap: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   ) => {
     const isInView = sectionInViewMap[String(item.id)] || false;
     const shouldLoadImage = sectionImageLoadReady[String(item.id)] || false;
@@ -976,7 +993,8 @@ export default function LiquidBentoPortfolio({
                   aria-hidden="true"
                 />
               )}
-              {(!sectionVimeoLoadedMap[String(item.id)] || !sectionPlayedMap[String(item.id)]) && (
+              {/* Thumbnail - shown until video actually starts playing */}
+              {!sectionVimeoPlayingMap[String(item.id)] && (
                 <>
                   {sectionVimeoThumbnails[item.src] ? (
                     <img
@@ -989,7 +1007,11 @@ export default function LiquidBentoPortfolio({
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover'
+                        objectFit: 'cover',
+                        opacity: 1,
+                        transition: 'opacity 0.5s ease',
+                        zIndex: sectionVimeoLoadingMap[String(item.id)] ? 3 : 2,
+                        display: 'block'
                       }}
                       onError={(e) => {
                         console.warn(`Thumbnail failed to load for ${item.src}`);
@@ -1033,7 +1055,8 @@ export default function LiquidBentoPortfolio({
                         background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5))',
                         color: 'rgba(255, 255, 255, 0.5)',
                         fontSize: '14px',
-                        fontFamily: 'Anybody, sans-serif'
+                        fontFamily: 'Anybody, sans-serif',
+                        zIndex: 2
                       }}
                     >
                       {item.title}
@@ -1041,7 +1064,8 @@ export default function LiquidBentoPortfolio({
                   )}
                 </>
               )}
-              {sectionVimeoLoadingMap[String(item.id)] && (() => {
+              {/* Loader - only show when loading and video is trying to play, but NOT when video is actually playing */}
+              {sectionVimeoLoadingMap[String(item.id)] && sectionPlayedMap[String(item.id)] && !sectionVimeoPlayingMap[String(item.id)] && (() => {
                 const progressMap = sectionVimeoLoadingMap === vimeoLoadingMap ? vimeoLoadingProgress : secondSectionVimeoLoadingProgress;
                 const progress = progressMap[String(item.id)] || 0;
                 return (
@@ -1050,7 +1074,7 @@ export default function LiquidBentoPortfolio({
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    zIndex: 4,
+                    zIndex: 5,
                     width: '120px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -1084,6 +1108,7 @@ export default function LiquidBentoPortfolio({
                   </div>
                 );
               })()}
+              {/* Video iframe */}
               {sectionVimeoLoadedMap[String(item.id)] ? (
                 <iframe
                   key={`vimeo-${item.id}`}
@@ -1110,19 +1135,39 @@ export default function LiquidBentoPortfolio({
                       setSecondSectionVimeoLoadingProgress((prev) => ({ ...prev, [itemIdStr]: 100 }));
                     }
                     
-                    // Hide loading bar after a brief delay to show 100%
-                    setTimeout(() => {
+                    // Hide loader and mark video as playing after video iframe loads
+                    // Use a delay to ensure video has actually started playing
+                    const markVideoPlaying = () => {
                       if (isFirstSection) {
                         setVimeoLoadingMap((prev) => ({ ...prev, [itemIdStr]: false }));
                         setVimeoLoadingProgress((prev) => ({ ...prev, [itemIdStr]: 0 }));
+                        setVimeoPlayingMap((prev) => ({ ...prev, [itemIdStr]: true }));
                       } else {
                         setSecondSectionVimeoLoadingMap((prev) => ({ ...prev, [itemIdStr]: false }));
                         setSecondSectionVimeoLoadingProgress((prev) => ({ ...prev, [itemIdStr]: 0 }));
+                        setSecondSectionVimeoPlayingMap((prev) => ({ ...prev, [itemIdStr]: true }));
                       }
-                    }, 300);
+                    };
+                    
+                    // Mark video as playing after it starts (800ms should be enough for autoplay to begin)
+                    // This will hide the loader immediately
+                    setTimeout(markVideoPlaying, 800);
+                    
+                    // Fallback: mark as playing after max 2 seconds even if video hasn't started
+                    setTimeout(markVideoPlaying, 2000);
                   }}
                   onError={(e) => {
                     console.error(`Vimeo iframe error for ${item.id} (${item.src}):`, e);
+                    // Hide loader on error
+                    const itemIdStr = String(item.id);
+                    const isFirstSection = sectionVimeoLoadingMap === vimeoLoadingMap;
+                    if (isFirstSection) {
+                      setVimeoLoadingMap((prev) => ({ ...prev, [itemIdStr]: false }));
+                      setVimeoLoadingProgress((prev) => ({ ...prev, [itemIdStr]: 0 }));
+                    } else {
+                      setSecondSectionVimeoLoadingMap((prev) => ({ ...prev, [itemIdStr]: false }));
+                      setSecondSectionVimeoLoadingProgress((prev) => ({ ...prev, [itemIdStr]: 0 }));
+                    }
                   }}
                   style={{ 
                     width: '100%', 
@@ -1133,7 +1178,10 @@ export default function LiquidBentoPortfolio({
                     left: 0,
                     border: 'none',
                     display: 'block',
-                    borderRadius: '14px'
+                    borderRadius: '14px',
+                    opacity: sectionVimeoPlayingMap[String(item.id)] ? 1 : 0,
+                        transition: 'opacity 0.5s ease',
+                        zIndex: sectionVimeoPlayingMap[String(item.id)] ? 4 : 1
                   }}
                 />
               ) : null}
@@ -1148,6 +1196,10 @@ export default function LiquidBentoPortfolio({
                     sectionHandlePlay(item.id, item.src);
                   }}
                   aria-label={`Play ${item.title}`}
+                  style={{
+                    zIndex: 6,
+                    position: 'absolute'
+                  }}
                 >
                   <span className="bento-play-icon">▶</span>
                 </button>
@@ -1205,6 +1257,10 @@ export default function LiquidBentoPortfolio({
                   className="bento-play-button"
                   onClick={() => sectionHandlePlay(item.id, item.src)}
                   aria-label={`Play ${item.title}`}
+                  style={{
+                    zIndex: 6,
+                    position: 'absolute'
+                  }}
                 >
                   <span className="bento-play-icon">▶</span>
                 </button>
@@ -1352,7 +1408,7 @@ export default function LiquidBentoPortfolio({
                         <div key={item.id} className="business-apps-slide">
                           <div className="business-apps-slide-content">
                             <div className="business-apps-media">
-                              {renderPortfolioItem(item, index, secondSectionPlayedMap, secondSectionVimeoLoadedMap, setSecondSectionVimeoLoadedMap, secondSectionVimeoLoadingMap, secondSectionVimeoThumbnails, setSecondSectionVimeoThumbnails, secondSectionItemsRef, secondSectionVideoRefs, handleSecondSectionPlay, handleSecondSectionPause, secondSectionInViewMap, secondSectionImageLoadReady)}
+                              {renderPortfolioItem(item, index, secondSectionPlayedMap, secondSectionVimeoLoadedMap, setSecondSectionVimeoLoadedMap, secondSectionVimeoLoadingMap, secondSectionVimeoThumbnails, setSecondSectionVimeoThumbnails, secondSectionItemsRef, secondSectionVideoRefs, handleSecondSectionPlay, handleSecondSectionPause, secondSectionInViewMap, secondSectionImageLoadReady, secondSectionVimeoPlayingMap, setSecondSectionVimeoPlayingMap)}
                             </div>
                             <div className="business-apps-details">
                               <h3 className="business-apps-details-title">{item.title}</h3>
@@ -1428,7 +1484,7 @@ export default function LiquidBentoPortfolio({
                           setMobileModalOpen(true);
                         }}
                       >
-                        {renderPortfolioItem(item, index, secondSectionPlayedMap, secondSectionVimeoLoadedMap, setSecondSectionVimeoLoadedMap, secondSectionVimeoLoadingMap, secondSectionVimeoThumbnails, setSecondSectionVimeoThumbnails, secondSectionItemsRef, secondSectionVideoRefs, handleSecondSectionPlay, handleSecondSectionPause, secondSectionInViewMap, secondSectionImageLoadReady)}
+                        {renderPortfolioItem(item, index, secondSectionPlayedMap, secondSectionVimeoLoadedMap, setSecondSectionVimeoLoadedMap, secondSectionVimeoLoadingMap, secondSectionVimeoThumbnails, setSecondSectionVimeoThumbnails, secondSectionItemsRef, secondSectionVideoRefs, handleSecondSectionPlay, handleSecondSectionPause, secondSectionInViewMap, secondSectionImageLoadReady, secondSectionVimeoPlayingMap, setSecondSectionVimeoPlayingMap)}
                       </div>
                     ))}
                   </div>
@@ -1456,7 +1512,7 @@ export default function LiquidBentoPortfolio({
                     </svg>
                   </button>
                   <div className="business-apps-mobile-modal-content">
-                    {renderPortfolioItem(selectedMobileItem, 0, secondSectionPlayedMap, secondSectionVimeoLoadedMap, setSecondSectionVimeoLoadedMap, secondSectionVimeoLoadingMap, secondSectionVimeoThumbnails, setSecondSectionVimeoThumbnails, secondSectionItemsRef, secondSectionVideoRefs, handleSecondSectionPlay, handleSecondSectionPause, secondSectionInViewMap, secondSectionImageLoadReady)}
+                    {renderPortfolioItem(selectedMobileItem, 0, secondSectionPlayedMap, secondSectionVimeoLoadedMap, setSecondSectionVimeoLoadedMap, secondSectionVimeoLoadingMap, secondSectionVimeoThumbnails, setSecondSectionVimeoThumbnails, secondSectionItemsRef, secondSectionVideoRefs, handleSecondSectionPlay, handleSecondSectionPause, secondSectionInViewMap, secondSectionImageLoadReady, secondSectionVimeoPlayingMap, setSecondSectionVimeoPlayingMap)}
                   </div>
                   <div className="business-apps-mobile-modal-details">
                     <h3 className="business-apps-mobile-modal-title">{selectedMobileItem.title}</h3>
@@ -1483,7 +1539,7 @@ export default function LiquidBentoPortfolio({
         ) : (
         <div className="liquid-bento-grid">
             {displayItems.map((item, index) => 
-            renderPortfolioItem(item, index, secondSectionPlayedMap, secondSectionVimeoLoadedMap, setSecondSectionVimeoLoadedMap, secondSectionVimeoLoadingMap, secondSectionVimeoThumbnails, setSecondSectionVimeoThumbnails, secondSectionItemsRef, secondSectionVideoRefs, handleSecondSectionPlay, handleSecondSectionPause, secondSectionInViewMap, secondSectionImageLoadReady)
+            renderPortfolioItem(item, index, secondSectionPlayedMap, secondSectionVimeoLoadedMap, setSecondSectionVimeoLoadedMap, secondSectionVimeoLoadingMap, secondSectionVimeoThumbnails, setSecondSectionVimeoThumbnails, secondSectionItemsRef, secondSectionVideoRefs, handleSecondSectionPlay, handleSecondSectionPause, secondSectionInViewMap, secondSectionImageLoadReady, secondSectionVimeoPlayingMap, setSecondSectionVimeoPlayingMap)
           )}
         </div>
         )}
