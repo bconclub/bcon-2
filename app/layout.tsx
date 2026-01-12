@@ -5,7 +5,7 @@ import TrackingProvider from '@/components/Tracking/TrackingProvider';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://bconclub.com'),
-  title: 'BCON Club | Human X AI Powered Business Solutions',
+  title: 'BCON | Human X AI Powered Business Solutions',
   description: 'Intelligent marketing systems. Powered by AI and human creativity.',
   keywords: 'AI marketing, marketing automation, PROXe, Human X AI, business growth',
   icons: {
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     apple: '/favicon.ico',
   },
   openGraph: {
-    title: 'BCON Club | Human X AI Powered Business Solutions',
+    title: 'BCON | Human X AI Powered Business Solutions',
     description: 'Intelligent marketing systems. Powered by AI and human creativity.',
     url: 'https://bconclub.com',
     siteName: 'BCON Club',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BCON Club | Human X AI Powered Business Solutions',
+    title: 'BCON | Human X AI Powered Business Solutions',
     description: 'Intelligent marketing systems',
     images: ['/og-image.png'],
   }
