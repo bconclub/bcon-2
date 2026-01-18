@@ -79,12 +79,13 @@ jobs:
           cp next.config.js tsconfig.json package.json package-lock.json ecosystem.config.js deploy/
           
           # Create .env.build file with git information for Next.js build
-          cat > deploy/.env.build << EOF
-          NEXT_PUBLIC_GIT_COMMIT_HASH=${{ steps.git_info.outputs.commit_hash }}
-          NEXT_PUBLIC_GIT_COMMIT_MESSAGE=${{ steps.git_info.outputs.commit_message }}
-          NEXT_PUBLIC_GIT_BRANCH=${{ steps.git_info.outputs.branch }}
-          NEXT_PUBLIC_VERSION=${{ steps.git_info.outputs.version }}
-          EOF
+          # Properly quote commit message to handle special characters
+          {
+            echo "NEXT_PUBLIC_GIT_COMMIT_HASH=${{ steps.git_info.outputs.commit_hash }}"
+            echo "NEXT_PUBLIC_GIT_COMMIT_MESSAGE=\"${{ steps.git_info.outputs.commit_message }}\""
+            echo "NEXT_PUBLIC_GIT_BRANCH=${{ steps.git_info.outputs.branch }}"
+            echo "NEXT_PUBLIC_VERSION=${{ steps.git_info.outputs.version }}"
+          } > deploy/.env.build
           
           # Create tarball
           tar -czf deploy.tar.gz -C deploy .
@@ -130,8 +131,10 @@ jobs:
             # Load build environment variables from .env.build file (if exists)
             if [ -f .env.build ]; then
               echo "📋 Loading build environment variables from .env.build..."
-              # Export all variables from .env.build for Next.js build
-              export $(cat .env.build | grep -v '^#' | xargs)
+              # Safely source the .env.build file (set -a enables auto-export of variables)
+              set -a
+              source .env.build
+              set +a
               echo "✅ Loaded git info: COMMIT=$NEXT_PUBLIC_GIT_COMMIT_HASH, BRANCH=$NEXT_PUBLIC_GIT_BRANCH, VERSION=$NEXT_PUBLIC_VERSION"
             else
               echo "⚠️ Warning: .env.build not found - git info may not be available"
