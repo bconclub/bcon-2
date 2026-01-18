@@ -49,8 +49,9 @@ jobs:
           
           echo "New version: $NEW_VERSION"
           
-          # Update package.json version
-          npm version $NEW_VERSION --no-git-tag-version
+          # Update package.json version manually (since we use 2-decimal format, not 3)
+          # npm version requires 3-part versions, so we'll update package.json directly
+          node -e "const fs = require('fs'); const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); pkg.version = '$NEW_VERSION'; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
           
           # Commit version change and push back to trigger deployment with new version
           git config user.name "github-actions[bot]"
