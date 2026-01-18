@@ -35,15 +35,14 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "Current version: $CURRENT_VERSION"
           
-          # Parse version (format: MAJOR.MINOR.PATCH)
+          # Parse version (format: MAJOR.MINOR or MAJOR.MINOR.PATCH)
           IFS='.' read -r -a version_parts <<< "$CURRENT_VERSION"
           MAJOR=${version_parts[0]}
           MINOR=${version_parts[1]}
-          PATCH=${version_parts[2]:-0}
           
           # Increment minor version (e.g., 1.11 -> 1.12)
           NEW_MINOR=$((MINOR + 1))
-          NEW_VERSION="$MAJOR.$NEW_MINOR.0"
+          NEW_VERSION="$MAJOR.$NEW_MINOR"
           
           echo "New version: $NEW_VERSION"
           
