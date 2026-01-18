@@ -58,13 +58,30 @@ jobs:
           
           echo "✅ Version updated to $NEW_VERSION and pushed to production"
 
+      - name: Get Git Information
+        id: git_info
+        run: |
+          echo "commit_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "commit_message=$(git log -1 --pretty=%s | sed 's/"/\\"/g')" >> $GITHUB_OUTPUT
+          echo "branch=$(git branch --show-current || echo 'production')" >> $GITHUB_OUTPUT
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
       - name: Create deployment package
         run: |
           # Create package with source files (build will happen on VPS)
           mkdir -p deploy
           # Copy source directories and config files
-          cp -r app components sections lib public effects types deploy/
+          cp -r app components sections lib public effects types deploy/ || true
           cp next.config.js tsconfig.json package.json package-lock.json ecosystem.config.js deploy/
+          
+          # Create .env.build file with git information for Next.js build
+          cat > deploy/.env.build << EOF
+          NEXT_PUBLIC_GIT_COMMIT_HASH=${{ steps.git_info.outputs.commit_hash }}
+          NEXT_PUBLIC_GIT_COMMIT_MESSAGE=${{ steps.git_info.outputs.commit_message }}
+          NEXT_PUBLIC_GIT_BRANCH=${{ steps.git_info.outputs.branch }}
+          NEXT_PUBLIC_VERSION=${{ steps.git_info.outputs.version }}
+          EOF
+          
           # Create tarball
           tar -czf deploy.tar.gz -C deploy .
 
@@ -106,12 +123,22 @@ jobs:
               echo "⚠️ Warning: .env.local not found!"
             fi
             
+            # Load build environment variables from .env.build file (if exists)
+            if [ -f .env.build ]; then
+              echo "📋 Loading build environment variables from .env.build..."
+              # Export all variables from .env.build for Next.js build
+              export $(cat .env.build | grep -v '^#' | xargs)
+              echo "✅ Loaded git info: COMMIT=$NEXT_PUBLIC_GIT_COMMIT_HASH, BRANCH=$NEXT_PUBLIC_GIT_BRANCH, VERSION=$NEXT_PUBLIC_VERSION"
+            else
+              echo "⚠️ Warning: .env.build not found - git info may not be available"
+            fi
+            
             # Install production dependencies
             echo "📥 Installing dependencies..."
             npm ci || { echo "❌ npm install failed"; exit 1; }
             
             # Build - CRITICAL: stop if this fails
-            echo "🔨 Building application..."
+            echo "🔨 Building application with git info..."
             npm run build || { echo "❌ Build failed"; exit 1; }
             
             # Only restart if build succeeded
