@@ -33,14 +33,12 @@ export async function sendToWebhook(data: TrackingData): Promise<WebhookResponse
       sessionId: data.sessionId,
       userId: data.userId,
       
-      // UTM parameters (flattened for easier access)
-      ...(data.utm && {
-        utm_source: data.utm.utm_source,
-        utm_medium: data.utm.utm_medium,
-        utm_campaign: data.utm.utm_campaign,
-        utm_term: data.utm.utm_term,
-        utm_content: data.utm.utm_content,
-      }),
+      // UTM parameters (always included, even if null/undefined)
+      utm_source: data.utm?.utm_source || null,
+      utm_medium: data.utm?.utm_medium || null,
+      utm_campaign: data.utm?.utm_campaign || null,
+      utm_term: data.utm?.utm_term || null,
+      utm_content: data.utm?.utm_content || null,
       
       // All additional data (form fields, form metadata, page context, etc.) - flattened
       ...data.additionalData,
