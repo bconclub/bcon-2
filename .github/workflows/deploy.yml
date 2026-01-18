@@ -38,20 +38,20 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "Current version: $CURRENT_VERSION"
           
-          # Parse version (format: MAJOR.MINOR or MAJOR.MINOR.PATCH)
+          # Parse version (format: MAJOR.MINOR.PATCH or MAJOR.MINOR)
           IFS='.' read -r -a version_parts <<< "$CURRENT_VERSION"
           MAJOR=${version_parts[0]}
           MINOR=${version_parts[1]}
+          PATCH=${version_parts[2]:-0}  # Default to 0 if patch version doesn't exist
           
-          # Increment minor version (e.g., 1.11 -> 1.12)
+          # Increment minor version and reset patch to 0 (e.g., 1.12.5 -> 1.13.0, or 1.12 -> 1.13.0)
           NEW_MINOR=$((MINOR + 1))
-          NEW_VERSION="$MAJOR.$NEW_MINOR"
+          NEW_VERSION="$MAJOR.$NEW_MINOR.0"
           
           echo "New version: $NEW_VERSION"
           
-          # Update package.json version manually (since we use 2-decimal format, not 3)
-          # npm version requires 3-part versions, so we'll update package.json directly
-          node -e "const fs = require('fs'); const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); pkg.version = '$NEW_VERSION'; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');"
+          # Update package.json version using npm (requires 3-part version format)
+          npm version $NEW_VERSION --no-git-tag-version
           
           # Commit version change and push back to trigger deployment with new version
           git config user.name "github-actions[bot]"
