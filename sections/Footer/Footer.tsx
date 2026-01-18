@@ -3,8 +3,6 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { InstagramIcon, LinkedInIcon, YouTubeIcon, FacebookIcon, XIcon } from '@/components/shared/Icons';
-import { sendToWebhook } from '@/lib/tracking/webhook';
-import { getTrackingData } from '@/lib/tracking/utm';
 import './Footer.css';
 
 interface FooterProps {
@@ -84,33 +82,14 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
     if (!email || isSubmitting) return;
     
     setIsSubmitting(true);
-    try {
-      // Send newsletter subscription to webhook with all tracking info
-      const trackingData = getTrackingData('form_submit', {
-        formType: 'newsletter',
-        // Form data
-        email: email,
-        source: 'footer',
-        // Additional context
-        timestamp: new Date().toISOString(),
-        page: typeof window !== 'undefined' ? window.location.pathname : '',
-        fullUrl: typeof window !== 'undefined' ? window.location.href : '',
-      });
-
-      // Send to webhook - includes UTM params, referrer, userAgent, sessionId, etc.
-      await sendToWebhook(trackingData);
-      
-      // On success, hide form and show confirmation
-      setIsSubscribed(true);
-      setEmail('');
-    } catch (error) {
-      console.error('Newsletter subscription error:', error);
-      // Still show success to user even if webhook fails
-      setIsSubscribed(true);
-      setEmail('');
-    } finally {
-      setIsSubmitting(false);
-    }
+    
+    // All tracking data is handled by TrackingProvider through data-form-type attribute
+    // No need for explicit webhook calls here - TrackingProvider sends one consolidated webhook
+    
+    // On success, hide form and show confirmation
+    setIsSubscribed(true);
+    setEmail('');
+    setIsSubmitting(false);
   };
 
   const isInternalLink = (href: string) => {
@@ -147,7 +126,7 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
                 </p>
               </div>
             ) : (
-              <form className="newsletter-form" onSubmit={handleSubscribe}>
+              <form className="newsletter-form" onSubmit={handleSubscribe} data-form-type="newsletter">
                 <input
                   type="email"
                   placeholder="Email"

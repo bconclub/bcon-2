@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, Suspense } from 'react';
-import { getTrackingData, getUTMParamsFromURL, storeUTMParams, getSessionId } from '@/lib/tracking/utm';
+import { getTrackingData, getUTMParamsFromURL, storeUTMParams, getSessionId, getUTMParams } from '@/lib/tracking/utm';
 import { sendToWebhook } from '@/lib/tracking/webhook';
 
 /**
@@ -23,7 +23,7 @@ function TrackingComponent({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Track form submissions only
+    // Track form submissions only - ALL tracking data goes through one webhook
     const handleSubmit = (event: Event) => {
       const form = event.target as HTMLFormElement;
       
@@ -54,8 +54,39 @@ function TrackingComponent({ children }: { children: React.ReactNode }) {
         }
       }
       
+      // Get form type from data attribute (set by form components)
+      const formType = form.dataset.formType || 'general';
+      
+      // Get traffic source from UTM params or referrer
+      // Priority: utm_source > referrer domain > 'direct'
+      let trafficSource: string | undefined;
+      const utmParams = getUTMParams();
+      
+      if (utmParams.utm_source) {
+        trafficSource = utmParams.utm_source;
+      } else if (typeof document !== 'undefined' && document.referrer) {
+        try {
+          const referrerUrl = new URL(document.referrer);
+          // Exclude same domain as traffic source
+          if (referrerUrl.hostname !== window.location.hostname) {
+            trafficSource = referrerUrl.hostname;
+          } else {
+            trafficSource = 'direct';
+          }
+        } catch {
+          trafficSource = 'direct';
+        }
+      } else {
+        trafficSource = 'direct';
+      }
+      
       // Get tracking data with ALL session details (UTM params, session ID, referrer, etc.)
+      // This consolidates all tracking data into one webhook call
       const trackingData = getTrackingData('form_submit', {
+        // Form type and traffic source
+        formType: formType,
+        source: trafficSource,
+        
         // Form details
         formId: form.id || undefined,
         formAction: form.action || undefined,
@@ -64,6 +95,7 @@ function TrackingComponent({ children }: { children: React.ReactNode }) {
         
         // Page context
         pageTitle: typeof document !== 'undefined' ? document.title : undefined,
+        fullUrl: typeof window !== 'undefined' ? window.location.href : undefined,
         viewport: typeof window !== 'undefined' 
           ? { width: window.innerWidth, height: window.innerHeight }
           : undefined,
@@ -76,8 +108,8 @@ function TrackingComponent({ children }: { children: React.ReactNode }) {
           : undefined,
       });
 
-      // Send immediately to webhook with all session details
-      // This includes: formData, UTM params, sessionId, page, path, referrer, userAgent, timestamp
+      // Send immediately to webhook with ALL tracking data in one call
+      // This includes: formType, formData, UTM params, sessionId, page, path, referrer, userAgent, timestamp, etc.
       sendToWebhook(trackingData).catch(error => {
         console.error('Failed to send form submission to webhook:', error);
       });

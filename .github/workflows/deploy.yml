@@ -12,12 +12,52 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
+
+      - name: Auto-increment version on production push
+        if: github.event_name == 'push' && github.ref == 'refs/heads/production' && !contains(github.event.head_commit.message, '[skip version]')
+        run: |
+          # Skip if this is already a version bump commit to avoid infinite loops
+          if [[ "${{ github.event.head_commit.message }}" == *"[skip ci]"* ]] || [[ "${{ github.event.head_commit.message }}" == *"chore: auto-increment version"* ]]; then
+            echo "⏭️ Skipping version bump - this is already a version update commit"
+            exit 0
+          fi
+          
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Parse version (format: MAJOR.MINOR.PATCH)
+          IFS='.' read -r -a version_parts <<< "$CURRENT_VERSION"
+          MAJOR=${version_parts[0]}
+          MINOR=${version_parts[1]}
+          PATCH=${version_parts[2]:-0}
+          
+          # Increment minor version (e.g., 1.11 -> 1.12)
+          NEW_MINOR=$((MINOR + 1))
+          NEW_VERSION="$MAJOR.$NEW_MINOR.0"
+          
+          echo "New version: $NEW_VERSION"
+          
+          # Update package.json version
+          npm version $NEW_VERSION --no-git-tag-version
+          
+          # Commit version change and push back to trigger deployment with new version
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: auto-increment version to $NEW_VERSION [skip ci]" || exit 0
+          git push origin production || exit 0
+          
+          echo "✅ Version updated to $NEW_VERSION and pushed to production"
 
       - name: Create deployment package
         run: |

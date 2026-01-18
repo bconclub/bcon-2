@@ -121,8 +121,8 @@
   
   .modal-content {
     position: relative;
-    width: 90vh;
-    max-width: 450px;
+    width: 72vh; /* 20% smaller: 90vh * 0.8 = 72vh */
+    max-width: 360px; /* 20% smaller: 450px * 0.8 = 360px */
     aspect-ratio: 9 / 16;
     background: #000000;
     border-radius: 16px;

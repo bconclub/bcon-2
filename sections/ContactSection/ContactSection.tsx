@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { sendToWebhook } from '@/lib/tracking/webhook';
-import { getTrackingData, getUTMParams } from '@/lib/tracking/utm';
 import './ContactSection.css';
 
 interface FormData {
@@ -67,46 +65,8 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
 
     if (Object.keys(newErrors).length > 0) return;
 
-    // Send form data to webhook with all tracking info including UTM parameters
-    try {
-      // Get UTM params from sessionStorage
-      const utmParams = typeof window !== 'undefined' ? getUTMParams() : {};
-      
-      // Get session ID
-      const sessionId = typeof window !== 'undefined' 
-        ? sessionStorage.getItem('session_id') || null 
-        : null;
-
-      // Build payload with explicit UTM parameters
-      const trackingData = getTrackingData('form_submit', {
-        formType: 'contact',
-        // Form data
-        name: formData.name,
-        phone: formData.phone || '',
-        email: formData.email,
-        service: formData.service,
-        // UTM parameters (explicitly included)
-        utm_source: utmParams.utm_source || null,
-        utm_medium: utmParams.utm_medium || null,
-        utm_campaign: utmParams.utm_campaign || null,
-        utm_term: utmParams.utm_term || null,
-        utm_content: utmParams.utm_content || null,
-        // Additional context
-        timestamp: new Date().toISOString(),
-        page: typeof window !== 'undefined' ? window.location.pathname : '',
-        path: typeof window !== 'undefined' ? window.location.pathname + window.location.search : '',
-        referrer: typeof document !== 'undefined' ? document.referrer : '',
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        sessionId: sessionId,
-        fullUrl: typeof window !== 'undefined' ? window.location.href : '',
-      });
-
-      // Send to webhook - includes UTM params, referrer, userAgent, sessionId, etc.
-      await sendToWebhook(trackingData);
-    } catch (error) {
-      console.error('Error sending form data to webhook:', error);
-      // Continue even if webhook fails - don't block user experience
-    }
+    // All tracking data is handled by TrackingProvider through data-form-type attribute
+    // No need for explicit webhook calls here - TrackingProvider sends one consolidated webhook
 
     // Redirect to thank you page
     router.push('/thank-you');
@@ -156,7 +116,7 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
         </div>
 
         <div className="contact-right">
-          <form className="contact-form" onSubmit={handleSubmit}>
+          <form className="contact-form" onSubmit={handleSubmit} data-form-type="Lead Form">
             <div className="form-group">
               <input
                 type="text"

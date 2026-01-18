@@ -35,9 +35,7 @@ export default function Home() {
   const socialItems = [
     { label: 'Instagram', link: 'https://www.instagram.com/bconclub/' },
     { label: 'LinkedIn', link: 'https://www.linkedin.com/company/bconclub' },
-    { label: 'YouTube', link: 'https://www.youtube.com/@bconclub' },
-    { label: 'Facebook', link: 'https://www.facebook.com/bconclub' },
-    { label: 'X', link: 'https://x.com/bconclub' }
+    { label: 'YouTube', link: 'https://www.youtube.com/@bconclub' }
   ];
 
   return (
