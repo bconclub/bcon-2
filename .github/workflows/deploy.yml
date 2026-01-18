@@ -99,8 +99,8 @@ jobs:
           source: "deploy.tar.gz"
           target: "/tmp/"
           port: 22
-          timeout: 60s
-          command_timeout: 120s
+          timeout: 120s
+          command_timeout: 300s
           debug: true
 
       - name: Deploy on VPS
@@ -110,7 +110,7 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_DEPLOY_KEY }}
           port: 22
-          timeout: 60s
+          timeout: 120s
           command_timeout: 300s
           debug: true
           script: |
