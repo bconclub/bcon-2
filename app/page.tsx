@@ -117,7 +117,7 @@ export default function Home() {
       </section>
     
       {/* ==================== SECTION 3: SERVICES GRID ==================== */}
-      <section className="section-three">
+      <section id="solutions" className="section-three">
         <div className="section-container">
           <h2 className="section-heading">Solutions</h2>
           <ServicesGrid onServiceClick={() => setShowComingSoon(true)} />

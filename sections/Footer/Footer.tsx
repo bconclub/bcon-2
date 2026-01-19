@@ -106,8 +106,8 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
   };
 
   const companyLinks = [
-    { label: 'Work', href: '/work', className: 'company-link-work' },
-    { label: 'Solutions', href: '/services', className: 'company-link-solutions' },
+    { label: 'Work', href: '/#our-work', className: 'company-link-work' },
+    { label: 'Solutions', href: '/#solutions', className: 'company-link-solutions' },
     { label: 'Contact', href: '/#contact', className: 'company-link-contact' },
   ];
 
@@ -149,16 +149,25 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
               {companyLinks.map((link) => (
                 <li key={link.href}>
                   {link.href.startsWith('/#') ? (
-                    // Hash link (like /#contact) - navigate to homepage and scroll
+                    // Hash link (like /#contact, /#our-work, /#solutions) - navigate to homepage and scroll
                     <a
                       href={link.href}
                       className={`footer-link ${link.className || ''}`}
                       onClick={(e) => {
-                        if (typeof window !== 'undefined' && window.location.pathname !== '/') {
-                          e.preventDefault();
-                          window.location.href = link.href;
+                        e.preventDefault();
+                        if (typeof window !== 'undefined') {
+                          if (window.location.pathname !== '/') {
+                            // If not on homepage, navigate to homepage first
+                            window.location.href = link.href;
+                          } else {
+                            // If on homepage, scroll to section
+                            const hash = link.href.split('#')[1];
+                            const element = document.getElementById(hash);
+                            if (element) {
+                              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }
                         }
-                        // If on homepage, let default scroll behavior work
                       }}
                     >
                       {link.label}

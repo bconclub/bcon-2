@@ -1366,7 +1366,7 @@ export default function LiquidBentoPortfolio({
 
   return (
     <>
-      <section className="liquid-bento-section">
+      <section id="our-work" className="liquid-bento-section">
         <div className="bento-header">
           <p className="bento-eyebrow">{eyebrowText}</p>
           <h2 className="bento-heading">{headingText}</h2>
