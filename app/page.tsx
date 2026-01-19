@@ -19,15 +19,28 @@ export default function Home() {
 
   // Menu configuration
   const menuItems = [
-    { label: 'Work', ariaLabel: 'View our work', link: '/work' },
-    { label: 'Solutions', ariaLabel: 'View our solutions', link: '/services' },
-    { label: 'Contact', ariaLabel: 'Get in touch', link: '#contact' } // Scrolls to contact section
+    { label: 'Work', ariaLabel: 'View our work', link: '/#our-work' },
+    { label: 'Solutions', ariaLabel: 'View our solutions', link: '/#solutions' },
+    { label: 'Contact', ariaLabel: 'Get in touch', link: '/#contact' }
   ];
 
   const handleMenuItemClick = (item: { label: string; ariaLabel: string; link: string }) => {
-    // Show Coming Soon modal for internal page links
-    // Keep contact (#contact) working - scrolls to contact section
-    if (!item.link.startsWith('#')) {
+    // Handle hash links - scroll to sections
+    if (item.link.startsWith('/#')) {
+      const hash = item.link.split('#')[1];
+      const element = document.getElementById(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else if (item.link.startsWith('#')) {
+      // Handle hash links without leading slash
+      const hash = item.link.substring(1);
+      const element = document.getElementById(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else if (!item.link.startsWith('http') && !item.link.startsWith('mailto:') && !item.link.startsWith('tel:')) {
+      // Show Coming Soon modal for other internal page links
       setShowComingSoon(true);
     }
   };
