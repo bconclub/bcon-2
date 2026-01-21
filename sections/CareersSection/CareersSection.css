@@ -1,0 +1,188 @@
+.careers-section {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  padding: clamp(64px, 10vw, 120px) clamp(20px, 6vw, 80px);
+}
+
+.careers-section .careers-stars,
+.careers-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.careers-stars {
+  background:
+    radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 30% 40%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 70% 30%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 90% 80%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 50% 70%, rgba(255, 255, 255, 0.6), transparent);
+  animation: careers-twinkle 6s ease-in-out infinite alternate;
+  opacity: 0.5;
+}
+
+.careers-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  align-items: center;
+  gap: clamp(24px, 5vw, 64px);
+  z-index: 1;
+}
+
+.careers-astronaut {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.astro-orbit {
+  width: min(320px, 40vw);
+  height: min(320px, 40vw);
+  background: radial-gradient(circle at 30% 30%, rgba(204, 255, 0, 0.2), rgba(204, 255, 0, 0) 60%);
+  border: 1px solid rgba(204, 255, 0, 0.2);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  animation: astro-bob 3s ease-in-out infinite;
+}
+
+.astro-body {
+  font-size: min(140px, 18vw);
+  filter: drop-shadow(0 0 12px rgba(204, 255, 0, 0.5));
+}
+
+.careers-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.careers-kicker {
+  color: #cdfc2e;
+  font-size: clamp(32px, 3vw, 48px);
+  letter-spacing: 2px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.careers-title {
+  margin: 0;
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 600;
+  color: #fff;
+}
+
+.careers-positions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0 8px;
+}
+
+.careers-position {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.careers-role {
+  font-size: clamp(16px, 1.6vw, 18px);
+  font-weight: 600;
+  color: #fff;
+}
+
+.careers-desc {
+  font-size: clamp(13px, 1.2vw, 14px);
+  color: #a0a0a0;
+}
+
+.careers-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 22px;
+  margin-top: 12px;
+  background: #cdfc2e;
+  color: #000;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  width: fit-content;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.careers-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(205, 252, 46, 0.25);
+}
+
+.careers-cta:active {
+  transform: translateY(0);
+}
+
+.careers-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.6s ease;
+}
+
+.careers-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+  .careers-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .careers-content {
+    align-items: center;
+  }
+
+  .careers-positions {
+    align-items: center;
+  }
+
+  .careers-position {
+    justify-content: center;
+  }
+
+  .careers-cta {
+    width: 100%;
+    max-width: 260px;
+  }
+}
+
+@keyframes astro-bob {
+  0% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes careers-twinkle {
+  0% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
