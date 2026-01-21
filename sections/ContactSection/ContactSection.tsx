@@ -7,6 +7,8 @@ import './ContactSection.css';
 
 interface FormData {
   name: string;
+  brandName: string;
+  website: string;
   phone: string;
   email: string;
   service: string;
@@ -20,13 +22,15 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     name: '',
+    brandName: '',
+    website: 'https://',
     phone: '',
     email: '',
     service: ''
   });
 
   const services = [
-    { value: '', label: 'Select a solution' },
+    { value: '', label: 'Select Solution' },
     { value: 'ai-in-business', label: 'AI in Business' },
     { value: 'brand-marketing', label: 'Brand Marketing' },
     { value: 'business-apps', label: 'Business Apps' },
@@ -152,20 +156,44 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
               />
             </div>
 
+            <div className="form-row">
+              <div className="form-group form-group-half">
+                <select
+                  name="service"
+                  value={formData.service}
+                  onChange={handleChange}
+                  className="form-input form-select"
+                >
+                  {services.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.service && <div className="form-error">{errors.service}</div>}
+              </div>
+
+              <div className="form-group form-group-half">
+                <input
+                  type="text"
+                  name="brandName"
+                  placeholder="Brand Name"
+                  value={formData.brandName}
+                  onChange={handleChange}
+                  className="form-input"
+                />
+              </div>
+            </div>
+
             <div className="form-group">
-              <select
-                name="service"
-                value={formData.service}
+              <input
+                type="url"
+                name="website"
+                placeholder="Website"
+                value={formData.website}
                 onChange={handleChange}
-                className="form-input form-select"
-              >
-                {services.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-              {errors.service && <div className="form-error">{errors.service}</div>}
+                className="form-input"
+              />
             </div>
 
             <button type="submit" className="submit-button">
