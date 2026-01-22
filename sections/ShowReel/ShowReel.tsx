@@ -99,6 +99,7 @@ export default function ShowReel() {
                 onLoadedData={() => {
                   setVideoLoaded(true);
                   if (videoRef.current) {
+                    videoRef.current.currentTime = 7;
                     videoRef.current.play().catch(() => {});
                   }
                 }}
