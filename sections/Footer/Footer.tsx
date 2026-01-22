@@ -105,6 +105,17 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
     }
   };
 
+  const handleSocialClick = (platform: string, linkUrl: string, linkText: string) => {
+    if (typeof window !== 'undefined' && (window as any).dataLayer) {
+      (window as any).dataLayer.push({
+        'event': 'social_click',
+        'platform': platform,
+        'link_url': linkUrl,
+        'link_text': linkText
+      });
+    }
+  };
+
   const companyLinks = [
     { label: 'Work', href: '/#our-work', className: 'company-link-work' },
     { label: 'Solutions', href: '/#solutions', className: 'company-link-solutions' },
@@ -240,6 +251,7 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
               rel="noopener noreferrer"
               className="footer-social-icon-link"
               aria-label="Instagram"
+              onClick={() => handleSocialClick('Instagram', 'https://www.instagram.com/bconclub', 'Instagram')}
             >
               <InstagramIcon size={32} color="#E4405F" />
             </a>
@@ -249,6 +261,7 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
               rel="noopener noreferrer"
               className="footer-social-icon-link"
               aria-label="LinkedIn"
+              onClick={() => handleSocialClick('LinkedIn', 'https://www.linkedin.com/company/bconclub', 'LinkedIn')}
             >
               <LinkedInIcon size={32} color="#0077B5" />
             </a>
@@ -258,6 +271,7 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
               rel="noopener noreferrer"
               className="footer-social-icon-link"
               aria-label="YouTube"
+              onClick={() => handleSocialClick('YouTube', 'https://www.youtube.com/@bconclub', 'YouTube')}
             >
               <YouTubeIcon size={32} color="#FF0000" />
             </a>
@@ -267,6 +281,7 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
               rel="noopener noreferrer"
               className="footer-social-icon-link"
               aria-label="Facebook"
+              onClick={() => handleSocialClick('Facebook', 'https://www.facebook.com/bconclub', 'Facebook')}
             >
               <FacebookIcon size={32} color="#1877F2" />
             </a>
@@ -276,6 +291,7 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
               rel="noopener noreferrer"
               className="footer-social-icon-link"
               aria-label="X"
+              onClick={() => handleSocialClick('X', 'https://x.com/bconclub', 'X')}
             >
               <XIcon size={32} color="#FFFFFF" />
             </a>
