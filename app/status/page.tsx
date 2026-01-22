@@ -112,6 +112,7 @@ export default function StatusPage() {
     }
   };
 
+
   if (loading && !statusData) {
     return (
       <div className="status-container">
