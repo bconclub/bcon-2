@@ -8,7 +8,6 @@ import './ContactSection.css';
 interface FormData {
   name: string;
   brandName: string;
-  website: string;
   phone: string;
   email: string;
   service: string;
@@ -23,7 +22,6 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
   const [formData, setFormData] = useState<FormData>({
     name: '',
     brandName: '',
-    website: 'https://',
     phone: '',
     email: '',
     service: ''
@@ -156,24 +154,24 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group form-group-half">
-                <select
-                  name="service"
-                  value={formData.service}
-                  onChange={handleChange}
-                  className="form-input form-select"
-                >
-                  {services.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-                {errors.service && <div className="form-error">{errors.service}</div>}
-              </div>
+            <div className="form-group">
+              <select
+                name="service"
+                value={formData.service}
+                onChange={handleChange}
+                className="form-input form-select"
+              >
+                {services.map((s) => (
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+              {errors.service && <div className="form-error">{errors.service}</div>}
+            </div>
 
-              <div className="form-group form-group-half">
+            {formData.service && (
+              <div className="form-group">
                 <input
                   type="text"
                   name="brandName"
@@ -183,18 +181,7 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
                   className="form-input"
                 />
               </div>
-            </div>
-
-            <div className="form-group">
-              <input
-                type="url"
-                name="website"
-                placeholder="Website"
-                value={formData.website}
-                onChange={handleChange}
-                className="form-input"
-              />
-            </div>
+            )}
 
             <button type="submit" className="submit-button">
               Submit
