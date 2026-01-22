@@ -69,9 +69,12 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
 
     // All tracking data is handled by TrackingProvider through data-form-type attribute
     // No need for explicit webhook calls here - TrackingProvider sends one consolidated webhook
+    // GTM event is pushed to dataLayer by TrackingProvider before redirect
 
-    // Redirect to thank you page
-    router.push('/thank-you');
+    // Add small delay to ensure GTM event fires before redirect
+    setTimeout(() => {
+      router.push('/thank-you');
+    }, 100);
   };
 
   return (

@@ -25,6 +25,11 @@ function TrackingComponent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Track form submissions only - ALL tracking data goes through one webhook
     const handleSubmit = (event: Event) => {
+      // Exclude admin forms from tracking
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+        return;
+      }
+
       const form = event.target as HTMLFormElement;
       
       // Collect all form field values
@@ -107,6 +112,15 @@ function TrackingComponent({ children }: { children: React.ReactNode }) {
           ? { width: window.screen.width, height: window.screen.height }
           : undefined,
       });
+
+      // Push to GTM dataLayer FIRST (before any redirect)
+      if (typeof window !== 'undefined' && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          'event': 'web_lead',
+          'formType': formType,
+          'source': trafficSource
+        });
+      }
 
       // Send immediately to webhook with ALL tracking data in one call
       // This includes: formType, formData, UTM params, sessionId, page, path, referrer, userAgent, timestamp, etc.
