@@ -226,6 +226,13 @@
     100% { transform: rotate(360deg); }
   }
   
+  /* Desktop - Add top padding */
+  @media (min-width: 769px) {
+    .showreel-section {
+      padding-top: 70px; /* 30px original + 40px additional */
+    }
+  }
+
   /* Mobile Responsive */
   @media (max-width: 768px) {
     .showreel-section {

@@ -100,7 +100,19 @@ export default function ShowReel() {
                   setVideoLoaded(true);
                   if (videoRef.current) {
                     videoRef.current.currentTime = 7;
+                    // Ensure video starts at exactly 7 seconds
+                    videoRef.current.addEventListener('timeupdate', () => {
+                      if (videoRef.current && videoRef.current.currentTime < 7) {
+                        videoRef.current.currentTime = 7;
+                      }
+                    }, { once: true });
                     videoRef.current.play().catch(() => {});
+                  }
+                }}
+                onCanPlay={() => {
+                  // Additional safeguard to ensure video starts at 7 seconds
+                  if (videoRef.current && videoRef.current.currentTime < 7) {
+                    videoRef.current.currentTime = 7;
                   }
                 }}
                 onEnded={closeModal}

@@ -51,6 +51,13 @@ code {
   margin: 0;
 }
 
+/* Desktop - Add top padding to hero section */
+@media (min-width: 769px) {
+  .container {
+    padding-top: 80px;
+  }
+}
+
 .content {
   text-align: center;
   color: white;
