@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import './BusinessAppsSection.css';
 
 interface BusinessApp {
@@ -189,11 +190,25 @@ function BusinessAppModal({ app, isOpen, onClose, onCaseStudyClick }: BusinessAp
 }
 
 export default function BusinessAppsSection({ onCaseStudyClick }: BusinessAppsSectionProps = {}) {
+  const router = useRouter();
   const [selectedApp, setSelectedApp] = useState<BusinessApp | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const mobileVideoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const desktopVideoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  const handleGetQuote = () => {
+    // Track quote button click
+    if (typeof window !== 'undefined' && (window as any).dataLayer) {
+      (window as any).dataLayer.push({
+        'event': 'pricing_quote_button_clicked',
+        'source': 'business_apps_section'
+      });
+    }
+
+    // Navigate to pricing quote page
+    router.push('/pricing-quote');
+  };
 
   const handleCardClick = (app: BusinessApp) => {
     setSelectedApp(app);
@@ -315,6 +330,13 @@ export default function BusinessAppsSection({ onCaseStudyClick }: BusinessAppsSe
         <div className="business-apps-header">
           <p className="business-apps-eyebrow">OUR WORK</p>
           <h2 className="business-apps-title">Business Apps</h2>
+          <button
+            onClick={handleGetQuote}
+            className="business-apps-quote-button"
+            type="button"
+          >
+            Get Pricing Quote
+          </button>
         </div>
 
         {/* Mobile: Vertical Stack */}

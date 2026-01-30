@@ -11,7 +11,7 @@ const DynamicLiquidEther = dynamic(
 );
 
 export default function DesktopHero() {
-  const rotatingWords = ['Thinks', 'Learns', 'Scales'];
+  const rotatingWords = ['Thinks', 'Builds', 'Learns', 'Scales'];
 
   return (
     <div className="container">
@@ -32,7 +32,7 @@ export default function DesktopHero() {
       <div className="content">
         <p className="tagline">HUMAN <span style={{color: '#CCFF00'}}>X</span> AI</p>
         <h1>
-          Business <RotatingText words={rotatingWords} interval={2000} />
+          Marketing <RotatingText words={rotatingWords} interval={2000} />
         </h1>
         <p className="description">
           We build intelligent business systems powered by AI and human creativity.

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import './ContactSection.css';
@@ -11,6 +11,10 @@ interface FormData {
   phone: string;
   email: string;
   service: string;
+  industry?: string;
+  appType?: string;
+  estimatedMinPrice?: string;
+  estimatedMaxPrice?: string;
 }
 
 interface ContactSectionProps {
@@ -26,6 +30,27 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
     email: '',
     service: ''
   });
+
+  // Pre-fill form from pricing quote data
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const pricingIndustry = sessionStorage.getItem('pricing_quote_industry');
+      const pricingAppType = sessionStorage.getItem('pricing_quote_app_type');
+      const pricingMinPrice = sessionStorage.getItem('pricing_quote_min_price');
+      const pricingMaxPrice = sessionStorage.getItem('pricing_quote_max_price');
+
+      if (pricingIndustry || pricingAppType) {
+        setFormData(prev => ({
+          ...prev,
+          service: 'business-apps', // Pre-select business apps
+          industry: pricingIndustry || undefined,
+          appType: pricingAppType || undefined,
+          estimatedMinPrice: pricingMinPrice || undefined,
+          estimatedMaxPrice: pricingMaxPrice || undefined
+        }));
+      }
+    }
+  }, []);
 
   const services = [
     { value: '', label: 'Select Solution' },
@@ -75,12 +100,28 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
       const utmSource = typeof window !== 'undefined' ? sessionStorage.getItem('utm_source') : null;
       const referrer = typeof document !== 'undefined' ? document.referrer : '';
       
-      (window as any).dataLayer.push({
+      const gtmData: any = {
         'event': 'web_lead',
-        'formType': 'Lead Form',
+        'formType': formData.industry && formData.appType ? 'Business App Quote' : 'Lead Form',
         'service': formData.service || '',
         'source': utmSource || referrer || 'direct'
-      });
+      };
+
+      // Add pricing quote data if available
+      if (formData.industry) {
+        gtmData.industry = formData.industry;
+      }
+      if (formData.appType) {
+        gtmData.appType = formData.appType;
+      }
+      if (formData.estimatedMinPrice) {
+        gtmData.estimatedMinPrice = formData.estimatedMinPrice;
+      }
+      if (formData.estimatedMaxPrice) {
+        gtmData.estimatedMaxPrice = formData.estimatedMaxPrice;
+      }
+
+      (window as any).dataLayer.push(gtmData);
     }
     
     // Wait 200ms then redirect
@@ -200,8 +241,22 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
               </div>
             )}
 
+            {/* Hidden fields for pricing quote data */}
+            {formData.industry && (
+              <input type="hidden" name="industry" value={formData.industry} />
+            )}
+            {formData.appType && (
+              <input type="hidden" name="appType" value={formData.appType} />
+            )}
+            {formData.estimatedMinPrice && (
+              <input type="hidden" name="estimatedMinPrice" value={formData.estimatedMinPrice} />
+            )}
+            {formData.estimatedMaxPrice && (
+              <input type="hidden" name="estimatedMaxPrice" value={formData.estimatedMaxPrice} />
+            )}
+
             <button type="submit" className="submit-button">
-              Submit
+              {formData.industry && formData.appType ? 'Start Your Build' : 'Submit'}
             </button>
 
             {errors.name && <div className="form-error">{errors.name}</div>}

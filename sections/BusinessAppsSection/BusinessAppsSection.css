@@ -31,8 +31,30 @@ image.png/* ==================== BUSINESS APPS SECTION ==================== */
   font-size: 32px;
   font-weight: 700;
   color: #FFFFFF;
-  margin: 0 0 16px 0;
+  margin: 0 0 24px 0;
   line-height: 1.1;
+}
+
+.business-apps-quote-button {
+  padding: 12px 32px;
+  background: #CDFC2E;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Anybody', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+.business-apps-quote-button:hover {
+  background: #B8E600;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(205, 252, 46, 0.3);
 }
 
 .business-apps-subtitle {
