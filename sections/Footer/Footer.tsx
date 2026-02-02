@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { InstagramIcon, LinkedInIcon, YouTubeIcon, FacebookIcon, XIcon } from '@/components/shared/Icons';
+import { getTrackingData } from '@/lib/tracking/utm';
+import { sendToWebhook } from '@/lib/tracking/webhook';
 import './Footer.css';
 
 interface FooterProps {
@@ -10,7 +12,9 @@ interface FooterProps {
 }
 
 export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [step, setStep] = useState<'name' | 'email'>('name');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
@@ -77,19 +81,44 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
     trackVisitor();
   }, []);
 
+  const handleNameSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setStep('email');
+  };
+
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || isSubmitting) return;
-    
+    if (!name || !email || isSubmitting) return;
+
     setIsSubmitting(true);
-    
-    // All tracking data is handled by TrackingProvider through data-form-type attribute
-    // No need for explicit webhook calls here - TrackingProvider sends one consolidated webhook
-    
-    // On success, hide form and show confirmation
-    setIsSubscribed(true);
-    setEmail('');
-    setIsSubmitting(false);
+
+    try {
+      // Send newsletter subscription data to webhook
+      const trackingData = getTrackingData('form_submit', {
+        formType: 'newsletter',
+        formData: {
+          name: name,
+          email: email,
+        },
+        pageTitle: typeof document !== 'undefined' ? document.title : undefined,
+        fullUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+      });
+
+      console.log('[Newsletter] Sending subscription:', { name, email });
+      const result = await sendToWebhook(trackingData);
+      console.log('[Newsletter] Webhook result:', result);
+
+      // On success, hide form and show confirmation
+      setIsSubscribed(true);
+      setName('');
+      setEmail('');
+      setStep('name');
+    } catch (error) {
+      console.error('Failed to send newsletter subscription:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isInternalLink = (href: string) => {
@@ -136,16 +165,34 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
                   Thank you for subscribing!
                 </p>
               </div>
+            ) : step === 'name' ? (
+              <form className="newsletter-form" onSubmit={handleNameSubmit}>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="newsletter-input"
+                  required
+                />
+                <button type="submit" className="newsletter-button">
+                  Next
+                </button>
+              </form>
             ) : (
               <form className="newsletter-form" onSubmit={handleSubscribe} data-form-type="newsletter">
                 <input
                   type="email"
+                  name="email"
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="newsletter-input"
                   required
+                  autoFocus
                 />
+                <input type="hidden" name="name" value={name} />
                 <button type="submit" className="newsletter-button" disabled={isSubmitting}>
                   {isSubmitting ? 'Subscribing...' : 'Subscribe'}
                 </button>
