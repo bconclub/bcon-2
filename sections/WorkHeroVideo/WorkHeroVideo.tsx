@@ -10,10 +10,12 @@ export default function WorkHeroVideo() {
   const [isMuted, setIsMuted] = useState(true);
   const [fadeIn, setFadeIn] = useState(false);
   const [player, setPlayer] = useState<VimeoPlayer | null>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isTogglingRef = useRef(false); // Prevent double-triggering
   const VIDEO_ID = '1151194408';
+  const THUMBNAIL_URL = '/portfolio/thumbnails/Work Hero Thumbnail.webp';
 
   // Load Vimeo Player API
   useEffect(() => {
@@ -113,27 +115,36 @@ export default function WorkHeroVideo() {
     }
   }, []); // Remove player dependency to avoid re-initialization
 
-  // Intersection Observer for scroll-triggered playback
+  // Intersection Observer for lazy loading the iframe and scroll-triggered playback
   useEffect(() => {
-    if (!containerRef.current || !player) return;
+    if (!containerRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Set to 7 seconds before playing
-            player.setCurrentTime(7).then(() => {
-              player.play().catch(() => {});
-            }).catch(() => {
-              player.play().catch(() => {});
-            });
+            // Load iframe only when near viewport
+            if (!shouldLoad) {
+              setShouldLoad(true);
+            }
+            // Control playback once player is ready
+            if (player) {
+              player.setCurrentTime(7).then(() => {
+                player.play().catch(() => {});
+              }).catch(() => {
+                player.play().catch(() => {});
+              });
+            }
           } else {
-            player.pause().catch(() => {});
+            if (player) {
+              player.pause().catch(() => {});
+            }
           }
         });
       },
       {
-        threshold: 0.3,
+        threshold: 0.1,
+        rootMargin: '200px', // Start loading 200px before entering viewport
       }
     );
 
@@ -142,7 +153,7 @@ export default function WorkHeroVideo() {
     return () => {
       observer.disconnect();
     };
-  }, [player]);
+  }, [player, shouldLoad]);
 
   const toggleMute = async () => {
     // Prevent double-triggering
@@ -218,16 +229,37 @@ export default function WorkHeroVideo() {
     <section className="work-hero-video-section" ref={containerRef}>
       <div 
         className={`work-hero-video-container ${fadeIn ? 'fade-in' : ''}`}
+        style={{ position: 'relative', minHeight: '300px' }}
       >
-        <iframe
-          ref={iframeRef}
-          src={vimeoUrl}
-          className="work-hero-video"
-          frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowFullScreen
-          title="Our Work"
-        ></iframe>
+        {/* Thumbnail placeholder - shown until video loads */}
+        {!shouldLoad && (
+          <div 
+            className="work-hero-thumbnail"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundImage: `url(${THUMBNAIL_URL})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              zIndex: 2,
+            }}
+          />
+        )}
+        {shouldLoad && (
+          <iframe
+            ref={iframeRef}
+            src={vimeoUrl}
+            className="work-hero-video"
+            frameBorder="0"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            title="Our Work"
+            loading="lazy"
+          ></iframe>
+        )}
         
         {/* Mute/Unmute Button */}
         {player && (

@@ -52,8 +52,13 @@ export default function LiquidEther({
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const rafRef = useRef<number | null>(null);
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
-  const isVisibleRef = useRef(true);
+  const isVisibleRef = useRef(false); // Start as false - lazy init
+  const isInitializedRef = useRef(false);
   const resizeRafRef = useRef<number | null>(null);
+
+  // Detect mobile for reduced quality
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const optimizedResolution = isMobile ? Math.min(resolution * 0.5, 0.25) : resolution;
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -1168,7 +1173,7 @@ export default function LiquidEther({
         iterations_poisson: iterationsPoisson,
         dt,
         BFECC,
-        resolution,
+        resolution: optimizedResolution,
         isBounce
       });
       if (webgl.autoDriver) {
@@ -1181,28 +1186,43 @@ export default function LiquidEther({
           (webgl.autoDriver.mouse as any).takeoverDuration = takeoverDuration;
         }
       }
-      if (resolution !== prevRes) {
+      if (optimizedResolution !== prevRes) {
         sim.resize();
       }
     };
     applyOptionsFromProps();
 
-    webgl.start();
+    // Lazy initialization: use requestIdleCallback or setTimeout to defer heavy work
+    const initWebGL = () => {
+      isInitializedRef.current = true;
+      webgl.start();
+    };
+    
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(initWebGL, { timeout: 100 });
+    } else {
+      setTimeout(initWebGL, 50);
+    }
 
-    // IntersectionObserver to pause rendering when not visible
+    // IntersectionObserver to lazy init and pause rendering when not visible
     const io = new IntersectionObserver(
       entries => {
         const entry = entries[0];
         const isVisible = entry.isIntersecting && entry.intersectionRatio > 0;
         isVisibleRef.current = isVisible;
         if (!webglRef.current) return;
-        if (isVisible && !document.hidden) {
+        
+        // Initialize only when component becomes visible
+        if (isVisible && !isInitializedRef.current && !document.hidden) {
+          isInitializedRef.current = true;
+          webglRef.current.start();
+        } else if (isVisible && !document.hidden) {
           webglRef.current.start();
         } else {
           webglRef.current.pause();
         }
       },
-      { threshold: [0, 0.01, 0.1] }
+      { threshold: [0, 0.01, 0.1], rootMargin: '100px' }
     );
     io.observe(container);
     intersectionObserverRef.current = io;
@@ -1248,7 +1268,7 @@ export default function LiquidEther({
     iterationsPoisson,
     iterationsViscous,
     mouseForce,
-    resolution,
+    optimizedResolution,
     viscous,
     colors,
     autoDemo,
@@ -1274,7 +1294,7 @@ export default function LiquidEther({
       iterations_poisson: iterationsPoisson,
       dt,
       BFECC,
-      resolution,
+      resolution: optimizedResolution,
       isBounce
     });
     if (webgl.autoDriver) {
@@ -1287,7 +1307,7 @@ export default function LiquidEther({
         (webgl.autoDriver as any).mouse.takeoverDuration = takeoverDuration;
       }
     }
-    if (resolution !== prevRes) {
+    if (optimizedResolution !== prevRes) {
       sim.resize();
     }
   }, [
@@ -1299,7 +1319,7 @@ export default function LiquidEther({
     iterationsPoisson,
     dt,
     BFECC,
-    resolution,
+    optimizedResolution,
     isBounce,
     autoDemo,
     autoSpeed,

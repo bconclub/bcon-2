@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, memo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
@@ -36,7 +36,7 @@ const rawAllItems: PortfolioItem[] = [
   { id: 'comet-ai', type: 'video', src: '/portfolio/Comet Ai Video.mp4', ratio: '1:1', title: 'Comet AI' },
   { id: 'campa-cola', type: 'video', src: '/portfolio/Campa Cola.mp4', ratio: '9:16', title: 'Campa Cola' },
   { id: 2, type: 'video', src: '/portfolio/Birdbox Reel.mp4', ratio: '9:16', title: 'Social Reel' },
-  { id: 3, type: 'image', src: '/portfolio/Come-to-Dubai.png', ratio: '1:1', title: 'Instagram Post' },
+  { id: 3, type: 'image', src: '/portfolio/Come-to-Dubai.webp', ratio: '1:1', title: 'Instagram Post' },
   { id: 4, type: 'video', src: '/portfolio/WOW-VFX.mp4', ratio: '16:9', title: 'Event Launch' },
   { id: 5, type: 'video', src: '/portfolio/Laptopstore Offer.mp4', ratio: '1:1', title: 'Brand Offer' },
   { id: 6, type: 'image', src: '/portfolio/Laptopstore-Product-Ad.jpg', ratio: '1:1', title: 'Product Ad' },
@@ -55,7 +55,7 @@ const rawMobileItems: PortfolioItem[] = [
   { id: 'm-comet-ai', type: 'video', src: '/portfolio/Comet Ai Video.mp4', ratio: '1:1', title: 'Comet AI' },
   { id: 'm-campa-cola', type: 'video', src: '/portfolio/Campa Cola.mp4', ratio: '9:16', title: 'Campa Cola' },
   { id: 'm-2', type: 'video', src: '/portfolio/Vyjayanthi Movies.mp4', ratio: '16:9', title: 'Website Video' },
-  { id: 'm-3', type: 'image', src: '/portfolio/Come-to-Dubai.png', ratio: '1:1', title: 'Instagram Post' },
+  { id: 'm-3', type: 'image', src: '/portfolio/Come-to-Dubai.webp', ratio: '1:1', title: 'Instagram Post' },
   { id: 'm-4', type: 'video', src: '/portfolio/Birdbox Reel.mp4', ratio: '9:16', title: 'Social Reel' },
   { id: 'm-5', type: 'video', src: '/portfolio/Laptopstore Offer.mp4', ratio: '1:1', title: 'Brand Offer' },
   { id: 'm-6', type: 'video', src: '/portfolio/WC-Facility.mp4', ratio: '16:9', title: 'Brand Asset' }
@@ -193,8 +193,9 @@ export default function LiquidBentoPortfolio({
   isBusinessApps = false,
   onInternalLinkClick
 }: LiquidBentoPortfolioProps) {
-  const [visibleCount, setVisibleCount] = useState(8);
-  const [secondSectionVisibleCount, setSecondSectionVisibleCount] = useState(8);
+  // Reduce initial visible count for better performance - virtualize the grid
+  const [visibleCount, setVisibleCount] = useState(6); // Reduced from 8
+  const [secondSectionVisibleCount, setSecondSectionVisibleCount] = useState(6); // Reduced from 8
   const [currentSlide, setCurrentSlide] = useState(0);
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   const [columnCount, setColumnCount] = useState(5);
@@ -277,7 +278,7 @@ export default function LiquidBentoPortfolio({
       { id: '11pc-launch', type: 'image', src: '/portfolio/11PC-Launch.jpg', ratio: '1:1', title: '11PC Launch' },
       { id: '11pc-event', type: 'image', src: '/portfolio/11PC-Event.jpg', ratio: '1:1', title: '11PC Event' },
       { id: 'birdbox-launching-soon', type: 'image', src: '/portfolio/Birdbox-Launching-Soon.jpg', ratio: '1:1', title: 'Birdbox Launching Soon' },
-      { id: 'come-to-dubai', type: 'image', src: '/portfolio/Come-to-Dubai.png', ratio: '1:1', title: 'Come to Dubai' },
+      { id: 'come-to-dubai', type: 'image', src: '/portfolio/Come-to-Dubai.webp', ratio: '1:1', title: 'Come to Dubai' },
       { id: 'laptopstore-product-ad', type: 'image', src: '/portfolio/Laptopstore-Product-Ad.jpg', ratio: '1:1', title: 'Laptopstore Product Ad' },
       { id: 'wc-event', type: 'image', src: '/portfolio/WC-Event.jpg', ratio: '1:1', title: 'WC Event' }
     ];

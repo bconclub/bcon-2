@@ -45,6 +45,41 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preload critical LCP images */}
+        <link rel="preload" as="image" href="/product thumbnail/PROXe Cover.webp" type="image/webp" />
+        <link rel="preload" as="image" href="/portfolio/Showreel Thumbnail.webp" type="image/webp" />
+        
+        {/* Inline Critical CSS - Above the fold */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            /* Critical: Dark background to prevent white flash */
+            html, body {
+              background-color: #000000;
+              color: #ffffff;
+            }
+            /* Critical: Green glow for hero */
+            .rotating-text-word {
+              color: #CCFF00;
+              will-change: filter, opacity;
+            }
+            /* Critical: Hero typography */
+            .tagline {
+              font-family: 'Anybody', sans-serif;
+              font-weight: 600;
+              letter-spacing: 0.2em;
+            }
+            /* Critical: Prevent layout shift */
+            .liquid-ether-container {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              z-index: -1;
+            }
+          `
+        }} />
+        
         {/* Google Tag Manager */}
         <Script id="gtm-head" strategy="beforeInteractive">
           {`
