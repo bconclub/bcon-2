@@ -211,6 +211,7 @@ export default function StaggeredMenu({
       {/* Header with logo and menu button */}
       <header 
         className={`staggered-menu-header ${isScrolled ? 'scrolled' : ''}`}
+        style={{ zIndex: 9999, position: 'fixed', top: 0, left: 0, right: 0 }}
       >
         <Link href="/" className="sm-logo" aria-label="Go to homepage" onClick={closeMenu}>
           <Image src={logoUrl} alt="BCON Logo" className="sm-logo-img" width={120} height={40} />

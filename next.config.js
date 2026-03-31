@@ -9,6 +9,10 @@ const nextConfig = {
   // Generate stable chunk filenames for better caching
   generateBuildId: () => 'build',
   
+  // Security and performance
+  poweredByHeader: false,
+  generateEtags: false,
+  
   // Image optimization
   images: {
     remotePatterns: [

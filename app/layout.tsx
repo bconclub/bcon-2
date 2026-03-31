@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import TrackingProvider from '@/components/Tracking/TrackingProvider';
+import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://bconclub.com'),
@@ -148,9 +149,11 @@ export default function RootLayout({
             alt=""
           />
         </noscript>
-        <TrackingProvider>
-          {children}
-        </TrackingProvider>
+        <ErrorBoundary>
+          <TrackingProvider>
+            {children}
+          </TrackingProvider>
+        </ErrorBoundary>
         {/* PROXe Chat Widget */}
         <Script
           src="https://proxe.bconclub.com/api/widget/embed.js"
