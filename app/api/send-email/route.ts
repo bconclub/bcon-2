@@ -1,7 +1,14 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy init Resend client - only when API key is available
+const getResend = () => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY is not configured');
+  }
+  return new Resend(apiKey);
+};
 
 const NOTIFICATION_EMAIL = 'bconclubx@gmail.com';
 
@@ -228,6 +235,7 @@ export async function POST(request: NextRequest) {
     if (type === 'newsletter') {
       const { name, email } = data;
 
+      const resend = getResend();
       const { error } = await resend.emails.send({
         from: 'BCON Club <onboarding@resend.dev>',
         to: NOTIFICATION_EMAIL,
@@ -246,6 +254,7 @@ export async function POST(request: NextRequest) {
     if (type === 'lead') {
       const { name, email, phone, service, brandName, industry, appType, estimatedMinPrice, estimatedMaxPrice } = data;
 
+      const resend = getResend();
       const { error } = await resend.emails.send({
         from: 'BCON Club <onboarding@resend.dev>',
         to: NOTIFICATION_EMAIL,
