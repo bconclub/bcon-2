@@ -393,7 +393,7 @@ export default function DesktopBusinessApps() {
                   {currentApp.vimeo_id ? (
                     <iframe
                       ref={(el) => { videoRefs.current[currentIndex] = el; }}
-                      src={`https://player.vimeo.com/video/${currentApp.vimeo_id}?autoplay=${isPlaying ? 1 : 0}&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=1${currentVimeoStart}`}
+                      src={`https://player.vimeo.com/video/${currentApp.vimeo_id}?autoplay=${isPlaying ? 1 : 0}&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=1&dnt=1${currentVimeoStart}`}
                       className="business-apps-device-video"
                       frameBorder="0"
                       allow="autoplay; fullscreen; picture-in-picture"

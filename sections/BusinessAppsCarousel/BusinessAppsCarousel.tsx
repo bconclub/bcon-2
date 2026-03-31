@@ -632,7 +632,7 @@ export default function BusinessAppsCarousel() {
                         ref={(el) => {
                           videoRefs.current[index] = el;
                         }}
-                        src={`https://player.vimeo.com/video/${app.vimeo_id}?autoplay=${isActive ? 1 : 0}&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=${isActive ? 1 : 0}`}
+                        src={`https://player.vimeo.com/video/${app.vimeo_id}?autoplay=${isActive ? 1 : 0}&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=${isActive ? 1 : 0}&dnt=1`}
                         className="business-apps-mobile-video"
                         frameBorder="0"
                         allow="autoplay; fullscreen; picture-in-picture"
@@ -757,7 +757,7 @@ export default function BusinessAppsCarousel() {
                   {currentApp.vimeo_id ? (
                     <iframe
                       key={currentApp.id}
-                      src={`https://player.vimeo.com/video/${currentApp.vimeo_id}?autoplay=1&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=1`}
+                      src={`https://player.vimeo.com/video/${currentApp.vimeo_id}?autoplay=1&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=1&dnt=1`}
                       className="business-apps-screen-video"
                       frameBorder="0"
                       allow="autoplay; fullscreen; picture-in-picture"
@@ -1079,7 +1079,7 @@ export default function BusinessAppsCarousel() {
             <div className="business-apps-mobile-modal-content">
               {businessApps[mobileCurrentIndex].vimeo_id ? (
                 <iframe
-                  src={`https://player.vimeo.com/video/${businessApps[mobileCurrentIndex].vimeo_id}?autoplay=1&loop=1&controls=1&title=0&byline=0&portrait=0&muted=0`}
+                  src={`https://player.vimeo.com/video/${businessApps[mobileCurrentIndex].vimeo_id}?autoplay=1&loop=1&controls=1&title=0&byline=0&portrait=0&muted=0&dnt=1`}
                   className="business-apps-mobile-modal-video"
                   frameBorder="0"
                   allow="autoplay; fullscreen; picture-in-picture"

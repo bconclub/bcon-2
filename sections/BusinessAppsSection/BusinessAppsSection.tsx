@@ -121,7 +121,7 @@ function BusinessAppModal({ app, isOpen, onClose, onCaseStudyClick }: BusinessAp
               const startFrag = app.vimeo_id === '1151206257' ? '#t=10s' : '';
               return (
                 <iframe
-                  src={`https://player.vimeo.com/video/${app.vimeo_id}?autoplay=1&loop=1&controls=1&title=0&byline=0&portrait=0&muted=0${startFrag}`}
+                  src={`https://player.vimeo.com/video/${app.vimeo_id}?autoplay=1&loop=1&controls=1&title=0&byline=0&portrait=0&muted=0&dnt=1${startFrag}`}
                   className="business-apps-modal-video"
                   frameBorder="0"
                   allow="autoplay; fullscreen; picture-in-picture"
@@ -354,7 +354,7 @@ export default function BusinessAppsSection({ onCaseStudyClick }: BusinessAppsSe
                   const startFrag = app.vimeo_id === '1151206257' ? '#t=10s' : '';
                   return (
                     <iframe
-                      src={`https://player.vimeo.com/video/${app.vimeo_id}?autoplay=0&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=1${startFrag}`}
+                      src={`https://player.vimeo.com/video/${app.vimeo_id}?autoplay=0&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=1&dnt=1${startFrag}`}
                       className="business-apps-card-media"
                       frameBorder="0"
                       allow="autoplay; fullscreen; picture-in-picture"
@@ -412,7 +412,7 @@ export default function BusinessAppsSection({ onCaseStudyClick }: BusinessAppsSe
                     const startFrag = app.vimeo_id === '1151206257' ? '#t=10s' : '';
                     return (
                       <iframe
-                        src={`https://player.vimeo.com/video/${app.vimeo_id}?autoplay=0&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=1${startFrag}`}
+                        src={`https://player.vimeo.com/video/${app.vimeo_id}?autoplay=0&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&background=1&dnt=1${startFrag}`}
                         className="business-apps-card-media"
                         frameBorder="0"
                         allow="autoplay; fullscreen; picture-in-picture"

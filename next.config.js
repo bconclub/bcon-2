@@ -2,6 +2,13 @@
 const nextConfig = {
   reactStrictMode: true,
   
+  // Fix for chunk loading issues
+  trailingSlash: false,
+  distDir: '.next',
+  
+  // Generate stable chunk filenames for better caching
+  generateBuildId: () => 'build',
+  
   // Image optimization
   images: {
     remotePatterns: [

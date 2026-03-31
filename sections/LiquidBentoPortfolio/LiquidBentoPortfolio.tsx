@@ -923,8 +923,8 @@ export default function LiquidBentoPortfolio({
       const item = secondSectionItems.find(i => String(i.id) === id && i.type === 'vimeo');
       if (!item) return false;
       const newSrc = secondSectionPlayedMap[id]
-        ? `https://player.vimeo.com/video/${item.src}?autoplay=1&loop=1&controls=0&title=0&byline=0&portrait=0&responsive=1`
-        : `https://player.vimeo.com/video/${item.src}?loop=1&controls=0&title=0&byline=0&portrait=0&responsive=1`;
+        ? `https://player.vimeo.com/video/${item.src}?autoplay=1&loop=1&controls=0&title=0&byline=0&portrait=0&responsive=1&dnt=1`
+        : `https://player.vimeo.com/video/${item.src}?loop=1&controls=0&title=0&byline=0&portrait=0&responsive=1&dnt=1`;
       return iframe.src !== newSrc;
     });
 
@@ -1119,7 +1119,7 @@ export default function LiquidBentoPortfolio({
                       refsMap.current[String(item.id)] = el;
                     }
                   }}
-                  src={`https://player.vimeo.com/video/${item.src}?autoplay=${sectionPlayedMap[String(item.id)] ? 1 : 0}&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1${item.ratio === '1:1' ? '' : '&responsive=1'}`}
+                  src={`https://player.vimeo.com/video/${item.src}?autoplay=${sectionPlayedMap[String(item.id)] ? 1 : 0}&loop=1&controls=0&title=0&byline=0&portrait=0&muted=1&dnt=1${item.ratio === '1:1' ? '' : '&responsive=1'}`}
                   className="bento-media"
                   frameBorder="0"
                   allow="autoplay; fullscreen; picture-in-picture"
