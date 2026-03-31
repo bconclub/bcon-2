@@ -36,9 +36,14 @@ export default function ShowReel() {
 
   return (
     <>
-      <section className="showreel-section">
+      <section className="showreel-section" style={{ position: 'relative', zIndex: 10 }}>
         <div className="showreel-content">
-          <button className="showreel-trigger" onClick={openModal}>
+          <button 
+            className="showreel-trigger" 
+            onClick={openModal}
+            type="button"
+            style={{ position: 'relative', zIndex: 11 }}
+          >
             <div className="rotating-circle">
               <svg className="circle-text" viewBox="0 0 200 200" width="216" height="216">
                 <defs>
