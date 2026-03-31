@@ -109,6 +109,13 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
       const result = await sendToWebhook(trackingData);
       console.log('[Newsletter] Webhook result:', result);
 
+      // Send notification email
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'newsletter', data: { name, email } }),
+      }).catch((err) => console.error('Email notification failed:', err));
+
       // On success, hide form and show confirmation
       setIsSubscribed(true);
       setName('');

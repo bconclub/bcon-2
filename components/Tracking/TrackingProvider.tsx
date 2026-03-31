@@ -31,7 +31,13 @@ function TrackingComponent({ children }: { children: React.ReactNode }) {
       }
 
       const form = event.target as HTMLFormElement;
-      
+
+      // Skip newsletter forms - they handle their own webhook call
+      // This is because newsletter uses a two-step form and needs custom handling
+      if (form.dataset.formType === 'newsletter' || form.closest('[data-form-type="newsletter"]')) {
+        return;
+      }
+
       // Collect all form field values
       const formData: Record<string, any> = {};
       const formElements = form.elements;

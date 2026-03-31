@@ -94,7 +94,27 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
 
     // All tracking data is handled by TrackingProvider through data-form-type attribute
     // No need for explicit webhook calls here - TrackingProvider sends one consolidated webhook
-    
+
+    // Send notification email
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'lead',
+        data: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          service: formData.service,
+          brandName: formData.brandName,
+          industry: formData.industry,
+          appType: formData.appType,
+          estimatedMinPrice: formData.estimatedMinPrice,
+          estimatedMaxPrice: formData.estimatedMaxPrice,
+        },
+      }),
+    }).catch((err) => console.error('Email notification failed:', err));
+
     // Push GTM event first
     if (typeof window !== 'undefined' && (window as any).dataLayer) {
       const utmSource = typeof window !== 'undefined' ? sessionStorage.getItem('utm_source') : null;

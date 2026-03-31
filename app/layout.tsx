@@ -116,6 +116,11 @@ export default function RootLayout({
         <TrackingProvider>
           {children}
         </TrackingProvider>
+        {/* PROXe Chat Widget */}
+        <Script
+          src="https://proxe.bconclub.com/api/widget/embed.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

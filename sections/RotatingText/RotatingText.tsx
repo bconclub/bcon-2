@@ -30,6 +30,7 @@ export default function RotatingText({ words, interval = 3000 }: RotatingTextPro
         filter: isBlurred ? 'blur(10px)' : 'blur(0px)',
         opacity: isBlurred ? 0 : 1,
         transition: 'filter 0.5s ease-in-out, opacity 0.5s ease-in-out',
+        willChange: 'filter, opacity',
         display: 'inline-block',
         minWidth: '300px',
         fontSize: 'inherit',

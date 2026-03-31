@@ -31,7 +31,7 @@ export default function ServicesGrid({ onServiceClick }: ServicesGridProps = {})
       id: 1,
       title: 'AI in Business',
       description: 'Turn your business into an intelligent system.',
-      image: '/BRain.png'
+      image: '/BRain.webp'
     },
     {
       id: 2,
@@ -43,7 +43,7 @@ export default function ServicesGrid({ onServiceClick }: ServicesGridProps = {})
       id: 3,
       title: 'Business Apps',
       description: 'Digital platforms built to learn and convert.',
-      image: '/Business Apps.png'
+      image: '/Business Apps.webp'
     }
   ];
 
