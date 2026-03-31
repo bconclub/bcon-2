@@ -32,10 +32,11 @@
     -webkit-backdrop-filter: blur(20px);
     border-radius: 16px;
     border: none;
-    z-index: 100;
+    z-index: 9999;
     transition: all 0.4s ease;
     margin: 0 auto;
     gap: 1rem;
+    box-sizing: border-box;
   }
   
   .staggered-menu-wrapper.fixed-wrapper .staggered-menu-header {
@@ -47,6 +48,9 @@
     max-width: 800px;
     margin: 1.5rem auto 0 auto;
     z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   
   .staggered-menu-wrapper.fixed-wrapper .staggered-menu-header.scrolled {
@@ -74,6 +78,10 @@
     padding: 1.5rem 2.5rem;
     transform: none;
     margin: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   
   .staggered-menu-header > * {
