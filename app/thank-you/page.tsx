@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import './thank-you.css';
 
 // Dynamically import LiquidEther to avoid SSR issues with Three.js
@@ -13,6 +14,7 @@ const DynamicLiquidEther = dynamic(
 
 export default function ThankYouPage() {
   const searchParams = useSearchParams();
+  const [isCalling, setIsCalling] = useState(false);
   
   // Get form data from query params
   const name = searchParams.get('name') || '';
@@ -20,11 +22,47 @@ export default function ThankYouPage() {
   const phone = searchParams.get('phone') || '';
   const brandName = searchParams.get('brandName') || '';
   const service = searchParams.get('service') || '';
+  const leadId = searchParams.get('leadId') || '';
   
   // Construct WhatsApp message with form data
   const phoneNumber = '919353253817';
   const message = `Hi, I'm ${name}${brandName ? ` from ${brandName}` : ''}. Interested in ${service || 'your services'}.${phone ? ` My number: ${phone}` : ''}${email ? ` Email: ${email}` : ''}`;
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  
+  const handleCallClick = async () => {
+    if (!phone) {
+      alert('Phone number not provided. Please use WhatsApp instead.');
+      return;
+    }
+    
+    setIsCalling(true);
+    
+    try {
+      // Call PROXe to trigger voice call
+      const response = await fetch('https://proxe.bconclub.com/api/voice/call', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: phone,
+          name: name,
+          brand: brandName || 'bcon',
+          service_interest: service || '',
+          lead_id: leadId
+        })
+      });
+      
+      if (response.ok) {
+        alert('Our AI assistant will call you shortly!');
+      } else {
+        alert('Unable to place call. Please try WhatsApp or wait for our team to call.');
+      }
+    } catch (error) {
+      console.error('Call failed:', error);
+      alert('Call service unavailable. Please use WhatsApp.');
+    } finally {
+      setIsCalling(false);
+    }
+  };
   
   return (
     <div className="thank-you-container">
@@ -53,15 +91,17 @@ export default function ThankYouPage() {
         </p>
 
         <div className="thank-you-actions">
-          <a 
-            href="tel:919353253817" 
+          <button 
+            onClick={handleCallClick}
+            disabled={isCalling}
             className="thank-you-button thank-you-button-call"
+            style={{ border: 'none', cursor: isCalling ? 'not-allowed' : 'pointer' }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
             </svg>
-            Call
-          </a>
+            {isCalling ? 'Calling...' : 'Call'}
+          </button>
           
           <a 
             href={whatsappUrl}

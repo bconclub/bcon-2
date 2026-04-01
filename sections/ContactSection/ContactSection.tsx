@@ -71,11 +71,11 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
     });
   };
 
-  const submitToPROXe = async (formData: FormData) => {
+  const submitToPROXe = async (formData: FormData): Promise<string | null> => {
     try {
       const utmParams = new URLSearchParams(window.location.search);
       
-      await fetch('https://proxe.bconclub.com/api/website', {
+      const response = await fetch('https://proxe.bconclub.com/api/website', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -98,8 +98,15 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
           utm_campaign: utmParams.get('utm_campaign') || ''
         })
       });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.lead_id || null;
+      }
+      return null;
     } catch (e) {
       console.error('PROXe submission error:', e);
+      return null;
     }
   };
 
@@ -124,8 +131,8 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
 
     if (Object.keys(newErrors).length > 0) return;
 
-    // Send to PROXe (fire-and-forget)
-    submitToPROXe(formData);
+    // Send to PROXe and get lead_id
+    const leadId = await submitToPROXe(formData);
 
     // Send notification email
     fetch('/api/send-email', {
@@ -176,7 +183,7 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
       (window as any).dataLayer.push(gtmData);
     }
     
-    // Wait 200ms then redirect with form data
+    // Wait 200ms then redirect with form data and lead_id
     setTimeout(() => {
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams({
@@ -186,6 +193,9 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
           brandName: formData.brandName || '',
           service: formData.service || ''
         });
+        if (leadId) {
+          params.set('leadId', leadId);
+        }
         window.location.href = `/thank-you?${params.toString()}`;
       }
     }, 200);
