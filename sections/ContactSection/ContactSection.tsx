@@ -71,6 +71,42 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
     });
   };
 
+  const submitToPROXe = async (formData: FormData) => {
+    try {
+      // Parse UTM params from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get('utm_source') || '';
+      const utmMedium = urlParams.get('utm_medium') || '';
+      const utmCampaign = urlParams.get('utm_campaign') || '';
+
+      await fetch('https://proxe.bconclub.com/api/website', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || '',
+          message: formData.service + (formData.brandName ? ` - Brand: ${formData.brandName}` : ''),
+          form_type: 'contact',
+          page_url: window.location.href,
+          brand: formData.brandName || '',
+          service: formData.service,
+          industry: formData.industry || '',
+          app_type: formData.appType || '',
+          estimated_min_price: formData.estimatedMinPrice || '',
+          estimated_max_price: formData.estimatedMaxPrice || '',
+          utm_source: utmSource,
+          utm_medium: utmMedium,
+          utm_campaign: utmCampaign,
+        }),
+      });
+    } catch (e) {
+      console.error('PROXe submission failed:', e);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
@@ -92,8 +128,8 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
 
     if (Object.keys(newErrors).length > 0) return;
 
-    // All tracking data is handled by TrackingProvider through data-form-type attribute
-    // No need for explicit webhook calls here - TrackingProvider sends one consolidated webhook
+    // Send to PROXe (fire-and-forget, non-blocking)
+    submitToPROXe(formData);
 
     // Send notification email
     fetch('/api/send-email', {
