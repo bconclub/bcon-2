@@ -34,9 +34,10 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/set-build-time.js && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "set-build-time": "node scripts/set-build-time.js"
   },
   "browserslist": {
     "production": [
