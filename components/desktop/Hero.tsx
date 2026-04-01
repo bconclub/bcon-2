@@ -32,10 +32,10 @@ export default function DesktopHero() {
       <div className="content">
         <p className="tagline">HUMAN <span style={{color: '#CCFF00'}}>X</span> AI</p>
         <h1>
-          Business <RotatingText words={rotatingWords} interval={2000} />
+          Marketing <RotatingText words={rotatingWords} interval={2000} />
         </h1>
         <p className="description">
-          We build intelligent Business systems. Powered by AI. Perfected by humans.
+          We Build Intelligent Marketing Systems. Powered by AI. Perfected by humans.
         </p>
         <ShowReel />
       </div>
