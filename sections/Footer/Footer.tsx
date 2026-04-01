@@ -87,6 +87,33 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
     setStep('email');
   };
 
+  const submitToPROXe = async (formData: { name: string; email: string; form_type: string }) => {
+    try {
+      const utmParams = new URLSearchParams(window.location.search);
+      
+      await fetch('https://proxe.bconclub.com/api/website', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email || '',
+          phone: '',
+          message: 'Newsletter subscription',
+          form_type: formData.form_type,
+          page_url: window.location.href,
+          brand: 'bcon',
+          utm_source: utmParams.get('utm_source') || '',
+          utm_medium: utmParams.get('utm_medium') || '',
+          utm_campaign: utmParams.get('utm_campaign') || ''
+        })
+      });
+    } catch (e) {
+      console.error('PROXe submission error:', e);
+    }
+  };
+
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || isSubmitting) return;
@@ -108,6 +135,9 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
       console.log('[Newsletter] Sending subscription:', { name, email });
       const result = await sendToWebhook(trackingData);
       console.log('[Newsletter] Webhook result:', result);
+
+      // Send to PROXe (fire-and-forget)
+      submitToPROXe({ name, email, form_type: 'newsletter' });
 
       // Send notification email
       fetch('/api/send-email', {
