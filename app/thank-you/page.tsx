@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import './thank-you.css';
 
 // Dynamically import LiquidEther to avoid SSR issues with Three.js
@@ -11,6 +12,20 @@ const DynamicLiquidEther = dynamic(
 );
 
 export default function ThankYouPage() {
+  const searchParams = useSearchParams();
+  
+  // Get form data from query params
+  const name = searchParams.get('name') || '';
+  const email = searchParams.get('email') || '';
+  const phone = searchParams.get('phone') || '';
+  const brandName = searchParams.get('brandName') || '';
+  const service = searchParams.get('service') || '';
+  
+  // Construct WhatsApp message with form data
+  const phoneNumber = '919353253817';
+  const message = `Hi, I'm ${name}${brandName ? ` from ${brandName}` : ''}. Interested in ${service || 'your services'}.${phone ? ` My number: ${phone}` : ''}${email ? ` Email: ${email}` : ''}`;
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  
   return (
     <div className="thank-you-container">
       {/* Background effect - same as homepage */}
@@ -49,7 +64,7 @@ export default function ThankYouPage() {
           </a>
           
           <a 
-            href="https://wa.me/919353253817" 
+            href={whatsappUrl}
             target="_blank" 
             rel="noopener noreferrer"
             className="thank-you-button thank-you-button-whatsapp"

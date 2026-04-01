@@ -176,10 +176,17 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
       (window as any).dataLayer.push(gtmData);
     }
     
-    // Wait 200ms then redirect
+    // Wait 200ms then redirect with form data
     setTimeout(() => {
       if (typeof window !== 'undefined') {
-        window.location.href = '/thank-you';
+        const params = new URLSearchParams({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          brandName: formData.brandName || '',
+          service: formData.service || ''
+        });
+        window.location.href = `/thank-you?${params.toString()}`;
       }
     }, 200);
   };
