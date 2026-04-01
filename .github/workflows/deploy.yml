@@ -75,7 +75,7 @@ jobs:
           # Create package with source files (build will happen on VPS)
           mkdir -p deploy
           # Copy source directories and config files
-          cp -r app components sections lib public effects types deploy/ || true
+          cp -r app components sections lib public effects types scripts deploy/ || true
           cp next.config.js tsconfig.json package.json package-lock.json ecosystem.config.js deploy/
           
           # Create .env.build file with git information for Next.js build
