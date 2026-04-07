@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import RotatingText from '@/sections/RotatingText/RotatingText';
+
 import ShowReel from '@/sections/ShowReel/ShowReel';
 
 // Dynamically import LiquidEther to avoid SSR issues with Three.js
@@ -11,8 +11,6 @@ const DynamicLiquidEther = dynamic(
 );
 
 export default function DesktopHero() {
-  const rotatingWords = ['Thinks', 'Builds', 'Learns', 'Scales'];
-
   return (
     <div className="container">
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
@@ -30,12 +28,10 @@ export default function DesktopHero() {
         />
       </div>
       <div className="content">
-        <p className="tagline">HUMAN <span style={{color: '#CCFF00'}}>X</span> AI</p>
-        <h1>
-          Marketing <RotatingText words={rotatingWords} interval={2000} />
-        </h1>
+        <p className="tagline">AI-FIRST MARKETING</p>
+        <h1>On a mission to solve marketing with AI.</h1>
         <p className="description">
-          We Build Intelligent Marketing Systems. Powered by AI. Perfected by humans.
+          Customer Acquisition · Brand Management · Content & Ads · Business Apps
         </p>
         <ShowReel />
       </div>
