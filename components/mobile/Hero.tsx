@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 
 import ShowReel from '@/sections/ShowReel/ShowReel';
+import './Hero.css';
 
 // Dynamically import LiquidEther to avoid SSR issues with Three.js
 const DynamicLiquidEther = dynamic(
@@ -12,7 +13,7 @@ const DynamicLiquidEther = dynamic(
 
 export default function MobileHero() {
   return (
-    <div className="container">
+    <div className="container mobile-hero">
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
         <DynamicLiquidEther
           colors={['#CCFF00', '#CCFF00', '#CCFF00']}

@@ -1,0 +1,64 @@
+/* Mobile Hero Styles */
+
+/* Base mobile styles (up to 768px) */
+@media (max-width: 768px) {
+  .mobile-hero .content {
+    padding: 0 20px;
+    margin-top: auto;
+    padding-bottom: 20px;
+  }
+
+  .mobile-hero .tagline {
+    font-size: 0.75rem;
+    letter-spacing: 6px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
+  .mobile-hero .content h1 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+    margin-bottom: 1.25rem;
+    font-weight: 500;
+  }
+
+  .mobile-hero .description {
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+    padding: 0 10px;
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+}
+
+/* Small mobile (up to 480px) */
+@media (max-width: 480px) {
+  .mobile-hero .tagline {
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+  }
+
+  .mobile-hero .content h1 {
+    font-size: 1.5rem;
+    line-height: 1.35;
+    margin-bottom: 1rem;
+  }
+
+  .mobile-hero .description {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    padding: 0 5px;
+  }
+}
+
+/* Extra small mobile (up to 360px) */
+@media (max-width: 360px) {
+  .mobile-hero .content h1 {
+    font-size: 1.35rem;
+  }
+
+  .mobile-hero .description {
+    font-size: 0.7rem;
+  }
+}
