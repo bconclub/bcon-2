@@ -15,15 +15,15 @@ export default function DesktopHero() {
     <div className="container">
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
         <DynamicLiquidEther
-          colors={['#CCFF00', '#CCFF00', '#CCFF00']}
-          mouseForce={20}
-          cursorSize={100}
-          resolution={0.3}
+          colors={['#6B2FE8', '#CCFF00', '#CDFC2E']}
+          mouseForce={25}
+          cursorSize={120}
+          resolution={0.5}
           autoDemo={true}
-          autoSpeed={0.2}
-          autoIntensity={2.2}
+          autoSpeed={0.35}
+          autoIntensity={3.0}
           dt={0.04}
-          iterationsPoisson={16}
+          iterationsPoisson={20}
           iterationsViscous={16}
         />
       </div>

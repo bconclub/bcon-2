@@ -25,6 +25,13 @@
   box-sizing: border-box;
 }
 
+/* overflow-x: clip (NOT hidden) — clip prevents horizontal scroll without
+   breaking position:fixed. overflow-x:hidden on body turns body into the
+   fixed-position containing block in Chrome, making the LiquidEther canvas scroll. */
+html {
+  overflow-x: clip;
+}
+
 body {
   font-family: 'Anybody', sans-serif;
   background: #000000;
@@ -32,7 +39,6 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
 }
 
 code {
