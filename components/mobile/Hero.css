@@ -2,12 +2,40 @@
 
 /* ── Base mobile (≤768px) ── */
 @media (max-width: 768px) {
-  /* Left-align all hero children for editorial feel */
+  /* Two-column row: text left, ShowReel right */
   .mobile-hero .content {
-    align-items: flex-start;
-    padding: 0 24px;
-    padding-bottom: 8px;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 20px 16px 20px;
     margin-top: auto;
+    gap: 12px;
+    width: 100%;
+  }
+
+  /* LEFT column: 60% — label + heading + services */
+  .mobile-hero .hero-text-col {
+    flex: 0 0 60%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* RIGHT column: fills remaining space — ShowReel centered */
+  .mobile-hero .hero-reel-col {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  /* Remove ShowReel's internal spacing inside the column */
+  .mobile-hero .hero-reel-col .showreel-section {
+    margin-top: 0;
+    padding: 0;
+    min-height: unset;
+    width: auto;
   }
 
   /* Tagline: neon-lime left-border badge */
@@ -18,7 +46,7 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 20px;
+    margin-bottom: 14px;
     padding-left: 10px;
     border-left: 2px solid var(--neon-lime, #CDFC2E);
     line-height: 1.2;
@@ -27,18 +55,18 @@
   /* Heading: tight, left-aligned, Fraunces */
   .mobile-hero .content h1 {
     font-family: 'Fraunces', serif;
-    font-size: 2.75rem;
+    font-size: 2.25rem;
     font-weight: 500;
     line-height: 1.1;
     text-align: left;
     display: block;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
 
-  /* Description: muted, one service per line */
+  /* Description: muted, one service per line, tighter gap */
   .mobile-hero .description {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 300;
     letter-spacing: 0.05em;
     line-height: 1;
@@ -48,66 +76,59 @@
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     margin-bottom: 0;
   }
 
   .mobile-hero .description .service-item {
     display: block;
   }
-
-  /* Showreel: full-width so justify-content:center works */
-  .mobile-hero .showreel-section {
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-    margin-top: 8px;
-    min-height: unset;
-  }
 }
 
 /* ── Small mobile (≤480px) ── */
 @media (max-width: 480px) {
   .mobile-hero .content {
-    padding: 0 20px;
-    padding-bottom: 4px;
+    padding: 0 16px 12px 16px;
+    gap: 8px;
+  }
+
+  .mobile-hero .hero-text-col {
+    flex: 0 0 58%;
   }
 
   .mobile-hero .tagline {
     font-size: 0.6rem;
     letter-spacing: 0.15em;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   .mobile-hero .content h1 {
-    font-size: 2.25rem;
-    line-height: 1.1;
-    margin-bottom: 16px;
+    font-size: 1.9rem;
+    margin-bottom: 10px;
   }
 
   .mobile-hero .description {
-    font-size: 0.72rem;
-    gap: 6px;
-  }
-
-  .mobile-hero .showreel-section {
-    margin-top: 4px;
+    font-size: 0.68rem;
+    gap: 3px;
   }
 }
 
 /* ── Extra small (≤360px) ── */
 @media (max-width: 360px) {
   .mobile-hero .content {
-    padding: 0 16px;
+    padding: 0 14px 10px 14px;
+    gap: 6px;
+  }
+
+  .mobile-hero .hero-text-col {
+    flex: 0 0 56%;
   }
 
   .mobile-hero .content h1 {
-    font-size: 2rem;
+    font-size: 1.7rem;
   }
 
   .mobile-hero .description {
-    font-size: 0.68rem;
-    gap: 5px;
+    font-size: 0.65rem;
   }
 }
