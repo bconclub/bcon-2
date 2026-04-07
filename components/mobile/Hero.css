@@ -2,12 +2,18 @@
 
 /* ── Base mobile (≤768px) ── */
 @media (max-width: 768px) {
+  /* Pull container top down to just clear the nav pill (~100px) */
+  .mobile-hero.container {
+    padding-top: 90px;
+    align-items: flex-start;
+  }
+
   /* Two-column row: text left, ShowReel right */
   .mobile-hero .content {
     flex-direction: row;
     align-items: center;
     padding: 0 20px 16px 20px;
-    margin-top: auto;
+    margin-top: 0;
     gap: 12px;
     width: 100%;
   }
@@ -87,6 +93,10 @@
 
 /* ── Small mobile (≤480px) ── */
 @media (max-width: 480px) {
+  .mobile-hero.container {
+    padding-top: 82px;
+  }
+
   .mobile-hero .content {
     padding: 0 16px 12px 16px;
     gap: 8px;
@@ -115,6 +125,10 @@
 
 /* ── Extra small (≤360px) ── */
 @media (max-width: 360px) {
+  .mobile-hero.container {
+    padding-top: 76px;
+  }
+
   .mobile-hero .content {
     padding: 0 14px 10px 14px;
     gap: 6px;
