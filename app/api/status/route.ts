@@ -48,50 +48,54 @@ export async function GET(request: NextRequest) {
     }
   })();
   
-  // Get version from git tags (latest tag)
-  let version = 'v1.00';
-  let versionDate = timestamp;
-  try {
-    if (gitAvailable) {
-      // Get the latest git tag
-      try {
-        const latestTag = execSync('git describe --tags --abbrev=0', { 
-          encoding: 'utf-8',
-          stdio: ['ignore', 'pipe', 'ignore'],
-          timeout: 5000
-        }).trim();
-        version = latestTag;
-        
-        // Get the date of the tag
+  // Get version from environment variables or git/package.json
+  let version = process.env.NEXT_PUBLIC_VERSION || 'v1.00';
+  let versionDate = process.env.NEXT_PUBLIC_RELEASE_DATE || timestamp;
+  
+  // If environment variables not set, try to get from git/package.json
+  if (!process.env.NEXT_PUBLIC_VERSION) {
+    try {
+      if (gitAvailable) {
+        // Get the latest git tag
         try {
-          const tagDate = execSync(`git log -1 --format=%aI ${latestTag}`, { 
+          const latestTag = execSync('git describe --tags --abbrev=0', { 
             encoding: 'utf-8',
             stdio: ['ignore', 'pipe', 'ignore'],
             timeout: 5000
           }).trim();
-          versionDate = tagDate;
+          version = latestTag;
+          
+          // Get the date of the tag
+          try {
+            const tagDate = execSync(`git log -1 --format=%aI ${latestTag}`, { 
+              encoding: 'utf-8',
+              stdio: ['ignore', 'pipe', 'ignore'],
+              timeout: 5000
+            }).trim();
+            versionDate = tagDate;
+          } catch {
+            // If we can't get tag date, use current timestamp
+            versionDate = timestamp;
+          }
         } catch {
-          // If we can't get tag date, use current timestamp
-          versionDate = timestamp;
+          // Fallback to package.json if git tags not available
+          const packageJsonPath = join(process.cwd(), 'package.json');
+          if (existsSync(packageJsonPath)) {
+            const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+            version = `v${packageJson.version}`;
+          }
         }
-      } catch {
-        // Fallback to package.json if git tags not available
+      } else {
+        // Git not available, use package.json
         const packageJsonPath = join(process.cwd(), 'package.json');
         if (existsSync(packageJsonPath)) {
           const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
           version = `v${packageJson.version}`;
         }
       }
-    } else {
-      // Git not available, use package.json
-      const packageJsonPath = join(process.cwd(), 'package.json');
-      if (existsSync(packageJsonPath)) {
-        const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-        version = `v${packageJson.version}`;
-      }
+    } catch (error: any) {
+      errors.push(`Failed to read version: ${error.message || 'Unknown error'}`);
     }
-  } catch (error: any) {
-    errors.push(`Failed to read version: ${error.message || 'Unknown error'}`);
   }
   
   // Get Git information

@@ -87,30 +87,34 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
     setStep('email');
   };
 
-  const submitToPROXe = async (formData: { name: string; email: string; form_type: string }) => {
+  const submitToPROXe = async (name: string, email: string) => {
     try {
-      const utmParams = new URLSearchParams(window.location.search);
-      
+      // Parse UTM params from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get('utm_source') || '';
+      const utmMedium = urlParams.get('utm_medium') || '';
+      const utmCampaign = urlParams.get('utm_campaign') || '';
+
       await fetch('https://proxe.bconclub.com/api/website', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email || '',
+          name: name,
+          email: email,
           phone: '',
           message: 'Newsletter subscription',
-          form_type: formData.form_type,
+          form_type: 'newsletter',
           page_url: window.location.href,
-          brand: 'bcon',
-          utm_source: utmParams.get('utm_source') || '',
-          utm_medium: utmParams.get('utm_medium') || '',
-          utm_campaign: utmParams.get('utm_campaign') || ''
-        })
+          brand: '',
+          utm_source: utmSource,
+          utm_medium: utmMedium,
+          utm_campaign: utmCampaign,
+        }),
       });
     } catch (e) {
-      console.error('PROXe submission error:', e);
+      console.error('PROXe submission failed:', e);
     }
   };
 
@@ -136,8 +140,8 @@ export default function Footer({ onInternalLinkClick }: FooterProps = {}) {
       const result = await sendToWebhook(trackingData);
       console.log('[Newsletter] Webhook result:', result);
 
-      // Send to PROXe (fire-and-forget)
-      submitToPROXe({ name, email, form_type: 'newsletter' });
+      // Send to PROXe (fire-and-forget, non-blocking)
+      submitToPROXe(name, email);
 
       // Send notification email
       fetch('/api/send-email', {

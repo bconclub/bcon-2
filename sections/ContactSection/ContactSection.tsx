@@ -71,42 +71,39 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
     });
   };
 
-  const submitToPROXe = async (formData: FormData): Promise<string | null> => {
+  const submitToPROXe = async (formData: FormData) => {
     try {
-      const utmParams = new URLSearchParams(window.location.search);
-      
-      const response = await fetch('https://proxe.bconclub.com/api/website', {
+      // Parse UTM params from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get('utm_source') || '';
+      const utmMedium = urlParams.get('utm_medium') || '';
+      const utmCampaign = urlParams.get('utm_campaign') || '';
+
+      await fetch('https://proxe.bconclub.com/api/website', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: formData.name,
-          email: formData.email || '',
+          email: formData.email,
           phone: formData.phone || '',
           message: formData.service + (formData.brandName ? ` - Brand: ${formData.brandName}` : ''),
           form_type: 'contact',
           page_url: window.location.href,
-          brand: formData.brandName || 'bcon',
+          brand: formData.brandName || '',
           service: formData.service,
           industry: formData.industry || '',
           app_type: formData.appType || '',
           estimated_min_price: formData.estimatedMinPrice || '',
           estimated_max_price: formData.estimatedMaxPrice || '',
-          utm_source: utmParams.get('utm_source') || '',
-          utm_medium: utmParams.get('utm_medium') || '',
-          utm_campaign: utmParams.get('utm_campaign') || ''
-        })
+          utm_source: utmSource,
+          utm_medium: utmMedium,
+          utm_campaign: utmCampaign,
+        }),
       });
-      
-      if (response.ok) {
-        const data = await response.json();
-        return data.lead_id || null;
-      }
-      return null;
     } catch (e) {
-      console.error('PROXe submission error:', e);
-      return null;
+      console.error('PROXe submission failed:', e);
     }
   };
 
@@ -131,8 +128,8 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
 
     if (Object.keys(newErrors).length > 0) return;
 
-    // Send to PROXe and get lead_id
-    const leadId = await submitToPROXe(formData);
+    // Send to PROXe (fire-and-forget, non-blocking)
+    submitToPROXe(formData);
 
     // Send notification email
     fetch('/api/send-email', {
@@ -183,20 +180,10 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
       (window as any).dataLayer.push(gtmData);
     }
     
-    // Wait 200ms then redirect with form data and lead_id
+    // Wait 200ms then redirect
     setTimeout(() => {
       if (typeof window !== 'undefined') {
-        const params = new URLSearchParams({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          brandName: formData.brandName || '',
-          service: formData.service || ''
-        });
-        if (leadId) {
-          params.set('leadId', leadId);
-        }
-        window.location.href = `/thank-you?${params.toString()}`;
+        window.location.href = '/thank-you';
       }
     }, 200);
   };
