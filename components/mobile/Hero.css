@@ -1,65 +1,113 @@
 /* Mobile Hero Styles */
 
-/* Base mobile styles (up to 768px) */
+/* ── Base mobile (≤768px) ── */
 @media (max-width: 768px) {
+  /* Left-align all hero children for editorial feel */
   .mobile-hero .content {
-    padding: 0 20px;
+    align-items: flex-start;
+    padding: 0 24px;
+    padding-bottom: 8px;
     margin-top: auto;
-    padding-bottom: 20px;
   }
 
+  /* Tagline: neon-lime left-border badge */
   .mobile-hero .tagline {
-    font-size: 0.85rem;
-    letter-spacing: 6px;
-    margin-bottom: 1rem;
-    font-weight: 500;
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 20px;
+    padding-left: 10px;
+    border-left: 2px solid var(--neon-lime, #CDFC2E);
+    line-height: 1.2;
   }
 
+  /* Heading: tight, left-aligned, Fraunces */
   .mobile-hero .content h1 {
     font-family: 'Fraunces', serif;
     font-size: 2.75rem;
-    line-height: 1.15;
-    margin-bottom: 1.25rem;
-    font-weight: 400;
+    font-weight: 500;
+    line-height: 1.1;
+    text-align: left;
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
   }
 
+  /* Description: muted, one service per line */
   .mobile-hero .description {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
+    font-weight: 300;
     letter-spacing: 0.05em;
-    line-height: 1.5;
-    padding: 0 10px;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.45);
+    padding: 0;
     max-width: 100%;
-    word-wrap: break-word;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+
+  .mobile-hero .description .service-item {
+    display: block;
+  }
+
+  /* Showreel: full-width so justify-content:center works */
+  .mobile-hero .showreel-section {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    margin-top: 8px;
+    min-height: unset;
   }
 }
 
-/* Small mobile (up to 480px) */
+/* ── Small mobile (≤480px) ── */
 @media (max-width: 480px) {
+  .mobile-hero .content {
+    padding: 0 20px;
+    padding-bottom: 4px;
+  }
+
   .mobile-hero .tagline {
-    font-size: 0.8rem;
-    letter-spacing: 5px;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
   }
 
   .mobile-hero .content h1 {
     font-size: 2.25rem;
-    line-height: 1.2;
-    margin-bottom: 1rem;
+    line-height: 1.1;
+    margin-bottom: 16px;
   }
 
   .mobile-hero .description {
-    font-size: 0.85rem;
-    line-height: 1.5;
-    padding: 0 5px;
+    font-size: 0.72rem;
+    gap: 6px;
+  }
+
+  .mobile-hero .showreel-section {
+    margin-top: 4px;
   }
 }
 
-/* Extra small mobile (up to 360px) */
+/* ── Extra small (≤360px) ── */
 @media (max-width: 360px) {
+  .mobile-hero .content {
+    padding: 0 16px;
+  }
+
   .mobile-hero .content h1 {
     font-size: 2rem;
   }
 
   .mobile-hero .description {
-    font-size: 0.8rem;
+    font-size: 0.68rem;
+    gap: 5px;
   }
 }

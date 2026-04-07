@@ -240,8 +240,8 @@
   /* Mobile Responsive */
   @media (max-width: 768px) {
     .showreel-section {
-      min-height: 10vh;
-      padding: 30px 40px 80px 40px;
+      min-height: unset;
+      padding: 24px 20px 40px 20px;
     }
   
     .rotating-circle {

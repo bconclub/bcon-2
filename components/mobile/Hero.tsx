@@ -32,7 +32,10 @@ export default function MobileHero() {
         <p className="tagline">AI-FIRST MARKETING</p>
         <h1>On a mission to solve marketing with <span className="hero-accent">AI.</span></h1>
         <p className="description">
-          Customer Acquisition · Brand Management · Content & Ads · Business Apps
+          <span className="service-item">Customer Acquisition</span>
+          <span className="service-item">Brand Management</span>
+          <span className="service-item">Content &amp; Ads</span>
+          <span className="service-item">Business Apps</span>
         </p>
         <ShowReel />
       </div>
