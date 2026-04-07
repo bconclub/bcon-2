@@ -17,9 +17,10 @@
 
   .mobile-hero .content h1 {
     font-size: 2.75rem;
+    font-family: 'Fraunces', serif;
     line-height: 1.15;
     margin-bottom: 1.25rem;
-    font-weight: 700;
+    font-weight: 500;
   }
 
   .mobile-hero .description {
