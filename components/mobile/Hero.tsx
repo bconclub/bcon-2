@@ -13,8 +13,9 @@ const DynamicLiquidEther = dynamic(
 
 export default function MobileHero() {
   return (
-    <div className="container mobile-hero">
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
+    <div className="mobile-hero">
+      {/* Full-screen background */}
+      <div className="mobile-hero-bg">
         <DynamicLiquidEther
           colors={['#6B2FE8', '#CCFF00', '#CDFC2E']}
           mouseForce={25}
@@ -28,18 +29,22 @@ export default function MobileHero() {
           iterationsViscous={16}
         />
       </div>
-      <div className="content">
-        <div className="hero-text-col">
-          <p className="tagline">AI-FIRST MARKETING</p>
+      
+      {/* Content container */}
+      <div className="mobile-hero-content">
+        <div className="mobile-hero-text">
+          <p className="mobile-hero-tagline">AI-FIRST MARKETING</p>
           <h1>On a mission to solve marketing with <span className="hero-accent">AI.</span></h1>
-          <p className="description">
-            <span className="service-item">Customer Acquisition</span>
-            <span className="service-item">Brand Management</span>
-            <span className="service-item">Content &amp; Ads</span>
-            <span className="service-item">Business Apps</span>
-          </p>
+          <div className="mobile-hero-pillars">
+            <span>Customer Acquisition</span>
+            <span>Brand Management</span>
+            <span>Content & Ads</span>
+            <span>Business Apps</span>
+          </div>
         </div>
-        <div className="hero-reel-col">
+        
+        {/* ShowReel positioned at bottom-right */}
+        <div className="mobile-hero-showreel">
           <ShowReel />
         </div>
       </div>
