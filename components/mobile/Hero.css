@@ -1,4 +1,4 @@
-/* Mobile Hero Styles - Full viewport, left-aligned content */
+/* Mobile Hero Styles - Full viewport, left-aligned content, LARGE typography */
 
 /* Base mobile hero container - fills entire viewport */
 .mobile-hero {
@@ -32,7 +32,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 100px 24px 120px 24px;
+  padding: 100px 20px 160px 20px;
   box-sizing: border-box;
   background: transparent;
 }
@@ -46,28 +46,28 @@
   width: 100%;
 }
 
-/* Tagline - small, left-aligned above headline */
+/* Tagline - scaled up proportionally */
 .mobile-hero-tagline {
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 16px;
-  padding-left: 10px;
-  border-left: 2px solid var(--neon-lime, #CDFC2E);
+  margin-bottom: 24px;
+  padding-left: 12px;
+  border-left: 3px solid var(--neon-lime, #CDFC2E);
   line-height: 1.2;
 }
 
-/* Main headline - left aligned */
+/* Main headline - LARGE, dominates the screen */
 .mobile-hero-text h1 {
   font-family: 'Fraunces', serif;
-  font-size: 2.5rem;
-  font-weight: 500;
-  line-height: 1.1;
+  font-size: 3.5rem;
+  font-weight: 600;
+  line-height: 1.05;
   text-align: left;
   color: #ffffff;
-  margin: 0 0 20px 0;
+  margin: 0 0 32px 0;
   width: 100%;
 }
 
@@ -78,32 +78,32 @@
   color: #CCFF00;
 }
 
-/* Pillars - left aligned below headline */
+/* Pillars - scaled up proportionally, readable against large headline */
 .mobile-hero-pillars {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .mobile-hero-pillars span {
-  font-size: 0.75rem;
-  font-weight: 300;
-  letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.4;
 }
 
-/* ShowReel - positioned at bottom-right */
+/* ShowReel - positioned at bottom-right, 2-3x BIGGER */
 .mobile-hero-showreel {
   position: absolute;
-  bottom: 40px;
-  right: 20px;
+  bottom: 50px;
+  right: 24px;
   z-index: 10;
 }
 
-/* Adjust ShowReel sizing for mobile hero */
+/* Adjust ShowReel sizing for mobile hero - LARGE button */
 .mobile-hero-showreel .showreel-section {
   margin: 0;
   padding: 0;
@@ -112,93 +112,129 @@
 }
 
 .mobile-hero-showreel .rotating-circle {
-  width: 120px;
-  height: 120px;
+  width: 200px;
+  height: 200px;
 }
 
 .mobile-hero-showreel .circle-text {
-  width: 120px;
-  height: 120px;
+  width: 200px;
+  height: 200px;
 }
 
 .mobile-hero-showreel .rotating-text {
-  font-size: 9px;
-  letter-spacing: 0.6em;
+  font-size: 14px;
+  letter-spacing: 0.7em;
 }
 
 .mobile-hero-showreel .play-icon-center {
-  width: 44px;
-  height: 44px;
+  width: 80px;
+  height: 80px;
 }
 
 .mobile-hero-showreel .play-icon-center svg {
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
 }
 
-/* Small mobile adjustments */
+/* Small mobile adjustments (≤480px) */
 @media (max-width: 480px) {
   .mobile-hero-content {
-    padding: 90px 20px 100px 20px;
+    padding: 90px 16px 140px 16px;
   }
 
   .mobile-hero-tagline {
-    font-size: 0.6rem;
-    margin-bottom: 12px;
+    font-size: 0.75rem;
+    margin-bottom: 20px;
   }
 
   .mobile-hero-text h1 {
-    font-size: 2rem;
-    margin-bottom: 16px;
+    font-size: 2.8rem;
+    margin-bottom: 24px;
   }
 
   .mobile-hero-pillars span {
-    font-size: 0.7rem;
+    font-size: 0.95rem;
   }
 
   .mobile-hero-showreel {
-    bottom: 30px;
+    bottom: 40px;
     right: 16px;
   }
 
   .mobile-hero-showreel .rotating-circle {
-    width: 100px;
-    height: 100px;
+    width: 160px;
+    height: 160px;
   }
 
   .mobile-hero-showreel .circle-text {
-    width: 100px;
-    height: 100px;
+    width: 160px;
+    height: 160px;
   }
 
   .mobile-hero-showreel .rotating-text {
-    font-size: 8px;
+    font-size: 12px;
+    letter-spacing: 0.6em;
+  }
+
+  .mobile-hero-showreel .play-icon-center {
+    width: 64px;
+    height: 64px;
+  }
+
+  .mobile-hero-showreel .play-icon-center svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Extra small mobile (≤360px) */
+@media (max-width: 360px) {
+  .mobile-hero-content {
+    padding: 80px 14px 120px 14px;
+  }
+
+  .mobile-hero-tagline {
+    font-size: 0.7rem;
+    margin-bottom: 16px;
+  }
+
+  .mobile-hero-text h1 {
+    font-size: 2.3rem;
+    margin-bottom: 20px;
+  }
+
+  .mobile-hero-pillars span {
+    font-size: 0.85rem;
+  }
+
+  .mobile-hero-showreel {
+    bottom: 30px;
+    right: 12px;
+  }
+
+  .mobile-hero-showreel .rotating-circle {
+    width: 130px;
+    height: 130px;
+  }
+
+  .mobile-hero-showreel .circle-text {
+    width: 130px;
+    height: 130px;
+  }
+
+  .mobile-hero-showreel .rotating-text {
+    font-size: 10px;
     letter-spacing: 0.5em;
   }
 
   .mobile-hero-showreel .play-icon-center {
-    width: 38px;
-    height: 38px;
+    width: 54px;
+    height: 54px;
   }
 
   .mobile-hero-showreel .play-icon-center svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-/* Extra small mobile */
-@media (max-width: 360px) {
-  .mobile-hero-content {
-    padding: 80px 16px 90px 16px;
-  }
-
-  .mobile-hero-text h1 {
-    font-size: 1.75rem;
-  }
-
-  .mobile-hero-pillars span {
-    font-size: 0.65rem;
+    width: 28px;
+    height: 28px;
   }
 }
 
