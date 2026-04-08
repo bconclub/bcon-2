@@ -30,6 +30,7 @@
    fixed-position containing block in Chrome, making the LiquidEther canvas scroll. */
 html {
   overflow-x: clip;
+  background: #000000;
 }
 
 body {
@@ -39,6 +40,13 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile: ensure solid black background, no leaking colors */
+@media (max-width: 768px) {
+  html, body {
+    background: #000000 !important;
+  }
 }
 
 code {

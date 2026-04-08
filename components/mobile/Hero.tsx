@@ -1,34 +1,13 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-
 import ShowReel from '@/sections/ShowReel/ShowReel';
 import './Hero.css';
-
-// Dynamically import LiquidEther to avoid SSR issues with Three.js
-const DynamicLiquidEther = dynamic(
-  () => import('@/effects/LiquidEther/LiquidEther'),
-  { ssr: false }
-);
 
 export default function MobileHero() {
   return (
     <div className="mobile-hero">
-      {/* Full-screen background */}
-      <div className="mobile-hero-bg">
-        <DynamicLiquidEther
-          colors={['#6B2FE8', '#CCFF00', '#CDFC2E']}
-          mouseForce={25}
-          cursorSize={120}
-          resolution={0.4}
-          autoDemo={true}
-          autoSpeed={0.3}
-          autoIntensity={2.8}
-          dt={0.04}
-          iterationsPoisson={20}
-          iterationsViscous={16}
-        />
-      </div>
+      {/* Solid black background - no LiquidEther on mobile */}
+      <div className="mobile-hero-bg" />
       
       {/* Content container */}
       <div className="mobile-hero-content">
