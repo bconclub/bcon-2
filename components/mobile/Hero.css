@@ -32,7 +32,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 100px 20px 160px 20px;
+  padding: 100px 20px 160px 40px;
   box-sizing: border-box;
   background: transparent;
 }
@@ -139,7 +139,7 @@
 /* Small mobile adjustments (≤480px) */
 @media (max-width: 480px) {
   .mobile-hero-content {
-    padding: 90px 16px 140px 16px;
+    padding: 90px 16px 140px 28px;
   }
 
   .mobile-hero-tagline {
@@ -190,7 +190,7 @@
 /* Extra small mobile (≤360px) */
 @media (max-width: 360px) {
   .mobile-hero-content {
-    padding: 80px 14px 120px 14px;
+    padding: 80px 14px 120px 24px;
   }
 
   .mobile-hero-tagline {
