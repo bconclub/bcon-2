@@ -94,7 +94,7 @@ export default function Home() {
           <div className="reveal-text-container">
             <ScrollReveal
               baseOpacity={0}
-              enableBlur={true}
+              enableBlur={false}
               baseRotation={0}
               blurStrength={20}
               rotationEnd="bottom top"
@@ -105,7 +105,7 @@ export default function Home() {
             </ScrollReveal>
             <ScrollReveal
               baseOpacity={0}
-              enableBlur={true}
+              enableBlur={false}
               baseRotation={0}
               blurStrength={20}
               rotationEnd="bottom top"
@@ -116,7 +116,7 @@ export default function Home() {
             </ScrollReveal>
             <ScrollReveal
               baseOpacity={0}
-              enableBlur={true}
+              enableBlur={false}
               baseRotation={0}
               blurStrength={20}
               rotationEnd="bottom top"

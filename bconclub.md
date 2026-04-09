@@ -767,6 +767,595 @@ Required buckets:
 - **Three.js Docs**: https://threejs.org/docs
 - **TypeScript Docs**: https://www.typescriptlang.org/docs
 
+## Effects & Animations Reference
+
+### Overview
+The BCON website uses a comprehensive animation system powered by multiple libraries:
+- **GSAP 3.13.0** with ScrollTrigger for scroll-based animations
+- **Motion (Framer Motion)** 12.23.24 for React component animations
+- **Three.js 0.180.0** for 3D/WebGL effects
+- **Custom CSS animations** for simple transitions
+
+---
+
+### Effect Components (`/effects/`)
+
+#### 1. LiquidEther (`/effects/LiquidEther/`)
+**File**: `LiquidEther.tsx`, `LiquidEther.css`
+
+A WebGL-based fluid simulation background effect using Three.js.
+
+**Features**:
+- Navier-Stokes fluid dynamics simulation
+- Mouse/touch interaction creates fluid disturbances
+- Auto-demo mode with automatic cursor movement when idle
+- Color palette mapping based on velocity
+- Mobile-optimized (reduced resolution on mobile devices)
+
+**Technical Implementation**:
+- Custom shader passes: Advection, ExternalForce, Viscous, Divergence, Poisson, Pressure
+- Frame Buffer Objects (FBOs) for GPU-based simulation
+- BFECC (Back and Forth Error Compensation and Correction) for accuracy
+- Intersection Observer for lazy initialization (only renders when visible)
+
+**Props**:
+```typescript
+interface LiquidEtherProps {
+  mouseForce?: number;        // Force of mouse interaction (default: 20)
+  cursorSize?: number;        // Size of cursor influence (default: 100)
+  isViscous?: boolean;        // Enable viscosity (default: false)
+  viscous?: number;           // Viscosity coefficient (default: 30)
+  iterationsViscous?: number; // Viscous solver iterations (default: 16)
+  iterationsPoisson?: number; // Poisson solver iterations (default: 16)
+  dt?: number;                // Time step (default: 0.04)
+  BFECC?: boolean;            // Enable BFECC (default: true)
+  resolution?: number;        // Simulation resolution (default: 0.5)
+  isBounce?: boolean;         // Boundary bounce behavior (default: false)
+  colors?: string[];          // Color palette (default: ['#5227FF', '#FF9FFC', '#B19EEF'])
+  autoDemo?: boolean;         // Auto-demo mode (default: true)
+  autoSpeed?: number;         // Auto movement speed (default: 0.5)
+  autoIntensity?: number;     // Auto disturbance intensity (default: 2.2)
+  takeoverDuration?: number;  // Transition duration when user takes over (default: 0.25s)
+  autoResumeDelay?: number;   // Delay before auto resumes (default: 1000ms)
+}
+```
+
+**Usage**:
+- Desktop Hero background: Uses brand colors `['#6B2FE8', '#CCFF00', '#CDFC2E']`
+- Mobile: Disabled (replaced with solid black background for performance)
+
+---
+
+#### 2. GradualBlur (`/effects/GradualBlur/`)
+**File**: `GradualBlur.tsx`, `GradualBlur.css`
+
+A configurable blur overlay effect using CSS backdrop-filter with gradient masking.
+
+**Features**:
+- Multi-layered blur with exponential or linear progression
+- Four positioning options: top, bottom, left, right
+- Multiple curve functions: linear, bezier, ease-in, ease-out, ease-in-out
+- Animated entrance/exit with configurable duration
+- Hover intensity effects
+- Responsive dimension support
+- Intersection Observer for scroll-triggered animations
+
+**Presets**:
+```typescript
+PRESETS = {
+  top: { position: 'top', height: '6rem' },
+  bottom: { position: 'bottom', height: '6rem' },
+  left: { position: 'left', height: '6rem' },
+  right: { position: 'right', height: '6rem' },
+  subtle: { height: '4rem', strength: 1, opacity: 0.8, divCount: 3 },
+  intense: { height: '10rem', strength: 4, divCount: 8, exponential: true },
+  smooth: { height: '8rem', curve: 'bezier', divCount: 10 },
+  sharp: { height: '5rem', curve: 'linear', divCount: 4 },
+  header: { position: 'top', height: '8rem', curve: 'ease-out' },
+  footer: { position: 'bottom', height: '8rem', curve: 'ease-out' },
+  sidebar: { position: 'left', height: '6rem', strength: 2.5 },
+  'page-header': { position: 'top', height: '10rem', target: 'page', strength: 3 },
+  'page-footer': { position: 'bottom', height: '10rem', target: 'page', strength: 3 }
+}
+```
+
+**Curve Functions**:
+- `linear`: p => p
+- `bezier`: p => p * p * (3 - 2 * p) (smooth ease)
+- `ease-in`: p => p * p
+- `ease-out`: p => 1 - Math.pow(1 - p, 2)
+- `ease-in-out`: Cubic easing
+
+**Props**:
+```typescript
+interface GradualBlurProps {
+  position?: 'top' | 'bottom' | 'left' | 'right';
+  strength?: number;           // Blur intensity multiplier (default: 2)
+  height?: string;             // Blur zone height (default: '6rem')
+  divCount?: number;           // Number of blur layers (default: 5)
+  exponential?: boolean;       // Exponential blur progression
+  zIndex?: number;             // Stack order (default: 1000)
+  animated?: boolean | 'scroll'; // Animation mode
+  duration?: string;           // Animation duration (default: '0.3s')
+  easing?: string;             // Animation easing
+  opacity?: number;            // Overlay opacity (default: 1)
+  curve?: string;              // Blur curve type
+  responsive?: boolean;        // Responsive dimensions
+  target?: 'parent' | 'page';  // Target container
+  preset?: string;             // Use predefined preset
+  hoverIntensity?: number;     // Multiplier on hover
+}
+```
+
+---
+
+#### 3. Loader (`/effects/Loader/`)
+**File**: `Loader.tsx`, `Loader.css`
+
+Initial page load animation component.
+
+**Features**:
+- "HUMAN X AI" text reveal with accent color
+- Animated loading bar
+- Automatic fade-out after 2.5 seconds
+- Fixed position overlay covering entire viewport
+
+**CSS Animations**:
+```css
+@keyframes loading {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+```
+
+**Duration**: 2.5 seconds total (1s animation + 1.5s display)
+
+---
+
+### Section Animations (`/sections/`)
+
+#### 1. ScrollReveal (`/sections/ScrollReveal/`)
+**File**: `ScrollReveal.tsx`, `ScrollReveal.css`
+
+GSAP ScrollTrigger-powered text reveal animation.
+
+**Features**:
+- Word-by-word opacity animation on scroll
+- Rotation animation (element rotates from baseRotation to 0)
+- Color wave effect (words animate from accent green to white)
+- Blur-to-clear effect per word
+- Special handling for "BCON" brand word
+- Line-specific styling classes: `reveal-line-1`, `reveal-line-2`, `reveal-line-3`
+
+**Animation Details**:
+```typescript
+// Rotation animation
+gsap.fromTo(el, 
+  { transformOrigin: '0% 50%', rotate: 3 },
+  { rotate: 0, ease: 'none', scrollTrigger: { scrub: true } }
+);
+
+// Word opacity animation
+gsap.fromTo(wordElements,
+  { opacity: 0.1 },
+  { opacity: 1, stagger: 0.05, scrollTrigger: { scrub: true } }
+);
+
+// Color wave (green to white)
+gsap.fromTo(wordElements,
+  { color: '#CCFF00' },
+  { color: '#ffffff', stagger: 0.05, scrollTrigger: { scrub: true } }
+);
+
+// Blur removal
+gsap.fromTo(wordElements,
+  { filter: 'blur(4px)' },
+  { filter: 'blur(0px)', stagger: 0.05, scrollTrigger: { scrub: true } }
+);
+```
+
+**Props**:
+```typescript
+interface ScrollRevealProps {
+  children: React.ReactNode;
+  scrollContainerRef?: React.RefObject<HTMLElement>;
+  enableBlur?: boolean;        // Enable blur effect (default: true)
+  baseOpacity?: number;        // Starting opacity (default: 0.1)
+  baseRotation?: number;       // Starting rotation in degrees (default: 3)
+  blurStrength?: number;       // Starting blur in px (default: 4)
+  containerClassName?: string; // CSS class for container
+  textClassName?: string;      // CSS class for text
+  rotationEnd?: string;        // ScrollTrigger end for rotation
+  wordAnimationEnd?: string;   // ScrollTrigger end for words
+}
+```
+
+---
+
+#### 2. RotatingText (`/sections/RotatingText/`)
+**File**: `RotatingText.tsx`
+
+Auto-rotating text component with blur transition.
+
+**Features**:
+- Cycles through array of words
+- Blur out / blur in transition effect
+- Configurable interval and blur timing
+- Fixed min-width to prevent layout shift
+
+**Animation Timing**:
+- Interval: 3000ms (default) between word changes
+- Blur transition: 500ms
+- Blur strength: 10px during transition
+
+**Props**:
+```typescript
+interface RotatingTextProps {
+  words: string[];
+  interval?: number;  // Time between rotations in ms (default: 3000)
+}
+```
+
+---
+
+#### 3. ShowReel (`/sections/ShowReel/`)
+**File**: `ShowReel.tsx`, `ShowReel.css`
+
+Video showcase component with rotating play button.
+
+**Features**:
+- **Rotating Circle Text**: SVG text rotating around circular path (10s rotation)
+- **Play Button**: Centered play icon with hover effects
+- **Modal Video Player**: Full-screen video modal with loading states
+- **Video Controls**: Starts at 7 seconds, auto-closes on end
+
+**CSS Animations**:
+```css
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(30px); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(50px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+```
+
+**Hover Effects**:
+- Trigger scales to 1.1x
+- Circle text changes to white
+- Play button background glows
+
+---
+
+#### 4. ShowcaseCard (`/sections/ShowcaseCard/`)
+**File**: `ShowcaseCard.tsx`, `ShowcaseCard.css`
+
+Animated card component for showcasing work items.
+
+**Features**:
+- GSAP ScrollTrigger entrance animation
+- Fade in + slide up + scale effect
+- Staggered delay based on index
+- Aspect ratio support (16:9, 9:16)
+- Left/right positioning
+
+**Animation**:
+```typescript
+gsap.fromTo(cardRef.current,
+  { opacity: 0, y: 60, scale: 0.95 },
+  {
+    opacity: 1, y: 0, scale: 1,
+    duration: 0.8,
+    ease: 'power3.out',
+    delay: index * 0.15,
+    scrollTrigger: { trigger: cardRef.current, start: 'top 80%' }
+  }
+);
+```
+
+---
+
+#### 5. StoryHighlights (`/sections/StoryHighlights/`)
+**File**: `StoryHighlights.tsx`, `StoryHighlights.css`
+
+Instagram Stories-style horizontal scroll component.
+
+**Features**:
+- Drag-to-scroll interaction
+- Scroll snap behavior
+- Gradient border circles with CSS pseudo-elements
+- Pulse animation on hover
+- Staggered entrance animation with Motion
+
+**Motion Animations**:
+```typescript
+<motion.button
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  initial={{ opacity: 0, scale: 0.8 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ delay: index * 0.1, duration: 0.3 }}
+/>
+```
+
+**CSS Animation**:
+```css
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+```
+
+---
+
+#### 6. WorkCard (`/sections/WorkCard/`)
+**File**: `WorkCard.tsx`, `WorkCard.css`
+
+Portfolio work item card with hover effects.
+
+**Features**:
+- Motion-based entrance animation (fade up)
+- Hover scale effect (1.05x)
+- Tap scale effect (0.98x)
+- Image/video zoom on hover (1.1x)
+- Loading spinner for images
+- Video play overlay
+
+**Motion Animations**:
+```typescript
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.4 }}
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.98 }}
+/>
+```
+
+**CSS Hover Effect**:
+```css
+.work-card:hover .work-card-image,
+.work-card:hover .work-card-video {
+  transform: scale(1.1);
+}
+```
+
+---
+
+#### 7. ProjectCard (`/sections/ProjectCard/`)
+**File**: `ProjectCard.tsx`, `ProjectCard.css`
+
+Project display card with video hover preview.
+
+**Features**:
+- Motion entrance animation
+- Hover video autoplay
+- Scale effects on hover/tap
+- Badge and view count display
+- Image/video scale on hover (1.05x)
+
+**Motion Animations**:
+```typescript
+<motion.div
+  whileHover={{ scale: 1.02 }}
+  whileTap={{ scale: 0.98 }}
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3 }}
+/>
+```
+
+---
+
+#### 8. LiquidBentoPortfolio (`/sections/LiquidBentoPortfolio/`)
+**File**: `LiquidBentoPortfolio.tsx`, `LiquidBentoPortfolio.css`
+
+Masonry-style portfolio grid with hover effects.
+
+**Features**:
+- CSS Columns masonry layout (5 cols desktop, 3 tablet, 2 mobile)
+- Business Apps Carousel with custom navigation
+- Bento item hover: translateY(-8px) + scale(1.02)
+- Neon glow border on hover
+- Video thumbnail autoplay
+- Play button with backdrop blur
+
+**Hover Animation**:
+```css
+.bento-item {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bento-item:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.bento-item:hover .bento-item-inner {
+  border-color: #CCFF00;
+  box-shadow: 0 10px 40px rgba(204, 255, 0, 0.3);
+}
+
+.bento-item:hover .bento-media {
+  transform: scale(1.05);
+}
+```
+
+**View Work Button**:
+```css
+.view-work-button {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(204, 255, 0, 0.3);
+}
+
+.view-work-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(204, 255, 0, 0.5);
+}
+```
+
+---
+
+### Component Animations (`/components/`)
+
+#### 1. StaggeredMenu (`/components/StaggeredMenu/`)
+**File**: `StaggeredMenu.tsx`, `StaggeredMenu.css`
+
+Full-screen navigation menu with staggered animations.
+
+**Features**:
+- **Pre-layer Animation**: 3 background layers stagger in (0.08s delay each)
+- **Panel Slide**: Menu panel slides from right/left
+- **Menu Items Stagger**: Items animate up with 0.08s stagger
+- **Hamburger Icon**: Morphs to X with rotation
+- **Frosted Glass**: Backdrop blur effect on header and panel
+- **Text Reveal**: "Menu" text slides up to reveal "Close"
+
+**GSAP Animations**:
+```typescript
+// Open - Prelayers
+gsap.fromTo(prelayersRef.current,
+  { x: '100%' },
+  { x: 0, duration: 0.6, ease: 'power3.inOut', stagger: 0.08 }
+);
+
+// Open - Panel
+gsap.fromTo(panelRef.current,
+  { x: '100%' },
+  { x: 0, duration: 0.7, ease: 'power3.inOut' }
+);
+
+// Open - Menu Items
+gsap.fromTo(itemsRef.current,
+  { y: 60, opacity: 0 },
+  { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', stagger: 0.08, delay: 0.2 }
+);
+
+// Open - Icon to X
+gsap.to(iconRef.current.children[0], { rotation: 45, y: 0, duration: 0.3 });
+gsap.to(iconRef.current.children[1], { rotation: -45, y: 0, duration: 0.3 });
+```
+
+**CSS Transitions**:
+```css
+.sm-toggle-textInner {
+  transition: transform 0.3s ease;
+}
+
+.staggered-menu-wrapper[data-open] .sm-toggle-textInner {
+  transform: translateY(-1em);
+}
+
+.sm-panel-item {
+  transition: color 0.3s ease;
+}
+
+.sm-panel-close:hover {
+  transform: rotate(90deg);
+}
+```
+
+---
+
+#### 2. ComingSoonModal (`/components/ComingSoonModal/`)
+**File**: `ComingSoonModal.tsx`, `ComingSoonModal.css`
+
+Modal dialog for unfinished pages.
+
+**Features**:
+- Backdrop blur fade-in
+- Modal slide-up animation
+- Close button rotation on hover
+
+**CSS Animations**:
+```css
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+```
+
+---
+
+### Global Animation Utilities
+
+#### Animation Library Versions
+```json
+{
+  "gsap": "^3.13.0",
+  "@gsap/react": "^2.1.2",
+  "motion": "^12.23.24",
+  "three": "^0.180.0",
+  "ogl": "^1.0.11"
+}
+```
+
+#### Easing Functions Reference
+| Name | Use Case |
+|------|----------|
+| `power2.out` | Menu items entrance |
+| `power3.out` | Cards, panels |
+| `power3.inOut` | Panel slides, prelayers |
+| `none` (linear) | Scroll-linked scrub animations |
+| `cubic-bezier(0.34, 1.56, 0.64, 1)` | Bento hover (elastic) |
+
+#### Performance Optimizations
+1. **will-change**: Applied to animated elements
+2. **transform/opacity**: Used for GPU-accelerated animations
+3. **Intersection Observer**: Lazy initialization for heavy effects (LiquidEther)
+4. **Reduced Motion**: Respect `prefers-reduced-motion` (implement where needed)
+5. **Mobile Optimizations**:
+   - LiquidEther disabled on mobile
+   - Reduced particle counts
+   - Simpler hover states
+
+#### ScrollTrigger Best Practices
+```typescript
+// Always clean up ScrollTrigger instances
+useEffect(() => {
+  // Create animations...
+  
+  return () => {
+    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+  };
+}, []);
+```
+
+---
+
+### Animation Checklist for New Components
+
+When adding new animations:
+1. ✅ Use `transform` and `opacity` for GPU acceleration
+2. ✅ Add `will-change` for complex animations
+3. ✅ Clean up GSAP ScrollTrigger instances on unmount
+4. ✅ Implement reduced motion support where applicable
+5. ✅ Test on mobile devices
+6. ✅ Use Intersection Observer for lazy initialization of heavy effects
+7. ✅ Keep animation duration between 200ms-800ms for UI feedback
+8. ✅ Use consistent easing functions (reference table above)
+
+---
+
 ## Version History
 
 ### Recent Releases

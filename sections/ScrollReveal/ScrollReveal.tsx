@@ -23,7 +23,7 @@ interface ScrollRevealProps {
 export default function ScrollReveal({
   children,
   scrollContainerRef,
-  enableBlur = true,
+  enableBlur = false,
   baseOpacity = 0.1,
   baseRotation = 3,
   blurStrength = 4,

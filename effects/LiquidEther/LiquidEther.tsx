@@ -1212,14 +1212,18 @@ export default function LiquidEther({
         isVisibleRef.current = isVisible;
         if (!webglRef.current) return;
         
-        // Initialize only when component becomes visible
-        if (isVisible && !isInitializedRef.current && !document.hidden) {
-          isInitializedRef.current = true;
-          webglRef.current.start();
-        } else if (isVisible && !document.hidden) {
+        // Cancel/resume rAF based on visibility
+        if (isVisible && !document.hidden) {
+          if (!isInitializedRef.current) {
+            isInitializedRef.current = true;
+          }
           webglRef.current.start();
         } else {
           webglRef.current.pause();
+          if (rafRef.current) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = null;
+          }
         }
       },
       { threshold: [0, 0.01, 0.1], rootMargin: '100px' }

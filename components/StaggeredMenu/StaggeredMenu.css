@@ -65,9 +65,7 @@
   
   /* Frosted glass effect when scrolled - expands to full width */
   .staggered-menu-header.scrolled {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: transparent;
     border: none;
     left: 0;
     right: 0;
@@ -82,6 +80,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .staggered-menu-header.scrolled::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(0, 0, 0, 0.75);
+    filter: blur(20px);
+    transform: translateZ(0);
   }
   
   .staggered-menu-header > * {
@@ -245,9 +253,7 @@
     width: clamp(300px, 40vw, 500px);
     height: 100vh;
     max-height: 100vh;
-    background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    background: transparent;
     border-left: 1px solid #CCFF0033;
     display: flex;
     flex-direction: column;
@@ -256,6 +262,18 @@
     overflow-x: hidden;
     z-index: 10000;
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .staggered-menu-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(0, 0, 0, 0.95);
+    filter: blur(30px);
+    transform: translateZ(0);
   }
   
   [data-position='left'] .staggered-menu-panel {
@@ -448,11 +466,19 @@
       max-width: 100%;
       margin: 0;
       transform: none;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: transparent;
       border-radius: 16px;
       border: none;
+    }
+
+    .staggered-menu-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: rgba(0, 0, 0, 0.75);
+      filter: blur(20px);
+      transform: translateZ(0);
     }
 
     .staggered-menu-wrapper.fixed-wrapper .staggered-menu-header {
@@ -513,11 +539,19 @@
       max-width: 100%;
       margin: 0;
       transform: none;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: transparent;
       border-radius: 12px;
       border: none;
+    }
+
+    .staggered-menu-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: rgba(0, 0, 0, 0.75);
+      filter: blur(20px);
+      transform: translateZ(0);
     }
 
     .staggered-menu-wrapper.fixed-wrapper .staggered-menu-header {

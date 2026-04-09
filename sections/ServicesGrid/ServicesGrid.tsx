@@ -29,13 +29,13 @@ export default function ServicesGrid({ onServiceClick }: ServicesGridProps = {})
   const services: Service[] = [
     {
       id: 1,
-      title: 'AI in Business',
+      title: 'AI in Marketing',
       description: 'Turn your business into an intelligent system.',
       image: '/BRain.webp'
     },
     {
       id: 2,
-      title: 'Brand Marketing',
+      title: 'Brand Management',
       description: 'Marketing that thinks, adapts, and performs.',
       image: '/Gulb Icon.png'
     },
