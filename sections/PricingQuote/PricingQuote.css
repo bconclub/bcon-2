@@ -74,7 +74,7 @@
   color: rgba(255, 255, 255, 0.5);
   position: relative;
   z-index: 1;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .pricing-progress-step.active .pricing-progress-step-number {
@@ -147,7 +147,7 @@
   font-weight: 500;
   cursor: pointer;
   margin-bottom: 24px;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
 }
 
 .pricing-back-button:hover {
@@ -171,7 +171,7 @@
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
   text-align: left;
   min-height: 100px;
   display: flex;
@@ -234,7 +234,7 @@
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -509,7 +509,7 @@
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -530,7 +530,7 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
 }
 
 .pricing-cta-secondary:hover {

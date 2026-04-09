@@ -253,7 +253,7 @@ iframe.business-apps-card-media {
     justify-content: center;
     color: #FFFFFF;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
     padding: 0;
     flex-shrink: 0;
     z-index: 10;
@@ -418,7 +418,7 @@ iframe.business-apps-modal-video {
   justify-content: center;
   color: #FFFFFF;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
   z-index: 10;
 }
 
@@ -451,7 +451,7 @@ iframe.business-apps-modal-video {
   text-decoration: none;
   text-align: center;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .business-apps-modal-cta:hover {

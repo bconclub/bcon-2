@@ -152,7 +152,7 @@
   justify-content: center;
   color: #FFFFFF;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   padding: 0;
   z-index: 10;
   pointer-events: auto;
@@ -347,7 +347,7 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   flex: 0 0 auto;
 }
 
@@ -431,7 +431,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease;
   min-height: 40px;
 }
 
@@ -494,7 +494,7 @@
   background: transparent;
   border: 2px solid #CDFC2E;
   border-radius: 25px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   cursor: pointer;
   font: inherit;
 }
@@ -518,7 +518,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50px;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
 .business-apps-cta-secondary:hover {
@@ -925,7 +925,7 @@
   font-size: 16px;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
   width: 100%;
   border: none;
@@ -969,7 +969,7 @@
   justify-content: center;
   color: #FFFFFF;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   padding: 0;
   z-index: 10;
 }
@@ -1012,7 +1012,7 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, transform 0.3s ease, width 0.3s ease, box-shadow 0.3s ease;
 }
 
 .business-apps-dot:hover {
@@ -1042,7 +1042,7 @@
   justify-content: center;
   color: #FFFFFF;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
   padding: 0;
   z-index: 100;
   touch-action: manipulation;
@@ -1102,7 +1102,7 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, transform 0.3s ease, width 0.3s ease, box-shadow 0.3s ease;
 }
 
 .business-apps-mobile-dot:hover {
@@ -1493,7 +1493,7 @@
   justify-content: center;
   cursor: pointer;
   z-index: 10000;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
   padding: 0;
 }
 
