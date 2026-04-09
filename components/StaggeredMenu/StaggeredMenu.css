@@ -27,16 +27,23 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem 2.5rem;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.0);
     border-radius: 16px;
     border: none;
     z-index: 9999;
-    transition: background 0.4s ease, border-radius 0.4s ease, padding 0.4s ease;
+    transition: background 0.3s ease;
     margin: 0 auto;
     gap: 1rem;
     box-sizing: border-box;
+  }
+
+  .staggered-menu-header::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    pointer-events: none;
+    background: inherit;
   }
   
   .staggered-menu-wrapper.fixed-wrapper .staggered-menu-header {
@@ -65,7 +72,7 @@
   
   /* Frosted glass effect when scrolled - expands to full width */
   .staggered-menu-header.scrolled {
-    background: transparent;
+    background: rgba(0, 0, 0, 0.85);
     border: none;
     left: 0;
     right: 0;
@@ -80,16 +87,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-
-  .staggered-menu-header.scrolled::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: rgba(0, 0, 0, 0.75);
-    filter: blur(20px);
-    transform: translateZ(0);
   }
   
   .staggered-menu-header > * {
@@ -322,7 +319,7 @@
     right: auto;
     left: 2rem;
   }
-
+  
   .sm-panel-inner {
     flex: 1;
     display: flex;
@@ -463,19 +460,9 @@
       max-width: 100%;
       margin: 0;
       transform: none;
-      background: transparent;
+      background: rgba(0, 0, 0, 0.0);
       border-radius: 16px;
       border: none;
-    }
-
-    .staggered-menu-header::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background: rgba(0, 0, 0, 0.75);
-      filter: blur(20px);
-      transform: translateZ(0);
     }
 
     .staggered-menu-wrapper.fixed-wrapper .staggered-menu-header {
@@ -536,19 +523,9 @@
       max-width: 100%;
       margin: 0;
       transform: none;
-      background: transparent;
+      background: rgba(0, 0, 0, 0.0);
       border-radius: 12px;
       border: none;
-    }
-
-    .staggered-menu-header::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background: rgba(0, 0, 0, 0.75);
-      filter: blur(20px);
-      transform: translateZ(0);
     }
 
     .staggered-menu-wrapper.fixed-wrapper .staggered-menu-header {
