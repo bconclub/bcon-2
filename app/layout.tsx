@@ -155,10 +155,10 @@ export default function RootLayout({
           </TrackingProvider>
         </ErrorBoundary>
         {/* PROXe Chat Widget - Hidden temporarily */}
-        {/* <Script
+        <Script
           src="https://proxe.bconclub.com/api/widget/embed.js"
           strategy="afterInteractive"
-        /> */}
+        />
       </body>
     </html>
   );
