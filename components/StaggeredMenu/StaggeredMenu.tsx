@@ -51,6 +51,18 @@ export default function StaggeredMenu({
   const prelayersRef = useRef<(HTMLDivElement | null)[]>([]);
   const pathname = usePathname();
 
+  // Close menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  // Set initial panel position on mount
+  useEffect(() => {
+    if (panelRef.current) {
+      gsap.set(panelRef.current, { x: position === 'right' ? '100%' : '-100%' });
+    }
+  }, []);
+
   // Scroll detection for frosted glass effect
   useEffect(() => {
     const handleScroll = () => {
@@ -123,8 +135,7 @@ export default function StaggeredMenu({
   };
 
   const closeMenu = () => {
-    if (!isOpen) return;
-    
+    // Always update state even if already closed to ensure consistency
     setIsOpen(false);
     onMenuClose?.();
 
