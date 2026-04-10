@@ -13,9 +13,7 @@
 }
 
 .service-card {
-  background: rgba(28, 28, 28, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(28, 28, 28, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 32px;
@@ -194,7 +192,6 @@
   object-fit: cover;
   display: block;
   transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  will-change: transform;
 }
 
 .service-text {

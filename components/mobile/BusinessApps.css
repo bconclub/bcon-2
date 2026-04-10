@@ -66,9 +66,7 @@ image.png/* ==================== BUSINESS APPS SECTION ==================== */
   scroll-snap-align: start;
   justify-content: flex-start;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(20, 20, 20, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   margin: 0;
 }
@@ -77,8 +75,6 @@ image.png/* ==================== BUSINESS APPS SECTION ==================== */
   width: 100%;
   padding: 24px 20px;
   background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -114,9 +110,7 @@ iframe.business-apps-card-media {
 /* ==================== DETAILS ==================== */
 .business-apps-card-details {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.8);
   border-radius: 0 0 16px 16px;
 }
 
@@ -530,8 +524,7 @@ iframe.business-apps-modal-video {
     left: 0;
     right: 0;
     z-index: 10;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.85);
   }
 
   .business-apps-modal-title {
@@ -582,8 +575,7 @@ iframe.business-apps-modal-video {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.85);
   }
 
   .business-apps-modal-cta {

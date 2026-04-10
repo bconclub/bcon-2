@@ -72,9 +72,7 @@
 }
 
 .work-showcase-media-item {
-  background: rgba(28, 28, 28, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(28, 28, 28, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   overflow: hidden;
@@ -183,13 +181,11 @@
   color: #ffffff;
   width: 60px;
   height: 60px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.6);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   transform: scale(0.8);
   transition: transform 0.3s ease;
 }

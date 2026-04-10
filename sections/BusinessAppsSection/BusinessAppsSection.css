@@ -109,9 +109,7 @@ iframe.business-apps-card-media {
 /* ==================== DETAILS ==================== */
 .business-apps-card-details {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.8);
   border-radius: 0 0 16px 16px;
 }
 
@@ -1279,9 +1277,7 @@ iframe.business-apps-modal-video {
 .business-apps-mobile-product-preview-glass {
   width: 100%;
   padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(0, 0, 0, 0.85);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 

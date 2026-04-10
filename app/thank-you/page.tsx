@@ -16,6 +16,7 @@ const DynamicLiquidEther = dynamic(
 function ThankYouContent() {
   const searchParams = useSearchParams();
   const [isCalling, setIsCalling] = useState(false);
+  const [hasWhatsAppClicked, setHasWhatsAppClicked] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
   // Ensure component is mounted before accessing browser APIs
@@ -32,17 +33,17 @@ function ThankYouContent() {
   const leadId = searchParams?.get('leadId') || '';
   
   // Only construct WhatsApp URL on client side
-  const [whatsappUrl, setWhatsappUrl] = useState('https://wa.me/919353253817');
+  const [whatsappUrl, setWhatsappUrl] = useState('https://wa.me/6360079756');
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const phoneNumber = '919353253817';
-        const message = `Hi, I'm ${name || 'interested customer'}${brandName ? ` from ${brandName}` : ''}. Interested in ${service || 'your services'}.${phone ? ` My number: ${phone}` : ''}${email ? ` Email: ${email}` : ''}`;
+        const phoneNumber = '6360079756';
+        const message = `Hi, I'm ${name || 'interested customer'}${brandName ? ` from ${brandName}` : ''}. Interested in ${service || 'your services'}.`;
         setWhatsappUrl(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`);
       } catch (e) {
         console.error('Error constructing WhatsApp URL:', e);
-        setWhatsappUrl('https://wa.me/919353253817');
+        setWhatsappUrl('https://wa.me/6360079756');
       }
     }
   }, [name, email, phone, brandName, service]);
@@ -82,6 +83,14 @@ function ThankYouContent() {
     }
   };
   
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    if (hasWhatsAppClicked) {
+      e.preventDefault();
+      return;
+    }
+    setHasWhatsAppClicked(true);
+  };
+  
   // Show loading state while mounting
   if (!isMounted) {
     return (
@@ -115,6 +124,7 @@ function ThankYouContent() {
         
         <a 
           href={whatsappUrl}
+          onClick={handleWhatsAppClick}
           target="_blank" 
           rel="noopener noreferrer"
           className="thank-you-button thank-you-button-whatsapp"

@@ -54,9 +54,7 @@
 }
 
 .business-apps-card {
-  background: rgba(10, 10, 10, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(10, 10, 10, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 80px;
@@ -140,9 +138,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   width: 48px;
@@ -338,9 +334,7 @@
 }
 
 .business-apps-feature-item {
-  background: rgba(28, 28, 28, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(28, 28, 28, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 12px 16px;
@@ -541,7 +535,6 @@
 .business-apps-mobile-carousel {
   display: flex;
   width: 100%;
-  will-change: transform;
   gap: 0;
 }
 
@@ -649,9 +642,7 @@
   width: 90%;
   max-width: 400px;
   max-height: 80vh;
-  background: rgba(28, 28, 28, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(28, 28, 28, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -1460,8 +1451,6 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .business-apps-mobile-modal {

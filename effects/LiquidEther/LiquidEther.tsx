@@ -24,6 +24,7 @@ interface LiquidEtherProps {
   takeoverDuration?: number;
   autoResumeDelay?: number;
   autoRampDuration?: number;
+  disabled?: boolean;
 }
 
 export default function LiquidEther({
@@ -45,7 +46,8 @@ export default function LiquidEther({
   autoIntensity = 2.2,
   takeoverDuration = 0.25,
   autoResumeDelay = 1000,
-  autoRampDuration = 0.6
+  autoRampDuration = 0.6,
+  disabled = false
 }: LiquidEtherProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const webglRef = useRef<any>(null);
@@ -62,6 +64,12 @@ export default function LiquidEther({
 
   useEffect(() => {
     if (!mountRef.current) return;
+    
+    // Skip WebGL initialization if disabled or on desktop (width > 768)
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth > 768;
+    if (disabled || isDesktop) {
+      return;
+    }
 
     function makePaletteTexture(stops: string[]): THREE.DataTexture {
       let arr: string[];
@@ -1280,7 +1288,8 @@ export default function LiquidEther({
     autoIntensity,
     takeoverDuration,
     autoResumeDelay,
-    autoRampDuration
+    autoRampDuration,
+    disabled
   ]);
 
   useEffect(() => {
@@ -1330,7 +1339,8 @@ export default function LiquidEther({
     autoIntensity,
     takeoverDuration,
     autoResumeDelay,
-    autoRampDuration
+    autoRampDuration,
+    disabled
   ]);
 
   return <div ref={mountRef} className={`liquid-ether-container ${className || ''}`} style={style} />;

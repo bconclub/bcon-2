@@ -16,10 +16,8 @@
   position: relative;
   z-index: 1;
   
-  /* Glass frosted effect - lighter to show LiquidEther through */
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* Solid background for performance */
+  background: rgba(20, 20, 20, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 48px 40px;

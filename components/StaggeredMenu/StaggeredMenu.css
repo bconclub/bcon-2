@@ -27,7 +27,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem 2.5rem;
-    background: rgba(0, 0, 0, 0.0);
+    background: rgba(0, 0, 0, 0.88);
     border-radius: 16px;
     border: none;
     z-index: 9999;
@@ -180,7 +180,6 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    will-change: transform;
   }
   
   .sm-icon-line {
@@ -190,7 +189,6 @@
     height: 2px;
     background: currentColor;
     border-radius: 2px;
-    will-change: transform;
     transition: transform 0.3s ease, background 0.3s ease;
   }
   
@@ -202,8 +200,6 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
     z-index: 9998;
     cursor: pointer;
     animation: fadeIn 0.3s ease;
@@ -250,7 +246,7 @@
     width: clamp(300px, 40vw, 500px);
     height: 100vh;
     max-height: 100vh;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.88);
     border-left: 1px solid #CCFF0033;
     display: flex;
     flex-direction: column;
@@ -258,16 +254,6 @@
     overflow: hidden;
     z-index: 10000;
     box-sizing: border-box;
-  }
-
-  .staggered-menu-panel::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: rgba(0, 0, 0, 0.95);
-    filter: blur(30px);
-    transform: translateZ(0);
   }
   
   [data-position='left'] .staggered-menu-panel {
@@ -366,7 +352,6 @@
   
   .sm-panel-itemLabel {
     display: inline-block;
-    will-change: transform;
     transform-origin: 50% 100%;
   }
   
