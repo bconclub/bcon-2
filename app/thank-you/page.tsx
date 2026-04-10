@@ -38,12 +38,12 @@ function ThankYouContent() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const phoneNumber = '6360079756';
-        const message = `Hi, I'm ${name || 'interested customer'}${brandName ? ` from ${brandName}` : ''}. Interested in ${service || 'your services'}.`;
+        const phoneNumber = '916360079756';
+        const message = `Hi BCON! I'm ${name}${brandName ? ` from ${brandName}` : ''}. I'm interested in ${service}. You can reach me at ${phone}${email ? ` / ${email}` : ''}.`;
         setWhatsappUrl(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`);
       } catch (e) {
         console.error('Error constructing WhatsApp URL:', e);
-        setWhatsappUrl('https://wa.me/6360079756');
+        setWhatsappUrl('https://wa.me/916360079756');
       }
     }
   }, [name, email, phone, brandName, service]);
@@ -110,19 +110,7 @@ function ThankYouContent() {
       </p>
 
       <div className="thank-you-actions">
-        <button 
-          onClick={handleCallClick}
-          disabled={isCalling}
-          className="thank-you-button thank-you-button-call"
-          style={{ border: 'none', cursor: isCalling ? 'not-allowed' : 'pointer' }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-          </svg>
-          {isCalling ? 'Calling...' : 'Call'}
-        </button>
-        
-        <a 
+        <a
           href={whatsappUrl}
           onClick={handleWhatsAppClick}
           target="_blank" 

@@ -182,9 +182,14 @@ export default function ContactSection({ onInternalLinkClick }: ContactSectionPr
     
     // Wait 200ms then redirect
     setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/thank-you';
-      }
+      const params = new URLSearchParams({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        brandName: formData.brandName,
+        service: formData.service,
+      });
+      router.push(`/thank-you?${params.toString()}`);
     }, 200);
   };
 
