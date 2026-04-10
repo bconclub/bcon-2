@@ -3,6 +3,7 @@ import Script from 'next/script';
 import './globals.css';
 import TrackingProvider from '@/components/Tracking/TrackingProvider';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
+import SmoothScroll from '@/lib/lenis';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://bconclub.com'),
@@ -93,6 +94,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body>
+        <SmoothScroll />
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
