@@ -27,13 +27,24 @@
   transform: scale(1.1);
 }
 
-.work-card-play-overlay {
+.work-card-mute-button {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  pointer-events: none;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 3;
+  transition: background-color 0.2s ease;
+}
+
+.work-card-mute-button:hover {
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .work-card-overlay {

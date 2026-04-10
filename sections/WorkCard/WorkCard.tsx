@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import Image from 'next/image';
 import './WorkCard.css';
@@ -16,6 +16,7 @@ export interface WorkCardProps {
   heroMediaType?: 'image' | 'video';
   featured?: boolean;
   onClick: () => void;
+  index?: number;
 }
 
 export default function WorkCard({
@@ -29,10 +30,13 @@ export default function WorkCard({
   heroMediaType,
   featured,
   onClick,
+  index = 0,
 }: WorkCardProps) {
   const [imageError, setImageError] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   const imageUrl = thumbnailUrl || heroMediaUrl;
   const isVideo = heroMediaType === 'video' || (heroMediaUrl && heroMediaUrl.match(/\.(mp4|webm)$/i));
@@ -112,23 +116,54 @@ export default function WorkCard({
             {isVideo ? (
               <>
                 <video
+                  ref={videoRef}
                   src={imageUrl!}
                   className="work-card-video"
-                  muted
+                  muted={isMuted}
                   loop
                   playsInline
-                  preload="metadata"
+                  preload={index < 4 ? 'auto' : 'metadata'}
                   onError={() => {
                     setVideoError(true);
                     console.warn('Video failed to load:', imageUrl);
                   }}
+                  onMouseEnter={() => {
+                    videoRef.current?.play().catch(() => {});
+                  }}
+                  onMouseLeave={() => {
+                    if (videoRef.current) {
+                      videoRef.current.pause();
+                      videoRef.current.currentTime = 0;
+                    }
+                  }}
                 />
-                <div className="work-card-play-overlay">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" fill="rgba(0, 0, 0, 0.6)" />
-                    <path d="M10 8l6 4-6 4V8z" fill="#FFFFFF" />
-                  </svg>
-                </div>
+                <button
+                  className="work-card-mute-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMuted(!isMuted);
+                    if (videoRef.current) {
+                      videoRef.current.muted = !isMuted;
+                    }
+                  }}
+                  aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+                  type="button"
+                >
+                  {isMuted ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M16.5 12C16.5 10.23 15.5 8.71 14 7.97V16.03C15.5 15.29 16.5 13.77 16.5 12Z" fill="white"/>
+                      <path d="M19 12C19 12.94 18.8 13.82 18.46 14.64L19.97 16.15C20.62 14.91 21 13.5 21 12C21 7.72 18.01 4.14 14 3.23V5.29C16.89 6.15 19 8.83 19 12Z" fill="white"/>
+                      <path d="M3.27 4L2 5.27L7.73 11H3V13H7.73L12 17.27V20.73C12 21.5 12.5 22 13.27 22C13.55 22 13.82 21.92 14.05 21.77L16.73 19.09L19.73 22.09L21 20.82L3.27 4Z" fill="white"/>
+                      <path d="M12 4L9.91 6.09L12 8.18V4Z" fill="white"/>
+                    </svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="white"/>
+                      <path d="M16.5 12C16.5 10.23 15.5 8.71 14 7.97V16.03C15.5 15.29 16.5 13.77 16.5 12Z" fill="white"/>
+                      <path d="M14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z" fill="white"/>
+                    </svg>
+                  )}
+                </button>
               </>
             ) : (
               <>

@@ -77,6 +77,7 @@ export default function WorkGrid({ category, onCardClick }: WorkGridProps) {
             heroMediaType={item.hero_media_type}
             featured={item.featured}
             onClick={() => onCardClick(item)}
+            index={index}
           />
         ))}
       </div>

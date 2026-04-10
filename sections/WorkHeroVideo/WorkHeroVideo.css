@@ -61,23 +61,22 @@
 /* Mute/Unmute Button */
 .work-hero-mute-button {
   position: absolute;
-  bottom: 24px;
-  right: 24px;
-  width: 48px;
-  height: 48px;
-  background-color: rgba(0, 0, 0, 0.6);
+  bottom: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
+  border-radius: 999px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-  z-index: 1000; /* Higher z-index to ensure it's above iframe */
-  -webkit-tap-highlight-color: transparent; /* Remove mobile tap highlight */
-  touch-action: manipulation; /* Improve touch responsiveness */
-  pointer-events: auto; /* Ensure button receives events */
-  user-select: none; /* Prevent text selection on mobile */
+  z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  pointer-events: auto;
+  user-select: none;
   -webkit-user-select: none;
 }
 
@@ -92,8 +91,8 @@
 }
 
 .work-hero-mute-button svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   pointer-events: none;
 }
 
@@ -114,18 +113,9 @@
   }
 
   .work-hero-mute-button {
-    width: 44px;
-    height: 44px;
     bottom: 16px;
     right: 16px;
-    z-index: 1000; /* Ensure it's above iframe on mobile */
-    min-width: 44px; /* Ensure minimum touch target size */
-    min-height: 44px;
-  }
-
-  .work-hero-mute-button svg {
-    width: 20px;
-    height: 20px;
+    z-index: 10;
   }
 }
 
