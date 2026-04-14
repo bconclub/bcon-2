@@ -1,19 +1,7 @@
 .pageContainer {
   position: relative;
   min-height: 100vh;
-  height: 100vh;
   background: transparent;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-}
-
-.pageContainer::-webkit-scrollbar {
-  display: none;
-}
-
-.pageContainer {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }
 
 .heroSection {
@@ -23,7 +11,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 120px 20px 100px;
+  padding: 200px 20px 100px;
   z-index: 1;
   text-align: center;
 }
