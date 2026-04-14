@@ -29,7 +29,7 @@ export default function DesktopHero() {
       </div>
       <div className="content">
         <p className="tagline">AI-FIRST MARKETING</p>
-        <h1>Solve Your Marketing With <span className="hero-accent">AI</span></h1>
+        <h1>Solve Marketing <br />With <span className="hero-accent">AI</span></h1>
         <p className="description">
           Customer Acquisition · Brand Management · Content & Ads · Business Apps
         </p>
