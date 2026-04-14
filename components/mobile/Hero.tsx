@@ -13,7 +13,7 @@ export default function MobileHero() {
       <div className="mobile-hero-content">
         <div className="mobile-hero-text">
           <p className="mobile-hero-tagline">AI-FIRST MARKETING</p>
-          <h1>Mission: Solve Marketing with <span className="hero-accent">AI</span></h1>
+          <h1>On a mission to solve marketing with <span className="hero-accent">AI.</span></h1>
           <div className="mobile-hero-pillars">
             <span>Customer Acquisition</span>
             <span>Brand Management</span>
