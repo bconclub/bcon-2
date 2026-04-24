@@ -20,7 +20,7 @@
   --proxe-font-heading: var(--font-proxe-heading), 'Instrument Serif', Georgia, serif;
   /* Back-compat alias: older rules still reference --proxe-font-serif */
   --proxe-font-serif: var(--proxe-font-heading);
-  --proxe-font-mono: var(--proxe-font-mono), 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  --proxe-font-mono: var(--font-proxe-mono), 'JetBrains Mono', 'SF Mono', Menlo, monospace;
 
   color: var(--proxe-fg);
   background: var(--proxe-bg);
