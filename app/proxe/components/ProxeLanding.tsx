@@ -234,6 +234,7 @@ function ScrollPopup({ triggerRef }: { triggerRef: React.RefObject<HTMLElement |
 export default function ProxeLanding() {
   const pillarsRef = useRef<HTMLElement | null>(null);
   const videoIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const videoFrameRef = useRef<HTMLDivElement | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [videoMuted, setVideoMuted] = useState(true);
 
@@ -271,6 +272,27 @@ export default function ProxeLanding() {
     );
 
     io.observe(target);
+    return () => io.disconnect();
+  }, []);
+
+  // 3D landing animation: tilt the video frame until it scrolls into view.
+  // Skip on large screens where the frame is already visible at page load.
+  useEffect(() => {
+    const frame = videoFrameRef.current;
+    if (!frame) return;
+    const rect = frame.getBoundingClientRect();
+    if (rect.top < window.innerHeight) return; // already in view — skip tilt
+    frame.classList.add('proxe-landing-ready');
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          frame.classList.remove('proxe-landing-ready');
+          io.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(frame);
     return () => io.disconnect();
   }, []);
 
@@ -373,7 +395,7 @@ export default function ProxeLanding() {
 
       {/* ===== Hero video (scroll-reveal scale-up + mute toggle) ===== */}
       <section className="proxe-hero-video" aria-label="PROXe product demo">
-        <div className="proxe-hero-video-frame">
+        <div className="proxe-hero-video-frame" ref={videoFrameRef}>
           <div className="proxe-hero-video-inner">
             <iframe
               ref={videoIframeRef}
