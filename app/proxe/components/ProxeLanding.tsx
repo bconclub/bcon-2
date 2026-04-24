@@ -103,12 +103,10 @@ function RevealOnScroll({
   children,
   delay = 0,
   className = '',
-  as: Tag = 'div',
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
-  as?: keyof React.JSX.IntrinsicElements;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -131,17 +129,15 @@ function RevealOnScroll({
     return () => io.disconnect();
   }, []);
 
-  const Component = Tag as keyof React.JSX.IntrinsicElements;
   return (
-    // @ts-expect-error polymorphic tag
-    <Component
+    <div
       ref={ref}
       className={`proxe-reveal ${className}`}
       data-revealed={visible ? 'true' : 'false'}
       style={{ '--reveal-delay': `${delay}ms` } as React.CSSProperties}
     >
       {children}
-    </Component>
+    </div>
   );
 }
 
@@ -421,32 +417,32 @@ export default function ProxeLanding() {
         </div>
       </section>
 
-      {/* ===== 7. Three pillars ===== */}
-      <section className="proxe-section" id="features" ref={pillarsRef}>
+      {/* ===== 7. Three pillars — sticky stack ===== */}
+      <section className="proxe-section proxe-pillars-section" id="features" ref={pillarsRef}>
         <div className="proxe-container">
           <div className="proxe-section-label">The PROXe System</div>
           <div className="proxe-pillars-list">
-            <RevealOnScroll className="proxe-pillar-row" delay={0}>
+            <div className="proxe-pillar-row" style={{ '--pillar-index': 0 } as React.CSSProperties}>
               <div className="proxe-pillar-icon">
                 <Icon.Capture />
               </div>
               <h3 className="proxe-pillar-title">Capture</h3>
               <p className="proxe-pillar-desc">Every inquiry, every channel, 24/7. Nothing slips through.</p>
-            </RevealOnScroll>
-            <RevealOnScroll className="proxe-pillar-row" delay={150}>
+            </div>
+            <div className="proxe-pillar-row" style={{ '--pillar-index': 1 } as React.CSSProperties}>
               <div className="proxe-pillar-icon">
                 <Icon.Remember />
               </div>
               <h3 className="proxe-pillar-title">Nurture</h3>
               <p className="proxe-pillar-desc">Stay in every conversation. One thread across channels. Customers never repeat themselves.</p>
-            </RevealOnScroll>
-            <RevealOnScroll className="proxe-pillar-row" delay={300}>
+            </div>
+            <div className="proxe-pillar-row" style={{ '--pillar-index': 2 } as React.CSSProperties}>
               <div className="proxe-pillar-icon">
                 <Icon.Close />
               </div>
               <h3 className="proxe-pillar-title">Close</h3>
               <p className="proxe-pillar-desc">Auto follow-ups until they book, buy, or say no.</p>
-            </RevealOnScroll>
+            </div>
           </div>
         </div>
       </section>
@@ -477,42 +473,29 @@ export default function ProxeLanding() {
         </div>
       </section>
 
-      {/* ===== 10. Voice demo section ===== */}
+      {/* ===== 10. Voice demo — gradient orb "click to talk" ===== */}
       <section className="proxe-section" id="voice">
         <div className="proxe-container">
           <div className="proxe-section-label" style={{ textAlign: 'center' }}>
             Hear it Live
           </div>
           <div className="proxe-voice">
-            <h2 className="proxe-voice-title">Listen to PROXe handle a real lead.</h2>
-            <div className="proxe-voice-row">
-              <div className="proxe-voice-card">
-                <div className="proxe-voice-player">
-                  <button className="proxe-voice-play" aria-label="Play demo audio">
-                    <Icon.Play />
-                  </button>
-                  <div className="proxe-voice-wave" aria-hidden="true">
-                    {Array.from({ length: 28 }).map((_, i) => (
-                      <span key={i} style={{ animationDelay: `${(i % 7) * 0.12}s` }} />
-                    ))}
-                  </div>
-                </div>
-                <div className="proxe-voice-note">
-                  Audio placeholder <span className="proxe-placeholder-tag">Placeholder</span>
-                </div>
-              </div>
-
-              <div className="proxe-voice-card">
-                <div className="proxe-voice-note">Or call the live number</div>
-                <div className="proxe-voice-phone">+91 00000 00000</div>
-                <a href="tel:+910000000000" className="proxe-btn proxe-btn-primary" style={{ alignSelf: 'flex-start' }}>
-                  <Icon.Phone />
-                  Call Now
-                </a>
-                <div className="proxe-voice-note">
-                  Phone number placeholder <span className="proxe-placeholder-tag">Placeholder</span>
-                </div>
-              </div>
+            <h2 className="proxe-voice-title">See PROXe in action.</h2>
+            <div className="proxe-voice-orb-wrap">
+              <button
+                type="button"
+                className="proxe-voice-orb"
+                aria-label="Click to talk to PROXe"
+                onClick={() => {
+                  // TODO: wire real voice call trigger
+                  window.location.href = 'tel:+910000000000';
+                }}
+              >
+                <span className="proxe-voice-orb-ring" aria-hidden="true" />
+                <span className="proxe-voice-orb-inner" aria-hidden="true" />
+                <span className="proxe-voice-orb-shine" aria-hidden="true" />
+              </button>
+              <div className="proxe-voice-orb-label">Click to talk</div>
             </div>
           </div>
         </div>
