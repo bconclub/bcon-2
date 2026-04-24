@@ -4,6 +4,7 @@ import './globals.css';
 import TrackingProvider from '@/components/Tracking/TrackingProvider';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
 import SmoothScroll from '@/lib/lenis';
+import ProxeWidget from '@/components/ProxeWidget/ProxeWidget';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://bconclub.com'),
@@ -156,11 +157,8 @@ export default function RootLayout({
             {children}
           </TrackingProvider>
         </ErrorBoundary>
-        {/* PROXe Chat Widget - Hidden temporarily */}
-        <Script
-          src="https://proxe.bconclub.com/api/widget/embed.js"
-          strategy="afterInteractive"
-        />
+        {/* PROXe Chat Widget - hidden on /proxe and /proxe-cfs */}
+        <ProxeWidget />
       </body>
     </html>
   );
