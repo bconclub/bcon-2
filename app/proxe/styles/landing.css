@@ -403,15 +403,29 @@ body:has(.proxe-root) {
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  cursor: grab;
+  /* Capture horizontal drags but let vertical scroll pass through (mobile). */
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.proxe-coverflow[data-dragging='true'] {
+  cursor: grabbing;
 }
 
 .proxe-coverflow-stage {
   position: relative;
   width: 100%;
-  height: 88px;
+  height: 110px;
   /* Allow children to overflow horizontally so off-screen siblings can
      transition in/out smoothly. */
   overflow: visible;
+}
+
+/* Suppress transitions during an active drag so the icon follows the
+   finger 1:1 instead of lagging behind a 0.6s cubic ease. */
+.proxe-coverflow[data-dragging='true'] .proxe-coverflow-tile {
+  transition: transform 0s, opacity 0.25s ease, filter 0.25s ease;
 }
 
 /* No tile chrome — pure icons. Size, position, opacity per offset. */
@@ -434,9 +448,11 @@ body:has(.proxe-root) {
 }
 
 .proxe-coverflow-tile svg {
-  width: 56px;
-  height: 56px;
+  width: 76px;
+  height: 76px;
   stroke: currentColor;
+  /* Block native image-drag interfering with our pointer drag */
+  pointer-events: none;
 }
 
 /* Hidden outside the visible window. */
@@ -493,11 +509,11 @@ body:has(.proxe-root) {
     max-width: 360px;
   }
   .proxe-coverflow-stage {
-    height: 76px;
+    height: 92px;
   }
   .proxe-coverflow-tile svg {
-    width: 46px;
-    height: 46px;
+    width: 60px;
+    height: 60px;
   }
   .proxe-coverflow-tile[data-offset='-1'] {
     transform: translate(calc(-50% - 70px), -50%) scale(0.7);
@@ -1045,16 +1061,15 @@ body:has(.proxe-root) {
 
 @media (max-width: 768px) {
   .proxe-pillars-list {
-    /* Taller sticky container so all three mobile cards dock together */
-    padding-bottom: 45vh;
+    /* Tight gap between cards on mobile — sticky-stack runway is no longer
+       needed since pillars are plain vertical flow. */
+    gap: 12px;
   }
   .proxe-pillar-row {
     grid-template-columns: 1fr;
     gap: 12px;
     padding: 20px 18px;
     border-radius: 18px;
-    top: calc(14vh + var(--pillar-index, 0) * 44px);
-    margin-bottom: 14vh;
   }
   .proxe-pillar-title {
     font-size: 28px;
@@ -1455,11 +1470,11 @@ body:has(.proxe-root) {
   opacity: 0.9;
 }
 
-/* ===== Connecting ring — one-shot loading sweep ============================
-   Single neon-lime arc fills 0 → 100% over ~1.2s (no rotation), then settles
-   into a steady full ring with a subtle glow pulse until call-start fires
-   (state transitions to 'listening' and the SVG unmounts). Reads as a real
-   loading action that completes, not an indefinite spinner. */
+/* ===== Connecting ring — progressive load arc =============================
+   Neon-lime arc fills 0 → 100% over 2.4s at a constant rate (no easing
+   tricks, no rotation) so it reads as a real "connecting…" progress
+   indicator rather than a snappy sweep. Once full, it settles into a
+   steady glow pulse until call-start fires and the SVG unmounts. */
 .proxe-voice-orb-connecting {
   position: absolute;
   inset: -10px;
@@ -1468,12 +1483,13 @@ body:has(.proxe-root) {
   pointer-events: none;
   z-index: 3;
   filter: drop-shadow(0 0 12px rgba(205, 252, 46, 0.55));
-  animation: proxeOrbConnectingPulse 1.8s ease-in-out 1.2s infinite;
+  /* Pulse only kicks in after the fill completes (delay matches fill duration). */
+  animation: proxeOrbConnectingPulse 1.8s ease-in-out 2.4s infinite;
 }
 .proxe-voice-orb-connecting-arc {
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
-  animation: proxeOrbConnectingFill 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: proxeOrbConnectingFill 2.4s linear forwards;
 }
 @keyframes proxeOrbConnectingFill {
   0%   { stroke-dashoffset: 100; }

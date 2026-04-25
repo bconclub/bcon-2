@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { FiGlobe, FiMail, FiMessageSquare, FiPhone } from 'react-icons/fi';
+import { SiInstagram, SiMessenger, SiWhatsapp } from 'react-icons/si';
 import Grainient from './Grainient';
 import VapiOrb from './VapiOrb';
 
@@ -242,94 +244,88 @@ function ScrollPopup({ triggerRef }: { triggerRef: React.RefObject<HTMLElement |
    side smaller and fading. Rotates through the channels PROXe listens to.
    White stroke icons, no brand colour. Hover pauses the rotation.
    Distance offsets are signed and wrapped so the carousel feels circular. */
+// Brand glyphs from react-icons / simple-icons (`si`) for messengers,
+// generic outlines from feather (`fi`) for the non-brand items. Tree-shaken
+// imports — only the named icons we use ship to the client.
 const CHANNELS: Array<{ name: string; icon: React.ReactNode }> = [
-  {
-    name: 'Website',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M3 12h18" />
-        <path d="M12 3a13 13 0 0 1 0 18 13 13 0 0 1 0-18z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'WhatsApp',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20.5 3.5A11 11 0 0 0 4.6 18.4L3 21l2.7-1.5a11 11 0 0 0 14.8-16z" />
-        <path d="M8 9.2c0-.4.2-.7.5-.7h.6c.2 0 .4 0 .5.4.2.4.7 1.5.8 1.7.1.1.1.4 0 .6-.1.2-.2.2-.4.4l-.4.4c-.2.2-.2.4-.1.6.2.4 1 1.5 1.7 2 .9.7 1.7 1 2 1.1.2 0 .4 0 .5-.1.2-.2.6-.7.8-.9.2-.2.4-.2.6-.1.2.1 1.5.7 1.8.9.3.2.5.2.6.4 0 .1 0 .8-.3 1.5-.4.7-1.7 1.3-2.3 1.4-.6.1-1.4.2-2.2-.1-.5-.2-1.2-.4-2-.7-3.5-1.5-5.8-5-6-5.3-.2-.3-1.4-1.9-1.4-3.6 0-1.7.9-2.5 1.2-2.8.3-.3.7-.4 1-.4z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Instagram',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-        <circle cx="17.5" cy="6.5" r="0.7" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Messenger',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2C6.5 2 2 6.1 2 11.2c0 2.7 1.3 5.1 3.4 6.7v3.6l3.1-1.7c.9.2 1.7.4 2.6.4 5.5 0 10-4.1 10-9.2C22 6.1 17.5 2 12 2z" />
-        <path d="M5.7 14.4l4.8-2.6 2.5 2.6 4.8-5.6-5.3 5.8" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Voice',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.1 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Email',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2.5" y="5" width="19" height="14" rx="2.5" />
-        <path d="M3 7l9 6 9-6" />
-      </svg>
-    ),
-  },
-  {
-    name: 'SMS',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 12a8 8 0 1 1-3.5-6.6L21 4l-1.4 3.5A8 8 0 0 1 21 12z" />
-        <line x1="8" y1="12" x2="8" y2="12.01" />
-        <line x1="12" y1="12" x2="12" y2="12.01" />
-        <line x1="16" y1="12" x2="16" y2="12.01" />
-      </svg>
-    ),
-  },
+  { name: 'Website',   icon: <FiGlobe /> },
+  { name: 'WhatsApp',  icon: <SiWhatsapp /> },
+  { name: 'Instagram', icon: <SiInstagram /> },
+  { name: 'Messenger', icon: <SiMessenger /> },
+  { name: 'Voice',     icon: <FiPhone /> },
+  { name: 'Email',     icon: <FiMail /> },
+  { name: 'SMS',       icon: <FiMessageSquare /> },
 ];
 
 function ChannelCoverflow() {
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  // Drag tracking — anchored on the position when the pointer went down so
+  // the index follows the finger 1:1, not cumulative across small moves.
+  const dragRef = useRef<{ startX: number; startActive: number; pointerId: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Auto-rotate while not hovered AND not dragging.
   useEffect(() => {
-    if (paused) return;
+    if (hovered || dragging) return;
     const id = setInterval(() => {
       setActive((i) => (i + 1) % CHANNELS.length);
     }, 2200);
     return () => clearInterval(id);
-  }, [paused]);
+  }, [hovered, dragging]);
 
   const len = CHANNELS.length;
+  const STEP_PX = 70; // distance one icon-step on the carousel
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Ignore secondary buttons / non-primary pointers.
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    setDragging(true);
+    dragRef.current = {
+      startX: e.clientX,
+      startActive: active,
+      pointerId: e.pointerId,
+    };
+    try {
+      containerRef.current?.setPointerCapture(e.pointerId);
+    } catch {
+      /* no-op */
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.startX;
+    // Drag right → previous icons; drag left → next icons. Hence the negation.
+    const stepsRaw = Math.round(-dx / STEP_PX);
+    const next = ((dragRef.current.startActive + stepsRaw) % len + len) % len;
+    if (next !== active) setActive(next);
+  };
+
+  const endDrag = (e?: React.PointerEvent<HTMLDivElement>) => {
+    if (dragRef.current && e) {
+      try {
+        containerRef.current?.releasePointerCapture(dragRef.current.pointerId);
+      } catch {
+        /* no-op */
+      }
+    }
+    dragRef.current = null;
+    setDragging(false);
+  };
 
   return (
     <div
+      ref={containerRef}
       className="proxe-coverflow"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      data-dragging={dragging}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
       aria-label={`PROXe listens on ${CHANNELS.map((c) => c.name).join(', ')}`}
     >
       <div className="proxe-coverflow-stage">
