@@ -265,6 +265,7 @@ function ChannelCoverflow() {
   // the index follows the finger 1:1, not cumulative across small moves.
   const dragRef = useRef<{ startX: number; startActive: number; pointerId: number } | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const iconInnersRef = useRef<Array<HTMLSpanElement | null>>([]);
 
   // Auto-rotate while not hovered AND not dragging.
   useEffect(() => {
@@ -274,6 +275,50 @@ function ChannelCoverflow() {
     }, 2200);
     return () => clearInterval(id);
   }, [hovered, dragging]);
+
+  // Scroll-driven parallax — each icon drifts horizontally at its own speed
+  // as the section moves through the viewport. rAF-throttled, mutates the
+  // wrapper span's transform directly to avoid re-renders.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Mixed signs so neighbouring icons drift opposite ways — gives depth.
+    const SPEEDS = [-0.12, 0.18, -0.08, 0.16, -0.2, 0.1, -0.14];
+    let rafId: number | null = null;
+
+    const update = () => {
+      rafId = null;
+      const el = containerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      // Bail if far outside viewport — saves layout/paint while off-screen.
+      if (rect.bottom < -200 || rect.top > window.innerHeight + 200) return;
+      const sectionCenter = rect.top + rect.height / 2;
+      const delta = window.innerHeight / 2 - sectionCenter;
+      for (let i = 0; i < iconInnersRef.current.length; i++) {
+        const inner = iconInnersRef.current[i];
+        if (!inner) continue;
+        const speed = SPEEDS[i % SPEEDS.length];
+        const x = delta * speed;
+        inner.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
+      }
+    };
+
+    const onScroll = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   const len = CHANNELS.length;
   const STEP_PX = 70; // distance one icon-step on the carousel
@@ -344,7 +389,14 @@ function ChannelCoverflow() {
               data-visible={visible}
               aria-hidden={offset !== 0}
             >
-              {c.icon}
+              <span
+                ref={(el) => {
+                  iconInnersRef.current[i] = el;
+                }}
+                className="proxe-coverflow-icon-inner"
+              >
+                {c.icon}
+              </span>
             </div>
           );
         })}

@@ -455,6 +455,13 @@ body:has(.proxe-root) {
   pointer-events: none;
 }
 
+/* Inner wrapper carries the scroll-driven parallax translate. Kept on its
+   own element so it doesn't fight the tile's coverflow positioning transform. */
+.proxe-coverflow-icon-inner {
+  display: inline-flex;
+  will-change: transform;
+}
+
 /* Hidden outside the visible window. */
 .proxe-coverflow-tile[data-visible='false'] {
   opacity: 0;
