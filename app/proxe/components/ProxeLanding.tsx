@@ -490,7 +490,7 @@ export default function ProxeLanding() {
             Ever Again.
           </h1>
           <p className="proxe-hero-subtitle">
-            Capture, nurture, close across channel. One AI brain. Full Context Always on.
+            Capture, nurture, close &mdash; across WhatsApp, voice, web, DMs. One brain. Always on.
           </p>
           <div className="proxe-hero-ctas">
             <a href="#voice" className="proxe-hero-big-cta">
@@ -549,7 +549,7 @@ export default function ProxeLanding() {
       <section className="proxe-problem">
         <div className="proxe-container">
           <h2 className="proxe-problem-line">Leads don&rsquo;t wait. Neither does PROXe.</h2>
-          <p className="proxe-problem-sub">Capture, nurture, close &mdash; across WhatsApp, voice, web, DMs. One brain. Always on.</p>
+          <p className="proxe-problem-sub">Capture, nurture, close across channel. One AI brain. Full Context Always on.</p>
           <p className="proxe-problem-sub">Every missed lead is lost revenue.</p>
           <ChannelCoverflow />
         </div>
