@@ -490,7 +490,7 @@ export default function ProxeLanding() {
             Neither does PROXe.
           </h1>
           <p className="proxe-hero-subtitle">
-            Capture, nurture, close &mdash; across WhatsApp, voice, web, DMs. One brain. Always on.
+            PROXe runs the full pipeline. Captures leads across channels, nurtures, scores, and pushes the ready-to-buy ones to you.
           </p>
           <p className="proxe-hero-tagline">Every missed lead is lost revenue.</p>
           <div className="proxe-hero-ctas">
