@@ -284,7 +284,9 @@ function ChannelCoverflow() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     // Mixed signs so neighbouring icons drift opposite ways — gives depth.
-    const SPEEDS = [-0.12, 0.18, -0.08, 0.16, -0.2, 0.1, -0.14];
+    // Kept tiny + hard-clamped so icons never escape their row.
+    const SPEEDS = [-0.02, 0.03, -0.015, 0.025, -0.03, 0.02, -0.018];
+    const MAX_OFFSET = 8; // px — hard cap so icons stay within the row
     let rafId: number | null = null;
 
     const update = () => {
@@ -300,7 +302,8 @@ function ChannelCoverflow() {
         const inner = iconInnersRef.current[i];
         if (!inner) continue;
         const speed = SPEEDS[i % SPEEDS.length];
-        const x = delta * speed;
+        const raw = delta * speed;
+        const x = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, raw));
         inner.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
       }
     };
