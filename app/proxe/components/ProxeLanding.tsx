@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { FiGlobe, FiMail, FiMessageSquare, FiPhone } from 'react-icons/fi';
+import { FiGlobe, FiPhone } from 'react-icons/fi';
 import { SiInstagram, SiMessenger, SiWhatsapp } from 'react-icons/si';
 import Grainient from './Grainient';
 import VapiOrb from './VapiOrb';
@@ -249,12 +249,10 @@ function ScrollPopup({ triggerRef }: { triggerRef: React.RefObject<HTMLElement |
 // imports — only the named icons we use ship to the client.
 const CHANNELS: Array<{ name: string; icon: React.ReactNode }> = [
   { name: 'Voice',     icon: <FiPhone /> },
-  { name: 'SMS',       icon: <FiMessageSquare /> },
   { name: 'WhatsApp',  icon: <SiWhatsapp /> },
   { name: 'Messenger', icon: <SiMessenger /> },
   { name: 'Instagram', icon: <SiInstagram /> },
   { name: 'Web',       icon: <FiGlobe /> },
-  { name: 'Email',     icon: <FiMail /> },
 ];
 
 function ChannelCoverflow() {
