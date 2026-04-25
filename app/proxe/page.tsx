@@ -24,7 +24,7 @@ const mono = JetBrains_Mono({
 export const metadata = {
   title: 'PROXe · The AI Customer Acquisition System',
   description:
-    'PROXe captures every lead, remembers every conversation, follows up until they close. Across Website, WhatsApp, Voice, Email, SMS.',
+    'PROXe captures every lead across Website, WhatsApp, social, and calls. Keeps the conversation alive. Delivers ready-to-buy prospects to your team.',
 };
 
 export default function ProxePage() {

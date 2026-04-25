@@ -237,6 +237,129 @@ function ScrollPopup({ triggerRef }: { triggerRef: React.RefObject<HTMLElement |
   );
 }
 
+/* ============ Channel Coverflow ============
+   Auto-rotating carousel. 5 icons visible — center one big, two on each
+   side smaller and fading. Rotates through the channels PROXe listens to.
+   White stroke icons, no brand colour. Hover pauses the rotation.
+   Distance offsets are signed and wrapped so the carousel feels circular. */
+const CHANNELS: Array<{ name: string; icon: React.ReactNode }> = [
+  {
+    name: 'Website',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18" />
+        <path d="M12 3a13 13 0 0 1 0 18 13 13 0 0 1 0-18z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'WhatsApp',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.5 3.5A11 11 0 0 0 4.6 18.4L3 21l2.7-1.5a11 11 0 0 0 14.8-16z" />
+        <path d="M8 9.2c0-.4.2-.7.5-.7h.6c.2 0 .4 0 .5.4.2.4.7 1.5.8 1.7.1.1.1.4 0 .6-.1.2-.2.2-.4.4l-.4.4c-.2.2-.2.4-.1.6.2.4 1 1.5 1.7 2 .9.7 1.7 1 2 1.1.2 0 .4 0 .5-.1.2-.2.6-.7.8-.9.2-.2.4-.2.6-.1.2.1 1.5.7 1.8.9.3.2.5.2.6.4 0 .1 0 .8-.3 1.5-.4.7-1.7 1.3-2.3 1.4-.6.1-1.4.2-2.2-.1-.5-.2-1.2-.4-2-.7-3.5-1.5-5.8-5-6-5.3-.2-.3-1.4-1.9-1.4-3.6 0-1.7.9-2.5 1.2-2.8.3-.3.7-.4 1-.4z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Instagram',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.5" cy="6.5" r="0.7" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Messenger',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2C6.5 2 2 6.1 2 11.2c0 2.7 1.3 5.1 3.4 6.7v3.6l3.1-1.7c.9.2 1.7.4 2.6.4 5.5 0 10-4.1 10-9.2C22 6.1 17.5 2 12 2z" />
+        <path d="M5.7 14.4l4.8-2.6 2.5 2.6 4.8-5.6-5.3 5.8" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Voice',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.1 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Email',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2.5" y="5" width="19" height="14" rx="2.5" />
+        <path d="M3 7l9 6 9-6" />
+      </svg>
+    ),
+  },
+  {
+    name: 'SMS',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 12a8 8 0 1 1-3.5-6.6L21 4l-1.4 3.5A8 8 0 0 1 21 12z" />
+        <line x1="8" y1="12" x2="8" y2="12.01" />
+        <line x1="12" y1="12" x2="12" y2="12.01" />
+        <line x1="16" y1="12" x2="16" y2="12.01" />
+      </svg>
+    ),
+  },
+];
+
+function ChannelCoverflow() {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused) return;
+    const id = setInterval(() => {
+      setActive((i) => (i + 1) % CHANNELS.length);
+    }, 2200);
+    return () => clearInterval(id);
+  }, [paused]);
+
+  const len = CHANNELS.length;
+
+  return (
+    <div
+      className="proxe-coverflow"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      aria-label={`PROXe listens on ${CHANNELS.map((c) => c.name).join(', ')}`}
+    >
+      <div className="proxe-coverflow-stage">
+        {CHANNELS.map((c, i) => {
+          // Shortest signed distance to active, wrapped — keeps motion circular.
+          let offset = i - active;
+          if (offset > len / 2) offset -= len;
+          if (offset < -len / 2) offset += len;
+          // Anything beyond ±2 is hidden.
+          const visible = Math.abs(offset) <= 2;
+          return (
+            <div
+              key={c.name}
+              className="proxe-coverflow-tile"
+              data-offset={offset}
+              data-visible={visible}
+              aria-hidden={offset !== 0}
+            >
+              {c.icon}
+            </div>
+          );
+        })}
+      </div>
+      <div className="proxe-coverflow-label" aria-live="polite">
+        {CHANNELS[active].name}
+      </div>
+    </div>
+  );
+}
+
 /* ============ Main Landing ============ */
 export default function ProxeLanding() {
   const pillarsRef = useRef<HTMLElement | null>(null);
@@ -376,18 +499,18 @@ export default function ProxeLanding() {
       <section className="proxe-hero" id="product">
 
         <div className="proxe-container proxe-hero-inner">
-          <div className="proxe-hero-eyebrow">The AI Customer Acquisition System</div>
+          <div className="proxe-hero-eyebrow">AI Customer Acquisition</div>
           <h1 className="proxe-hero-title">
-            Never Lose a Customer.
+            Never Miss a Lead
             <br />
             Ever Again.
           </h1>
           <p className="proxe-hero-subtitle">
-            PROXe captures every lead, remembers every conversation, follows up until they close. Across Website, WhatsApp, Voice, Email, SMS.
+            PROXe runs the full pipeline. Captures leads across channels, nurtures, scores, and pushes the ready-to-buy ones to you.
           </p>
           <div className="proxe-hero-ctas">
-            <a href="#book-demo" className="proxe-hero-big-cta">
-              Deploy PROXe
+            <a href="#voice" className="proxe-hero-big-cta">
+              What&rsquo;s PROXe?
               <span className="proxe-hero-big-cta-icon" aria-hidden="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12" />
@@ -443,6 +566,7 @@ export default function ProxeLanding() {
         <div className="proxe-container">
           <h2 className="proxe-problem-line">Every missed lead is lost revenue.</h2>
           <p className="proxe-problem-sub">Slow follow-ups kill deals. Silence wins. PROXe ends both.</p>
+          <ChannelCoverflow />
         </div>
       </section>
 
@@ -489,8 +613,8 @@ export default function ProxeLanding() {
         </div>
       </section>
 
-      {/* ===== 8. Scroll-triggered popup (fires once after pillars scroll past) ===== */}
-      <ScrollPopup triggerRef={pillarsRef} />
+      {/* ===== 8. Scroll-triggered popup — disabled for now ===== */}
+      {/* <ScrollPopup triggerRef={pillarsRef} /> */}
 
       {/* ===== 9. Feature grid ===== */}
       <section className="proxe-section">
