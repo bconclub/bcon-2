@@ -27,9 +27,16 @@ jobs:
 
       - name: Auto-increment version on production push
         if: github.event_name == 'push' && github.ref == 'refs/heads/production' && !contains(github.event.head_commit.message, '[skip version]')
+        env:
+          # Pass the commit message via env so multi-line / special-char
+          # messages are properly quoted as a single $COMMIT_MESSAGE
+          # variable. Inlining `${{ github.event.head_commit.message }}`
+          # directly into the shell script broke `[[ ]]` syntax whenever
+          # a commit message contained newlines.
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           # Skip if this is already a version bump commit to avoid infinite loops
-          if [[ "${{ github.event.head_commit.message }}" == *"[skip ci]"* ]] || [[ "${{ github.event.head_commit.message }}" == *"chore: auto-increment version"* ]]; then
+          if [[ "$COMMIT_MESSAGE" == *"[skip ci]"* ]] || [[ "$COMMIT_MESSAGE" == *"chore: auto-increment version"* ]]; then
             echo "⏭️ Skipping version bump - this is already a version update commit"
             exit 0
           fi
