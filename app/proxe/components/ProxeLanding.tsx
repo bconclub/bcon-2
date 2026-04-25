@@ -560,8 +560,9 @@ export default function ProxeLanding() {
       {/* ===== 6. Problem statement ===== */}
       <section className="proxe-problem">
         <div className="proxe-container">
-          <h2 className="proxe-problem-line">Every missed lead is lost revenue.</h2>
-          <p className="proxe-problem-sub">Slow follow-ups kill deals. Silence wins. PROXe ends both.</p>
+          <h2 className="proxe-problem-line">Leads don&rsquo;t wait. Neither does PROXe.</h2>
+          <p className="proxe-problem-sub">Capture, nurture, close &mdash; across WhatsApp, voice, web, DMs. One brain. Always on.</p>
+          <p className="proxe-problem-sub">Every missed lead is lost revenue.</p>
           <ChannelCoverflow />
         </div>
       </section>
