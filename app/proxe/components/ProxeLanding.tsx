@@ -554,7 +554,7 @@ export default function ProxeLanding() {
             Ever Again.
           </h1>
           <p className="proxe-hero-subtitle">
-            PROXe runs the full pipeline. Captures leads across channels, nurtures, scores, and pushes the ready-to-buy ones to you.
+            Capture, nurture, close across channel. One AI brain. Full Context Always on.
           </p>
           <div className="proxe-hero-ctas">
             <a href="#voice" className="proxe-hero-big-cta">
