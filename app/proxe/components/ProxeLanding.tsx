@@ -485,13 +485,14 @@ export default function ProxeLanding() {
         <div className="proxe-container proxe-hero-inner">
           <div className="proxe-hero-eyebrow">AI Customer Acquisition</div>
           <h1 className="proxe-hero-title">
-            Never Miss a Lead
+            Leads don&rsquo;t wait.
             <br />
-            Ever Again.
+            Neither does PROXe.
           </h1>
           <p className="proxe-hero-subtitle">
             Capture, nurture, close &mdash; across WhatsApp, voice, web, DMs. One brain. Always on.
           </p>
+          <p className="proxe-hero-tagline">Every missed lead is lost revenue.</p>
           <div className="proxe-hero-ctas">
             <a href="#voice" className="proxe-hero-big-cta">
               What&rsquo;s PROXe?
@@ -545,10 +546,9 @@ export default function ProxeLanding() {
         </div>
       </section>
 
-      {/* ===== 6. Problem statement ===== */}
+      {/* ===== 6. Channel dial ===== */}
       <section className="proxe-problem">
         <div className="proxe-container">
-          <h2 className="proxe-problem-line">Every missed lead is lost revenue.</h2>
           <p className="proxe-problem-sub">Capture, nurture, close across channel. One AI brain. Full Context Always on.</p>
           <ChannelCoverflow />
         </div>
