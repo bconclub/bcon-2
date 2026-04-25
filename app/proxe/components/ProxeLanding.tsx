@@ -240,11 +240,10 @@ function ScrollPopup({ triggerRef }: { triggerRef: React.RefObject<HTMLElement |
 }
 
 /* ============ Channel Coverflow ============
-   Scroll-driven dial. The outer wrapper is taller than the viewport; the
-   inner content is `position: sticky` so the carousel pins while the user
-   scrolls past. Scroll progress (0→1) within the wrapper maps to the active
-   icon (0..N-1) — each scroll step brings the next channel to centre focus.
-   No auto-rotate, no drag — purely scroll-driven. */
+   Auto-rotating carousel. Five tiles visible — center one focused, two on
+   each side scaled down and faded. setInterval advances the active index;
+   hover pauses rotation. Distance offsets are signed and wrapped so the
+   carousel feels circular. */
 // Brand glyphs from react-icons / simple-icons (`si`) for messengers,
 // generic outlines from feather (`fi`) for the non-brand items. Tree-shaken
 // imports — only the named icons we use ship to the client.
@@ -260,85 +259,47 @@ const CHANNELS: Array<{ name: string; icon: React.ReactNode }> = [
 
 function ChannelCoverflow() {
   const [active, setActive] = useState(0);
-  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
-    const wrap = wrapRef.current;
-    if (!wrap) return;
+    if (hovered) return;
+    const id = setInterval(() => {
+      setActive((i) => (i + 1) % CHANNELS.length);
+    }, 2200);
+    return () => clearInterval(id);
+  }, [hovered]);
 
-    let inView = false;
-    let rafId = 0;
-
-    const update = () => {
-      rafId = 0;
-      const rect = wrap.getBoundingClientRect();
-      const vh = window.innerHeight || document.documentElement.clientHeight;
-      // Scrollable distance inside the wrapper (sticky child is one viewport tall).
-      const total = rect.height - vh;
-      if (total <= 0) return;
-      // How far we've scrolled into the wrapper (0 = wrapper top hits viewport top).
-      const scrolled = -rect.top;
-      // Clamp just under 1 so floor(progress * len) never overshoots.
-      const progress = Math.min(0.9999, Math.max(0, scrolled / total));
-      const idx = Math.floor(progress * CHANNELS.length);
-      setActive((prev) => (prev === idx ? prev : idx));
-    };
-
-    const onScroll = () => {
-      if (!inView || rafId) return;
-      rafId = requestAnimationFrame(update);
-    };
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          inView = e.isIntersecting;
-          if (inView) update();
-        });
-      },
-      { threshold: 0 }
-    );
-    io.observe(wrap);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    update();
-
-    return () => {
-      io.disconnect();
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
+  const len = CHANNELS.length;
 
   return (
-    <div ref={wrapRef} className="proxe-coverflow-scroll">
-      <div className="proxe-coverflow-sticky">
-        <div
-          className="proxe-coverflow"
-          aria-label={`PROXe listens on ${CHANNELS.map((c) => c.name).join(', ')}`}
-        >
-          <div className="proxe-coverflow-stage">
-            {CHANNELS.map((c, i) => {
-              const offset = i - active;
-              const visible = Math.abs(offset) <= 2;
-              return (
-                <div
-                  key={c.name}
-                  className="proxe-coverflow-tile"
-                  data-offset={offset}
-                  data-visible={visible}
-                  aria-hidden={offset !== 0}
-                >
-                  {c.icon}
-                </div>
-              );
-            })}
-          </div>
-          <div className="proxe-coverflow-label" aria-live="polite">
-            {CHANNELS[active].name.toUpperCase()}
-          </div>
-        </div>
+    <div
+      className="proxe-coverflow"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      aria-label={`PROXe listens on ${CHANNELS.map((c) => c.name).join(', ')}`}
+    >
+      <div className="proxe-coverflow-stage">
+        {CHANNELS.map((c, i) => {
+          // Shortest signed distance to active, wrapped — keeps motion circular.
+          let offset = i - active;
+          if (offset > len / 2) offset -= len;
+          if (offset < -len / 2) offset += len;
+          const visible = Math.abs(offset) <= 2;
+          return (
+            <div
+              key={c.name}
+              className="proxe-coverflow-tile"
+              data-offset={offset}
+              data-visible={visible}
+              aria-hidden={offset !== 0}
+            >
+              {c.icon}
+            </div>
+          );
+        })}
+      </div>
+      <div className="proxe-coverflow-label" aria-live="polite">
+        {CHANNELS[active].name.toUpperCase()}
       </div>
     </div>
   );
@@ -485,14 +446,13 @@ export default function ProxeLanding() {
         <div className="proxe-container proxe-hero-inner">
           <div className="proxe-hero-eyebrow">AI Customer Acquisition</div>
           <h1 className="proxe-hero-title">
-            Leads don&rsquo;t wait.
+            Never Miss a Lead
             <br />
-            Neither does PROXe.
+            Ever Again.
           </h1>
           <p className="proxe-hero-subtitle">
             PROXe runs the full pipeline. Captures leads across channels, nurtures, scores, and pushes the ready-to-buy ones to you.
           </p>
-          <p className="proxe-hero-tagline">Every missed lead is lost revenue.</p>
           <div className="proxe-hero-ctas">
             <a href="#voice" className="proxe-hero-big-cta">
               What&rsquo;s PROXe?
@@ -549,7 +509,8 @@ export default function ProxeLanding() {
       {/* ===== 6. Channel dial ===== */}
       <section className="proxe-problem">
         <div className="proxe-container">
-          <p className="proxe-problem-sub">Capture, nurture, close across channel. One AI brain. Full Context Always on.</p>
+          <h2 className="proxe-problem-line">Leads don&rsquo;t wait. Neither does PROXe.</h2>
+          <p className="proxe-problem-sub">PROXe Captures, Follows up, and push leads to close across channel. One AI brain. Full Context Always on.</p>
           <ChannelCoverflow />
         </div>
       </section>
