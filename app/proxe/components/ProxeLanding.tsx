@@ -240,172 +240,105 @@ function ScrollPopup({ triggerRef }: { triggerRef: React.RefObject<HTMLElement |
 }
 
 /* ============ Channel Coverflow ============
-   Auto-rotating carousel. 5 icons visible — center one big, two on each
-   side smaller and fading. Rotates through the channels PROXe listens to.
-   White stroke icons, no brand colour. Hover pauses the rotation.
-   Distance offsets are signed and wrapped so the carousel feels circular. */
+   Scroll-driven dial. The outer wrapper is taller than the viewport; the
+   inner content is `position: sticky` so the carousel pins while the user
+   scrolls past. Scroll progress (0→1) within the wrapper maps to the active
+   icon (0..N-1) — each scroll step brings the next channel to centre focus.
+   No auto-rotate, no drag — purely scroll-driven. */
 // Brand glyphs from react-icons / simple-icons (`si`) for messengers,
 // generic outlines from feather (`fi`) for the non-brand items. Tree-shaken
 // imports — only the named icons we use ship to the client.
 const CHANNELS: Array<{ name: string; icon: React.ReactNode }> = [
-  { name: 'Website',   icon: <FiGlobe /> },
-  { name: 'WhatsApp',  icon: <SiWhatsapp /> },
-  { name: 'Instagram', icon: <SiInstagram /> },
-  { name: 'Messenger', icon: <SiMessenger /> },
   { name: 'Voice',     icon: <FiPhone /> },
-  { name: 'Email',     icon: <FiMail /> },
   { name: 'SMS',       icon: <FiMessageSquare /> },
+  { name: 'WhatsApp',  icon: <SiWhatsapp /> },
+  { name: 'Messenger', icon: <SiMessenger /> },
+  { name: 'Instagram', icon: <SiInstagram /> },
+  { name: 'Web',       icon: <FiGlobe /> },
+  { name: 'Email',     icon: <FiMail /> },
 ];
 
 function ChannelCoverflow() {
   const [active, setActive] = useState(0);
-  const [hovered, setHovered] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  // Drag tracking — anchored on the position when the pointer went down so
-  // the index follows the finger 1:1, not cumulative across small moves.
-  const dragRef = useRef<{ startX: number; startActive: number; pointerId: number } | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const iconInnersRef = useRef<Array<HTMLSpanElement | null>>([]);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto-rotate while not hovered AND not dragging.
   useEffect(() => {
-    if (hovered || dragging) return;
-    const id = setInterval(() => {
-      setActive((i) => (i + 1) % CHANNELS.length);
-    }, 2200);
-    return () => clearInterval(id);
-  }, [hovered, dragging]);
+    const wrap = wrapRef.current;
+    if (!wrap) return;
 
-  // Scroll-driven parallax — each icon drifts horizontally at its own speed
-  // as the section moves through the viewport. rAF-throttled, mutates the
-  // wrapper span's transform directly to avoid re-renders.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    // Mixed signs so neighbouring icons drift opposite ways — gives depth.
-    // Kept tiny + hard-clamped so icons never escape their row.
-    const SPEEDS = [-0.02, 0.03, -0.015, 0.025, -0.03, 0.02, -0.018];
-    const MAX_OFFSET = 8; // px — hard cap so icons stay within the row
-    let rafId: number | null = null;
+    let inView = false;
+    let rafId = 0;
 
     const update = () => {
-      rafId = null;
-      const el = containerRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      // Bail if far outside viewport — saves layout/paint while off-screen.
-      if (rect.bottom < -200 || rect.top > window.innerHeight + 200) return;
-      const sectionCenter = rect.top + rect.height / 2;
-      const delta = window.innerHeight / 2 - sectionCenter;
-      for (let i = 0; i < iconInnersRef.current.length; i++) {
-        const inner = iconInnersRef.current[i];
-        if (!inner) continue;
-        const speed = SPEEDS[i % SPEEDS.length];
-        const raw = delta * speed;
-        const x = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, raw));
-        inner.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
-      }
+      rafId = 0;
+      const rect = wrap.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      // Scrollable distance inside the wrapper (sticky child is one viewport tall).
+      const total = rect.height - vh;
+      if (total <= 0) return;
+      // How far we've scrolled into the wrapper (0 = wrapper top hits viewport top).
+      const scrolled = -rect.top;
+      // Clamp just under 1 so floor(progress * len) never overshoots.
+      const progress = Math.min(0.9999, Math.max(0, scrolled / total));
+      const idx = Math.floor(progress * CHANNELS.length);
+      setActive((prev) => (prev === idx ? prev : idx));
     };
 
     const onScroll = () => {
-      if (rafId !== null) return;
+      if (!inView || rafId) return;
       rafId = requestAnimationFrame(update);
     };
 
-    update();
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          inView = e.isIntersecting;
+          if (inView) update();
+        });
+      },
+      { threshold: 0 }
+    );
+    io.observe(wrap);
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+    update();
+
     return () => {
+      io.disconnect();
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
-      if (rafId !== null) cancelAnimationFrame(rafId);
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 
-  const len = CHANNELS.length;
-  const STEP_PX = 70; // distance one icon-step on the carousel
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Ignore secondary buttons / non-primary pointers.
-    if (e.button !== 0 && e.pointerType === 'mouse') return;
-    setDragging(true);
-    dragRef.current = {
-      startX: e.clientX,
-      startActive: active,
-      pointerId: e.pointerId,
-    };
-    try {
-      containerRef.current?.setPointerCapture(e.pointerId);
-    } catch {
-      /* no-op */
-    }
-  };
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current) return;
-    const dx = e.clientX - dragRef.current.startX;
-    // Drag right → previous icons; drag left → next icons. Hence the negation.
-    const stepsRaw = Math.round(-dx / STEP_PX);
-    const next = ((dragRef.current.startActive + stepsRaw) % len + len) % len;
-    if (next !== active) setActive(next);
-  };
-
-  const endDrag = (e?: React.PointerEvent<HTMLDivElement>) => {
-    if (dragRef.current && e) {
-      try {
-        containerRef.current?.releasePointerCapture(dragRef.current.pointerId);
-      } catch {
-        /* no-op */
-      }
-    }
-    dragRef.current = null;
-    setDragging(false);
-  };
-
   return (
-    <div
-      ref={containerRef}
-      className="proxe-coverflow"
-      data-dragging={dragging}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
-      aria-label={`PROXe listens on ${CHANNELS.map((c) => c.name).join(', ')}`}
-    >
-      <div className="proxe-coverflow-stage">
-        {CHANNELS.map((c, i) => {
-          // Shortest signed distance to active, wrapped — keeps motion circular.
-          let offset = i - active;
-          if (offset > len / 2) offset -= len;
-          if (offset < -len / 2) offset += len;
-          // Anything beyond ±2 is hidden.
-          const visible = Math.abs(offset) <= 2;
-          return (
-            <div
-              key={c.name}
-              className="proxe-coverflow-tile"
-              data-offset={offset}
-              data-visible={visible}
-              aria-hidden={offset !== 0}
-            >
-              <span
-                ref={(el) => {
-                  iconInnersRef.current[i] = el;
-                }}
-                className="proxe-coverflow-icon-inner"
-              >
-                {c.icon}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-      <div className="proxe-coverflow-label" aria-live="polite">
-        {CHANNELS[active].name}
+    <div ref={wrapRef} className="proxe-coverflow-scroll">
+      <div className="proxe-coverflow-sticky">
+        <div
+          className="proxe-coverflow"
+          aria-label={`PROXe listens on ${CHANNELS.map((c) => c.name).join(', ')}`}
+        >
+          <div className="proxe-coverflow-stage">
+            {CHANNELS.map((c, i) => {
+              const offset = i - active;
+              const visible = Math.abs(offset) <= 2;
+              return (
+                <div
+                  key={c.name}
+                  className="proxe-coverflow-tile"
+                  data-offset={offset}
+                  data-visible={visible}
+                  aria-hidden={offset !== 0}
+                >
+                  {c.icon}
+                </div>
+              );
+            })}
+          </div>
+          <div className="proxe-coverflow-label" aria-live="polite">
+            {CHANNELS[active].name.toUpperCase()}
+          </div>
+        </div>
       </div>
     </div>
   );

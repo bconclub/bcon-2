@@ -392,40 +392,44 @@ body:has(.proxe-root) {
   text-shadow: 0 1px 4px rgba(10, 20, 60, 0.5);
 }
 
-/* ===== Channel coverflow — focused center tile, side tiles fading =========
-   Auto-rotating carousel. Five tiles visible; center is full-size, the two
-   on each side scale + fade. Slot positions are driven by [data-offset] so
-   transitions are CSS-only and identical across React state changes. */
-.proxe-coverflow {
+/* ===== Channel coverflow — scroll-driven dial =========
+   Outer `.proxe-coverflow-scroll` is a tall wrapper that gives the dial its
+   scroll distance. Inner `.proxe-coverflow-sticky` is `position: sticky` so
+   the carousel pins to the viewport while the wrapper scrolls past. Active
+   index is set by JS based on scroll progress; tiles position themselves
+   from `data-offset` (0 = active, ±1 = side, ±2 = peripheral). */
+.proxe-coverflow-scroll {
+  position: relative;
+  /* ~1 viewport pinned + ~25vh of scroll per channel-step. With 7 channels
+     that's 100vh + 6×25vh = 250vh total. Tunable via this value. */
+  height: 250vh;
   margin: 36px auto 0;
+}
+
+.proxe-coverflow-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.proxe-coverflow {
+  width: 100%;
   max-width: 460px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  cursor: grab;
-  /* Capture horizontal drags but let vertical scroll pass through (mobile). */
-  touch-action: pan-y;
-  -webkit-user-select: none;
-  user-select: none;
-}
-.proxe-coverflow[data-dragging='true'] {
-  cursor: grabbing;
 }
 
 .proxe-coverflow-stage {
   position: relative;
   width: 100%;
-  height: 110px;
-  /* Allow children to overflow horizontally so off-screen siblings can
-     transition in/out smoothly. */
+  height: 130px;
+  /* Off-stage siblings can sit beyond the 460px max-width as they fade out. */
   overflow: visible;
-}
-
-/* Suppress transitions during an active drag so the icon follows the
-   finger 1:1 instead of lagging behind a 0.6s cubic ease. */
-.proxe-coverflow[data-dragging='true'] .proxe-coverflow-tile {
-  transition: transform 0s, opacity 0.25s ease, filter 0.25s ease;
 }
 
 /* No tile chrome — pure icons. Size, position, opacity per offset. */
@@ -440,9 +444,8 @@ body:has(.proxe-root) {
   transform: translate(-50%, -50%) scale(1);
   transform-origin: center center;
   transition:
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.5s ease,
-    filter 0.5s ease;
+    transform 0.3s ease,
+    opacity 0.3s ease;
   pointer-events: none;
   will-change: transform, opacity;
 }
@@ -451,26 +454,18 @@ body:has(.proxe-root) {
   width: 76px;
   height: 76px;
   stroke: currentColor;
-  /* Block native image-drag interfering with our pointer drag */
   pointer-events: none;
 }
 
-/* Inner wrapper carries the scroll-driven parallax translate. Kept on its
-   own element so it doesn't fight the tile's coverflow positioning transform. */
-.proxe-coverflow-icon-inner {
-  display: inline-flex;
-  will-change: transform;
-}
-
-/* Hidden outside the visible window. */
+/* Hidden outside the visible window (any |offset| > 2). */
 .proxe-coverflow-tile[data-visible='false'] {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.4);
 }
 
-/* Center — full size, fully bright */
+/* Centre — scaled up, fully bright */
 .proxe-coverflow-tile[data-offset='0'] {
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%, -50%) scale(1.2);
   opacity: 1;
   z-index: 4;
 }
@@ -478,61 +473,66 @@ body:has(.proxe-root) {
 /* ±1 — smaller, dimmer */
 .proxe-coverflow-tile[data-offset='-1'],
 .proxe-coverflow-tile[data-offset='1'] {
-  opacity: 0.45;
+  opacity: 0.4;
   z-index: 3;
 }
 .proxe-coverflow-tile[data-offset='-1'] {
-  transform: translate(calc(-50% - 90px), -50%) scale(0.7);
+  transform: translate(calc(-50% - 110px), -50%) scale(0.7);
 }
 .proxe-coverflow-tile[data-offset='1'] {
-  transform: translate(calc(-50% + 90px), -50%) scale(0.7);
+  transform: translate(calc(-50% + 110px), -50%) scale(0.7);
 }
 
-/* ±2 — tiny, almost invisible */
+/* ±2 — tiny peripheral hint (desktop only) */
 .proxe-coverflow-tile[data-offset='-2'],
 .proxe-coverflow-tile[data-offset='2'] {
   opacity: 0.18;
   z-index: 2;
 }
 .proxe-coverflow-tile[data-offset='-2'] {
-  transform: translate(calc(-50% - 165px), -50%) scale(0.5);
+  transform: translate(calc(-50% - 200px), -50%) scale(0.5);
 }
 .proxe-coverflow-tile[data-offset='2'] {
-  transform: translate(calc(-50% + 165px), -50%) scale(0.5);
+  transform: translate(calc(-50% + 200px), -50%) scale(0.5);
 }
 
 .proxe-coverflow-label {
   font-family: var(--proxe-font-mono);
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  font-size: 13px;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.85);
   min-height: 1em;
   transition: color 0.3s ease;
+  margin-top: 8px;
 }
 
 @media (max-width: 640px) {
+  .proxe-coverflow-scroll {
+    /* Mobile users scroll faster; tighten total scroll distance. */
+    height: 200vh;
+  }
   .proxe-coverflow {
-    max-width: 360px;
+    max-width: 320px;
   }
   .proxe-coverflow-stage {
-    height: 92px;
+    height: 110px;
   }
   .proxe-coverflow-tile svg {
     width: 60px;
     height: 60px;
   }
   .proxe-coverflow-tile[data-offset='-1'] {
-    transform: translate(calc(-50% - 70px), -50%) scale(0.7);
+    transform: translate(calc(-50% - 85px), -50%) scale(0.7);
   }
   .proxe-coverflow-tile[data-offset='1'] {
-    transform: translate(calc(-50% + 70px), -50%) scale(0.7);
+    transform: translate(calc(-50% + 85px), -50%) scale(0.7);
   }
-  .proxe-coverflow-tile[data-offset='-2'] {
-    transform: translate(calc(-50% - 125px), -50%) scale(0.5);
-  }
+  /* Mobile shows just 3 icons: hide ±2. */
+  .proxe-coverflow-tile[data-offset='-2'],
   .proxe-coverflow-tile[data-offset='2'] {
-    transform: translate(calc(-50% + 125px), -50%) scale(0.5);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
   }
 }
 
