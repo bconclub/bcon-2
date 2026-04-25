@@ -2,6 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Grainient from './Grainient';
+import VapiOrb from './VapiOrb';
+
+/**
+ * Voice call is now handled inline via the @vapi-ai/web SDK in <VapiOrb />.
+ * The PROXe chat widget script is hidden on /proxe and /proxe-cfs (see
+ * components/ProxeWidget) so the two voice surfaces don't fight for the mic.
+ */
 
 /* Icons kept tiny and inline so we don't add JS weight */
 const Icon = {
@@ -237,7 +244,6 @@ export default function ProxeLanding() {
   const videoFrameRef = useRef<HTMLDivElement | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [videoMuted, setVideoMuted] = useState(true);
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
@@ -319,9 +325,9 @@ export default function ProxeLanding() {
       {/* ===== Site-wide animated gradient backdrop ===== */}
       <div className="proxe-page-grainient" aria-hidden="true">
         <Grainient
-          color1="#FF9FFC"
-          color2="#5227FF"
-          color3="#B497CF"
+          color1="#7C3AED"
+          color2="#4C1D95"
+          color3="#1E1B4B"
           timeSpeed={0.22}
           colorBalance={0}
           warpStrength={1}
@@ -399,11 +405,12 @@ export default function ProxeLanding() {
           <div className="proxe-hero-video-inner">
             <iframe
               ref={videoIframeRef}
-              src="https://player.vimeo.com/video/1182869056?autoplay=0&muted=1&loop=1&controls=0&byline=0&title=0&portrait=0&dnt=1&api=1&transparent=1&background=0"
+              src="https://player.vimeo.com/video/1182869056?autoplay=1&muted=1&loop=1&controls=0&byline=0&title=0&portrait=0&dnt=1&api=1&transparent=1&background=0&playsinline=1"
               title="PROXe demo"
               allow="autoplay; fullscreen; picture-in-picture"
               frameBorder={0}
               loading="lazy"
+              allowFullScreen
             />
             <button
               type="button"
@@ -469,6 +476,19 @@ export default function ProxeLanding() {
         </div>
       </section>
 
+      {/* ===== Voice demo — gradient orb "click to talk" (moved up to sit right after pillars) ===== */}
+      <section className="proxe-section" id="voice">
+        <div className="proxe-container">
+          <div className="proxe-section-label" style={{ textAlign: 'center' }}>
+            Hear it Live
+          </div>
+          <div className="proxe-voice">
+            <h2 className="proxe-voice-title">See PROXe in action.</h2>
+            <VapiOrb />
+          </div>
+        </div>
+      </section>
+
       {/* ===== 8. Scroll-triggered popup (fires once after pillars scroll past) ===== */}
       <ScrollPopup triggerRef={pillarsRef} />
 
@@ -491,34 +511,6 @@ export default function ProxeLanding() {
                 <p className="proxe-feature-desc">{f.desc}</p>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== 10. Voice demo — gradient orb "click to talk" ===== */}
-      <section className="proxe-section" id="voice">
-        <div className="proxe-container">
-          <div className="proxe-section-label" style={{ textAlign: 'center' }}>
-            Hear it Live
-          </div>
-          <div className="proxe-voice">
-            <h2 className="proxe-voice-title">See PROXe in action.</h2>
-            <div className="proxe-voice-orb-wrap">
-              <button
-                type="button"
-                className="proxe-voice-orb"
-                aria-label="Click to talk to PROXe"
-                onClick={() => {
-                  // TODO: wire real voice call trigger
-                  window.location.href = 'tel:+910000000000';
-                }}
-              >
-                <span className="proxe-voice-orb-ring" aria-hidden="true" />
-                <span className="proxe-voice-orb-inner" aria-hidden="true" />
-                <span className="proxe-voice-orb-shine" aria-hidden="true" />
-              </button>
-              <div className="proxe-voice-orb-label">Click to talk</div>
-            </div>
           </div>
         </div>
       </section>
@@ -714,7 +706,7 @@ export default function ProxeLanding() {
           <div className="proxe-footer-grid">
             <div>
               <img
-                src="/proxe/brand/proxe-logo-black.webp"
+                src="/proxe/brand/proxe-logo-white.webp"
                 alt="PROXe"
                 className="proxe-footer-logo"
               />

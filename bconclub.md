@@ -3,16 +3,20 @@
 Authoritative notes for building and running the project, plus the high-level structure.
 
 ## Overview
-- **Framework**: Next.js 15.0.0 (App Router)
+- **Framework**: Next.js 15.x (App Router)
 - **Language**: TypeScript 5
 - **Runtime**: React 19.2.0, React DOM 19.2.0
 - **Database/Auth**: Supabase (with @supabase/ssr for Next.js integration)
-- **Effects/animation**: GSAP 3.13.0, @gsap/react 2.1.2, motion 12.23.24, three 0.180.0, ogl 1.0.11
+- **Effects/animation**: GSAP 3.13.0, @gsap/react 2.1.2, motion 12.23.24, three 0.180.0, ogl 1.0.11, lottie-react 2.4.1
+- **Smooth scroll**: lenis 1.3.21 (mounted globally via `lib/lenis.tsx`)
+- **Email**: resend 6.9.2 (transactional email via `/api/send-email`)
+- **Charts**: recharts 3.8.1 (used in admin / status surfaces)
+- **Styling**: Tailwind 4.x (`@tailwindcss/postcss`), still co-existing with per-component CSS
 - **Testing**: React Testing Library 16.3.0, Jest DOM 6.9.1, @testing-library/user-event 13.5.0
 - **UI Components**: @radix-ui/react-accordion 1.2.12
 - **Utilities**: mathjs 15.0.0, web-vitals 2.1.4
-- **Project Version**: 1.11.4
-- **Latest Git Tag**: v1.11.4
+- **Project Version**: 1.77.0 (auto-bumped via CI on every merge)
+- **Latest Git Tag**: v1.77.0
 - **Entry point**: `app/layout.tsx` → `app/page.tsx`
 
 ## Prerequisites
@@ -35,6 +39,12 @@ NEXT_PUBLIC_WEBHOOK_URL=https://build.goproxe.com/webhook/bconclub-website
 NEXT_PUBLIC_WEBHOOK_SECRET=your-webhook-secret-token  # Optional: for webhook authentication
 NEXT_PUBLIC_ENABLE_WEBHOOK_TRACKING=true  # Set to true to enable tracking in development
 WEBHOOK_SECRET=your-webhook-secret-token  # Server-side webhook secret (for /api/webhook endpoint)
+
+# Email (Required for /api/send-email — contact form, thank-you, quote builder)
+RESEND_API_KEY=re_xxx_your_resend_api_key
+
+# PROXe Form Integration (used by ContactSection + /thank-you)
+NEXT_PUBLIC_PROXE_FORM_URL=https://proxe.bconclub.com/api/...   # set per environment
 ```
 
 ### Environment Variable Notes
@@ -55,7 +65,7 @@ cd BCON2
 npm install
 ```
 
-### Dependency Versions (from package.json)
+### Dependency Versions (from package.json — v1.77.0)
 ```json
 {
   "dependencies": {
@@ -68,22 +78,30 @@ npm install
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "gsap": "^3.13.0",
+    "lenis": "^1.3.21",
+    "lottie-react": "^2.4.1",
     "mathjs": "^15.0.0",
     "motion": "^12.23.24",
     "next": "^15.0.0",
     "ogl": "^1.0.11",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "recharts": "^3.8.1",
+    "resend": "^6.9.2",
     "three": "^0.180.0",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.182.0",
+    "autoprefixer": "^10.4.27",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.1",
+    "postcss": "^8.5.9",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5"
   }
 }
@@ -169,200 +187,127 @@ npm run lint
 | Script | Command | Description |
 |--------|---------|-------------|
 | `dev` | `next dev` | Start Next.js development server |
-| `build` | `next build` | Create optimized production build |
+| `build` | `node scripts/set-build-time.js && next build` | Stamp build time + create optimized production build |
 | `start` | `next start` | Start production server (requires build) |
 | `lint` | `next lint` | Run ESLint on codebase |
+| `set-build-time` | `node scripts/set-build-time.js` | Write build timestamp/git metadata to `app/build-info.json` (consumed by `/status`) |
 
 ## Project Structure
 
 ```
-BCON2/
-├── app/                          # Next.js App Router
-│   ├── admin/                    # Admin panel routes
-│   │   ├── login/                # Admin login page (/admin/login)
-│   │   │   └── page.tsx
-│   │   ├── work/                 # Admin work management
-│   │   │   └── page.tsx
-│   │   └── page.tsx              # Admin dashboard (/admin)
-│   ├── api/                      # API routes
-│   │   ├── portfolio/            # Portfolio CRUD API
-│   │   │   ├── [id]/             # Individual portfolio item
-│   │   │   │   └── route.ts
-│   │   │   └── route.ts          # List/Create portfolio
-│   │   ├── status/               # Status endpoint
+bconclub/
+├── app/                                # Next.js App Router
+│   ├── about/                          # /about
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── admin/                          # Admin panel (protected)
+│   │   ├── login/                      # /admin/login
+│   │   ├── work/                       # /admin/work — work item CMS
+│   │   └── page.tsx                    # /admin — dashboard
+│   ├── api/                            # API routes
+│   │   ├── portfolio/                  # Portfolio CRUD
+│   │   │   ├── [id]/route.ts
 │   │   │   └── route.ts
-│   │   └── visitor-count/       # Visitor counter API
+│   │   ├── send-email/route.ts         # Resend-backed transactional email
+│   │   ├── status/route.ts             # Status / version / git metadata
+│   │   ├── story-highlights/route.ts
+│   │   ├── upload/route.ts             # File upload to Supabase Storage
+│   │   ├── viewer-count/route.ts       # Lightweight viewer counter
+│   │   ├── visitor-count/route.ts      # Site-wide visitor counter
+│   │   ├── webhook/route.ts            # Inbound webhook from build.goproxe.com
+│   │   └── work/                       # Work CRUD + media
+│   │       ├── [id]/media/route.ts
+│   │       ├── [id]/route.ts
+│   │       ├── media/[mediaId]/route.ts
 │   │       └── route.ts
-│   │   ├── story-highlights/     # Story highlights API
-│   │   │   └── route.ts
-│   │   ├── upload/               # File upload API
-│   │   │   └── route.ts
-│   │   ├── webhook/              # Webhook endpoint
-│   │   │   └── route.ts          # POST/GET /api/webhook
-│   │   └── work/                 # Work CRUD API
-│   │       ├── [id]/             # Individual work item
-│   │       │   ├── media/        # Work media endpoints
-│   │       │   │   └── route.ts
-│   │       │   └── route.ts
-│   │       ├── media/            # Work media management
-│   │       │   └── [mediaId]/    # Individual media item
-│   │       │       └── route.ts
-│   │       └── route.ts          # List/Create work
-│   ├── services/                 # Services page
-│   │   └── page.tsx              # /services
-│   ├── status/                   # Status page
-│   │   ├── page.tsx              # /status (displays version from git tags, database status)
+│   ├── campaigns/                      # /campaigns — campaign landing
+│   ├── gpfc-ai-lead-machine/           # /gpfc-ai-lead-machine — case-study landing
+│   ├── pricing-quote/                  # /pricing-quote — quote builder
+│   ├── privacy/                        # /privacy — privacy policy
+│   │   ├── page.tsx
+│   │   └── privacy.css
+│   ├── proxe/                          # /proxe — PROXe product landing
+│   │   ├── components/ProxeLanding.tsx
+│   │   ├── styles/landing.css
+│   │   └── page.tsx
+│   ├── proxe-cfs/                      # /proxe-cfs — PROXe Security & Platform
+│   │   ├── page.tsx
+│   │   └── proxe-cfs.css
+│   ├── services/                       # /services
+│   ├── status/                         # /status — version + DB status
+│   │   ├── page.tsx
 │   │   └── status.css
-│   ├── work/                     # Work/portfolio page
-│   │   ├── page.tsx              # /work
+│   ├── thank-you/                      # /thank-you — post-submit page (PROXe + WhatsApp)
+│   ├── work/                           # /work — portfolio
+│   │   ├── page.tsx
 │   │   └── work.css
-│   ├── layout.tsx                # Root layout (includes TrackingProvider)
-│   ├── page.tsx                  # Home page (/)
-│   └── globals.css               # Global styles
-├── components/                    # Reusable UI components
-│   ├── admin/
-│   │   └── ProtectedRoute.tsx   # Admin route protection
-│   ├── ComingSoonModal/          # Coming soon modal component
-│   │   ├── ComingSoonModal.tsx
-│   │   └── ComingSoonModal.css
-│   ├── desktop/                  # Desktop-specific components
-│   │   ├── Hero.tsx
-│   │   ├── BusinessApps.tsx
-│   │   ├── WorkGrid.tsx
-│   │   ├── BusinessApps.css
-│   │   └── index.ts              # Exports all desktop components
-│   ├── mobile/                   # Mobile-specific components
-│   │   ├── Hero.tsx
-│   │   ├── BusinessApps.tsx
-│   │   ├── WorkGrid.tsx
-│   │   ├── BusinessApps.css
-│   │   └── index.ts              # Exports all mobile components
-│   ├── ResponsiveSection.tsx     # Wrapper for device switching
-│   ├── shared/                   # Shared components
-│   │   └── Icons.tsx             # Icon components
-│   ├── StaggeredMenu/            # Navigation menu component
-│   │   ├── StaggeredMenu.tsx
-│   │   └── StaggeredMenu.css
-│   └── Tracking/                 # Tracking components
-│       └── TrackingProvider.tsx  # Global tracking provider
-├── effects/                       # Visual effects
-│   ├── GradualBlur/              # Gradual blur effect
-│   │   ├── GradualBlur.tsx
-│   │   └── GradualBlur.css
-│   ├── LiquidEther/              # Liquid ether effect
-│   │   ├── LiquidEther.tsx
-│   │   └── LiquidEther.css
-│   └── Loader/                   # Loading component
-│       ├── Loader.tsx
-│       └── Loader.css
-├── lib/                          # Utility libraries
-│   ├── hooks/
-│   │   └── useMediaQuery.ts      # Media query hook for responsive design
-│   ├── supabase/                 # Supabase integration
-│   │   ├── client.ts             # Client-side Supabase client
-│   │   └── server.ts             # Server-side Supabase client
-│   └── tracking/                 # Tracking and analytics
-│       ├── index.ts              # Tracking exports
-│       ├── README.md             # Tracking documentation
-│       ├── utm.ts                # UTM parameter handling
-│       └── webhook.ts            # Webhook integration
-├── sections/                     # Page sections
-│   ├── BusinessAppsCarousel/     # Business apps carousel
-│   │   ├── BusinessAppsCarousel.tsx
-│   │   └── BusinessAppsCarousel.css
-│   ├── BusinessAppsSection/     # Business apps section
-│   │   ├── BusinessAppsSection.tsx
-│   │   └── BusinessAppsSection.css
-│   ├── CaseStudyModal/           # Case study modal
-│   │   ├── CaseStudyModal.tsx
-│   │   └── CaseStudyModal.css
-│   ├── CategorySection/          # Category section
-│   │   ├── CategorySection.tsx
-│   │   └── CategorySection.css
-│   ├── CategoryToggle/           # Category toggle component
-│   │   ├── CategoryToggle.tsx
-│   │   └── CategoryToggle.css
-│   ├── ContactSection/           # Contact section
-│   │   ├── ContactSection.tsx
-│   │   └── ContactSection.css
-│   ├── FeaturedWorkGrid/         # Featured work grid
-│   │   ├── FeaturedWorkGrid.tsx
-│   │   └── FeaturedWorkGrid.css
-│   ├── Footer/                   # Footer component
-│   │   ├── Footer.tsx             # Includes visitor counter
-│   │   └── Footer.css             # Visitor counter styling (centered, accent color)
-│   ├── LiquidBentoPortfolio/     # Liquid bento portfolio
-│   │   ├── LiquidBentoPortfolio.tsx
-│   │   └── LiquidBentoPortfolio.css
-│   ├── ProjectCard/              # Project card component
-│   │   ├── ProjectCard.tsx
-│   │   └── ProjectCard.css
-│   ├── RotatingText/             # Rotating text component
-│   │   └── RotatingText.tsx
-│   ├── ScrollReveal/             # Scroll reveal animations
-│   │   ├── ScrollReveal.tsx
-│   │   └── ScrollReveal.css
-│   ├── ServicesDetail/           # Services detail section
-│   │   ├── ServicesDetail.tsx
-│   │   └── ServicesDetail.css
-│   ├── ServicesGrid/             # Services grid
-│   │   ├── ServicesGrid.tsx
-│   │   └── ServicesGrid.css
-│   ├── ShowcaseCard/             # Showcase card component
-│   │   ├── ShowcaseCard.tsx
-│   │   └── ShowcaseCard.css
-│   ├── ShowcaseSection/          # Showcase section
-│   │   ├── ShowcaseSection.tsx
-│   │   └── ShowcaseSection.css
-│   ├── ShowReel/                 # Show reel component
-│   │   ├── ShowReel.tsx
-│   │   └── ShowReel.css
-│   ├── StoryHighlights/          # Story highlights
-│   │   ├── StoryHighlights.tsx
-│   │   └── StoryHighlights.css
-│   ├── WorkCard/                 # Work card component
-│   │   ├── WorkCard.tsx
-│   │   └── WorkCard.css
-│   ├── WorkGrid/                 # Work grid component
-│   │   ├── WorkGrid.tsx
-│   │   └── WorkGrid.css
-│   ├── WorkHeroVideo/            # Work hero video
-│   │   ├── WorkHeroVideo.tsx
-│   │   └── WorkHeroVideo.css
-│   ├── WorkShowcase/             # Work showcase
-│   │   ├── WorkShowcase.tsx
-│   │   └── WorkShowcase.css
-│   └── index.ts                  # Section exports (if exists)
-├── public/                       # Static assets
-│   ├── assets/
-│   │   └── pixel-412.svg
-│   ├── portfolio/                # Portfolio media files
-│   │   ├── thumbnails/           # Portfolio thumbnails
-│   │   │   └── [6 .webp files]
-│   │   └── [various .mp4, .jpg, .png files]
-│   ├── product thumbnail/        # Product thumbnails
-│   │   └── [4 .webp files]
-│   ├── technology/               # Technology logos
-│   │   └── [5 .png files]
-│   ├── BCON White logo.webp
-│   ├── BRain.png
-│   ├── Business Apps.png
-│   ├── favicon.ico
-│   ├── Glass bulb.webp
-│   ├── Gulb Icon.png
-│   ├── logo192.png
-│   ├── logo512.png
-│   └── robots.txt
-├── next.config.js                # Next.js configuration
-├── tsconfig.json                 # TypeScript configuration
-├── vercel.json                   # Vercel deployment configuration
-├── ecosystem.config.js           # PM2 configuration (for server deployment)
-├── package.json                  # Dependencies and scripts
-├── package-lock.json             # Locked dependency versions
-├── ARCHITECTURE.md               # Architecture documentation
-├── DEPLOYMENT.md                 # Deployment guide
-├── README.md                     # Project README
-└── supabase-complete-schema.sql  # Complete Supabase schema (all tables)
+│   ├── globals.css                     # Global styles
+│   ├── layout.tsx                      # Root layout (Tracking, ErrorBoundary, Lenis, ProxeWidget)
+│   ├── not-found.tsx                   # 404 page
+│   ├── page.tsx                        # Home (/)
+│   └── sitemap.ts                      # Auto-generated sitemap
+├── components/                         # Reusable UI components
+│   ├── admin/ProtectedRoute.tsx        # Admin route guard
+│   ├── ComingSoonModal/                # "Coming soon" modal
+│   ├── desktop/                        # Desktop-specific Hero, BusinessApps, WorkGrid
+│   ├── mobile/                         # Mobile-specific Hero, BusinessApps, WorkGrid
+│   ├── ErrorBoundary/                  # App-wide error boundary
+│   ├── ProxeWidget/                    # Conditional PROXe chat-widget loader
+│   │   └── ProxeWidget.tsx             # Hides widget on /proxe and /proxe-cfs
+│   ├── ResponsiveSection.tsx           # Mobile/desktop switch wrapper
+│   ├── shared/Icons.tsx
+│   ├── StaggeredMenu/                  # Right-side staggered nav menu
+│   └── Tracking/TrackingProvider.tsx
+├── effects/                            # Visual effects
+│   ├── GradualBlur/                    # Gradient/backdrop blur overlay
+│   ├── LiquidEther/                    # WebGL fluid background (Three.js)
+│   └── Loader/                         # First-paint HUMAN X AI loader
+├── lib/                                # Utility libraries
+│   ├── hooks/useMediaQuery.ts
+│   ├── lenis.tsx                       # Lenis smooth-scroll provider (mounted in root layout)
+│   ├── pricing/                        # Quote-builder pricing logic (used by /pricing-quote)
+│   ├── supabase/{client,server}.ts     # Supabase clients (browser + SSR)
+│   └── tracking/                       # UTM + webhook tracking utilities
+├── sections/                           # Page sections (composable on home + sub-pages)
+│   ├── BusinessAppsCarousel/
+│   ├── BusinessAppsSection/
+│   ├── CareersSection/                 # NEW — careers/we're-hiring section
+│   ├── CaseStudyModal/
+│   ├── CategorySection/
+│   ├── CategoryToggle/
+│   ├── ContactSection/                 # Contact form (PROXe form integration)
+│   ├── FeaturedWorkGrid/
+│   ├── Footer/                         # Newsletter + sitemap + visitor counter
+│   ├── LiquidBentoPortfolio/           # Masonry bento portfolio grid
+│   ├── PricingQuote/                   # NEW — pricing quote builder UI
+│   ├── ProjectCard/
+│   ├── RotatingText/
+│   ├── ScrollReveal/
+│   ├── ServicesDetail/
+│   ├── ServicesGrid/
+│   ├── ShowReel/                       # Hero "Reel · Play Our" rotating button + modal player
+│   ├── ShowcaseCard/
+│   ├── ShowcaseSection/
+│   ├── StoryHighlights/                # IG-stories-style horizontal scroll
+│   ├── WorkCard/
+│   ├── WorkGrid/
+│   ├── WorkHeroVideo/                  # Hero video w/ mute/unmute (since v1.74)
+│   └── WorkShowcase/
+├── public/                             # Static assets (images, video, fonts, OG)
+├── scripts/
+│   └── set-build-time.js               # Stamps git SHA + build time into app/build-info.json
+├── ecosystem.config.js                 # PM2 deployment config
+├── next.config.js                      # Next.js configuration
+├── postcss.config.js                   # Tailwind + autoprefixer pipeline
+├── tailwind.config.ts                  # Tailwind 4 config
+├── tsconfig.json                       # TypeScript configuration
+├── vercel.json                         # Vercel deployment configuration
+├── package.json                        # Dependencies and scripts
+├── README.md
+├── ARCHITECTURE.md
+├── DEPLOYMENT.md
+├── bconclub.md                         # ← this file
+└── supabase-complete-schema.sql        # Full Supabase schema
 ```
 
 ## API Routes
@@ -399,8 +344,40 @@ BCON2/
 - **GET** `/api/visitor-count` - Increment and fetch visitor count
 - **GET** `/api/visitor-count?fetchOnly=true` - Fetch current count without incrementing
 
+### Viewer Count API
+- **GET** `/api/viewer-count` - Lightweight per-page concurrent-viewer counter (separate from total visitor count)
+
+### Send Email API
+- **POST** `/api/send-email` - Send transactional email via Resend (used by contact form, quote builder, thank-you flow). Requires `RESEND_API_KEY` server env var.
+
 ### Story Highlights API
 - **GET** `/api/story-highlights` - Get story highlights
+
+## Public Pages / Routes
+
+| Route | File | Purpose |
+|-------|------|---------|
+| `/` | `app/page.tsx` | Home — hero, scroll-reveal creative section, solutions grid, bento portfolio, business apps, contact, footer |
+| `/about` | `app/about/page.tsx` | About BCON |
+| `/services` | `app/services/page.tsx` | Services overview |
+| `/work` | `app/work/page.tsx` | Portfolio / work archive |
+| `/campaigns` | `app/campaigns/page.tsx` | Campaign-specific landing |
+| `/pricing-quote` | `app/pricing-quote/page.tsx` | Interactive quote builder (pricing logic in `lib/pricing/`) |
+| `/proxe` | `app/proxe/page.tsx` | PROXe product landing page |
+| `/proxe-cfs` | `app/proxe-cfs/page.tsx` | PROXe Security & Platform (compliance / infra spec) |
+| `/gpfc-ai-lead-machine` | `app/gpfc-ai-lead-machine/page.tsx` | GPFC AI Lead Machine case study |
+| `/thank-you` | `app/thank-you/page.tsx` | Post-form-submit page; auto-fills WhatsApp message and offers AI voice call |
+| `/privacy` | `app/privacy/page.tsx` | Privacy policy |
+| `/status` | `app/status/page.tsx` | Build/version/DB health (reads `app/build-info.json` + git tags) |
+| `/admin`, `/admin/login`, `/admin/work` | `app/admin/...` | Admin-only (Supabase Auth) |
+| `/sitemap.xml` | `app/sitemap.ts` | Auto-generated sitemap |
+
+### PROXe Chat Widget Visibility
+The PROXe chat widget script (`https://proxe.bconclub.com/api/widget/embed.js`) is loaded
+globally via `components/ProxeWidget/ProxeWidget.tsx`, which uses `usePathname()` to
+**hide the widget on `/proxe` and `/proxe-cfs`** (and all sub-routes). The widget loads on
+every other route. To exclude additional routes, edit the `HIDDEN_ROUTES` array in that
+component.
 
 ## Admin Access
 
@@ -1358,41 +1335,69 @@ When adding new animations:
 
 ## Version History
 
-### Recent Releases
+> Versions are auto-bumped by CI on every merge to `production` (commits tagged
+> `chore: auto-increment version to <x> [skip ci]`). Only meaningful releases are
+> summarized below — see `git log` for the full history.
 
-#### v1.11.3 (Current)
-- **Version Display**: Now reads from git tags instead of package.json
-- **Release Date Display**: Added formatted release date/time on status page
-- **Git Tag Integration**: Version automatically updates from latest git tag
-- **Status Page**: Enhanced with version date information
+### Unreleased (working tree, post-v1.77.0)
+- **NEW: `/proxe-cfs`** — PROXe Security & Platform page (`app/proxe-cfs/`). Cards-grid layout covering Infrastructure, Data Protection, Compliance, Access & Auth, AI & Privacy, Integrations, Reliability. Electric-purple accent (`#6B2FE8`).
+- **NEW: `ProxeWidget` component** (`components/ProxeWidget/`) — replaces the inline `<Script>` for the PROXe chat widget so it can be conditionally hidden by route. Hidden on `/proxe` and `/proxe-cfs`.
+- **Tailwind 4 wiring** — `postcss.config.js` + `tailwind.config.ts` added at the repo root. Tailwind co-exists with the existing per-component CSS modules.
 
-#### v1.11.2
-- **Visitor Counter**: Centered layout on mobile and desktop
-- **Brand Accent Color**: Visitor count number displays in accent green (#CDFC2E)
-- **Responsive Design**: Updated styling for all breakpoints
+### v1.77.0 (current production)
+- **PROXe landing polish** + portfolio asset aliases (`36557ed`).
+- **ESLint config repair** + chat widget hidden on `/proxe` (`1ba79c4`).
 
-#### v1.11.1
-- **Hydration Fix**: Fixed React hydration mismatch in LiquidBentoPortfolio component
-- **Server/Client Consistency**: Portfolio items now render consistently on server and client
-- **Client-Side Shuffling**: Items shuffle after hydration (browser-only)
+### v1.76.0 — v1.74.0 (PROXe rebuild + thank-you flow)
+- **Rebuilt `/proxe` landing page** from scratch (`167dd45`).
+- **Hero copy iteration**: settled on "Solve Marketing With AI" with serif `AI` accent (`db810e1`).
+- **Thank-you page**: passes form data to WhatsApp and PROXe (`3c623c7`).
+- **WorkHeroVideo**: added mute/unmute toggle; fixed video play delay on `WorkCard` (`5352c32`).
 
-#### v1.11.0
-- **Environment Setup**: Added comprehensive environment setup documentation
-- **Supabase Troubleshooting**: Added troubleshooting guide
-- **ShowReel Updates**: Updated ShowReel component and added media assets
+### v1.73.0 — v1.71.0 (Smooth scroll + perf passes)
+- **Lenis smooth scroll** mounted globally via `lib/lenis.tsx` (`07f0be4`, `cd95892`).
+- **Bare-bones perf pass**: stripped expensive transitions, removed backdrop-filter from header to fix scroll lag (`69a566a`, `6fda399`).
+- **Replaced `transition: all`** with specific properties site-wide (`893ed19`).
 
-### Previous Versions
-- **v1.10.0**: Previous stable release
-- **v1.0.2**: Initial documented version
+### v1.69.0 — v1.65.0 (Stability + animation tuning)
+- **StaggeredMenu fixes**: prevented panel from bleeding into viewport (`c843f87`); fixed menu opening on page load / getting stuck (`fddc6b6`).
+- **Animation/blur perf optimizations** (`c5a6f36`).
+
+### v1.64.0 — v1.60.0 (Mobile hero overhaul)
+- **PROXe chat widget enabled** site-wide via `<Script>` in root layout (`5eb1dd2`).
+- **Mobile hero**: 3–4× larger headline, 2–3× bigger ShowReel button, scaled pillars, left-aligned content with bottom-right ShowReel placement (`ea9bdfe`, `9d84fb4`).
+- **LiquidEther**: disabled on mobile (solid black background) for performance (`4ae45cb`).
+
+### v1.59.0 — v1.55.0 (Hero typography + layout)
+- **Two-column mobile hero** layout — text left, ShowReel right (`77724d1`).
+- **Restored LiquidEther** background and boosted visual impact (`05d8309`).
+- **Mobile UI/UX polish pass** across hero and full page (`026fc4c`).
+- **Mixed serif display font** (Fraunces) in hero for editorial typographic contrast (`2ec1001`, `7853354`).
+
+### v1.54.0 — v1.50.0 (Campaigns + AI Voice + Quote builder)
+- **AI-First Marketing hero** copy + `/campaigns` page added (`9589164`).
+- **AI Voice Call button** with PROXe integration on thank-you page (`13295e3`).
+- **Pre-filled WhatsApp message** with form data on `/thank-you` (`7d9e410`).
+- **PROXe form submission integration** end-to-end (`112249c`).
+
+### v1.46.0 — v1.43.0 (Build metadata + status page)
+- **`scripts/set-build-time.js`** — captures git SHA + build time into `app/build-info.json` (`c42b0f8`, `74090b5`).
+- **PROXe form integration** + status-page git/build info exposed.
+
+### Earlier (v1.11.x → v1.42.x)
+- **v1.11.3**: Version display reads from git tags; release date on status page.
+- **v1.11.2**: Visitor counter centered; accent-green count number.
+- **v1.11.1**: Fixed React hydration mismatch in `LiquidBentoPortfolio`.
+- **v1.11.0**: Initial environment-setup + Supabase troubleshooting docs; `ShowReel` updates.
 
 ### Version Information
-- **Current Package Version**: 1.11.3 (in `package.json`)
-- **Latest Git Tag**: v1.11.3
-- **Version Display**: Status page shows version from git tags with release date
-- See `package.json` for dependency versions
-- See git history for detailed code changes
+- **Current Package Version**: 1.77.0 (in `package.json`)
+- **Latest Git Tag**: v1.77.0
+- **Branch**: `production` is the deployable branch; `main` is the integration branch.
+- **Version Display**: Status page shows version from git tags + release date.
+- See `package.json` for dependency versions and `git log` for detailed code changes.
 
 ---
 
-**Last Updated**: January 2026 (v1.11.3)
+**Last Updated**: April 2026 (v1.77.0 + post-1.77.0 working tree)
 **Maintained By**: BCON Club Development Team
