@@ -1018,9 +1018,9 @@ body:has(.proxe-root) {
 .proxe-pillars-list {
   display: block;
   position: relative;
-  /* Big scroll runway *after* the stack forms so the user has time to
-     read the topmost card before the stack releases. */
-  padding-bottom: 90vh;
+  /* Modest scroll runway *after* the stack forms — enough to hold the
+     stacked view briefly without showing dead space once cards release. */
+  padding-bottom: 30vh;
 }
 
 /* Sticky-stack — each card pins as you scroll, slightly staggered, with
@@ -1091,7 +1091,7 @@ body:has(.proxe-root) {
 
 @media (max-width: 768px) {
   .proxe-pillars-list {
-    padding-bottom: 70vh;
+    padding-bottom: 25vh;
   }
   .proxe-pillar-row {
     grid-template-columns: 1fr;
