@@ -257,23 +257,89 @@ const CHANNELS: Array<{ name: string; icon: React.ReactNode }> = [
 
 function ChannelCoverflow() {
   const [active, setActive] = useState(0);
-  const [hovered, setHovered] = useState(false);
-
-  useEffect(() => {
-    if (hovered) return;
-    const id = setInterval(() => {
-      setActive((i) => (i + 1) % CHANNELS.length);
-    }, 2200);
-    return () => clearInterval(id);
-  }, [hovered]);
+  const [dragging, setDragging] = useState(false);
+  // Drag tracking — anchored on the position when the pointer went down so
+  // the index follows the finger 1:1, not cumulative across small moves.
+  const dragRef = useRef<{ startX: number; startActive: number; pointerId: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const len = CHANNELS.length;
+  const STEP_PX = 70; // distance one icon-step on the carousel
+
+  // Scroll-driven progression — as the user scrolls past the section, the
+  // active icon advances. Drag overrides this (paused while dragging).
+  useEffect(() => {
+    if (dragging) return;
+    const el = containerRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // 0 when carousel center is at viewport bottom, 1 at top.
+      const center = rect.top + rect.height / 2;
+      const progress = 1 - center / vh;
+      const clamped = Math.max(0, Math.min(0.9999, progress));
+      // Multiplier > 1 lets us cycle through the icons more than once
+      // during the section's traverse for a livelier feel.
+      const cycles = 1.4;
+      const next = Math.floor(clamped * len * cycles) % len;
+      setActive(next);
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [dragging, len]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    setDragging(true);
+    dragRef.current = {
+      startX: e.clientX,
+      startActive: active,
+      pointerId: e.pointerId,
+    };
+    try {
+      containerRef.current?.setPointerCapture(e.pointerId);
+    } catch {
+      /* no-op */
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.startX;
+    const stepsRaw = Math.round(-dx / STEP_PX);
+    const next = ((dragRef.current.startActive + stepsRaw) % len + len) % len;
+    if (next !== active) setActive(next);
+  };
+
+  const endDrag = (e?: React.PointerEvent<HTMLDivElement>) => {
+    if (dragRef.current && e) {
+      try {
+        containerRef.current?.releasePointerCapture(dragRef.current.pointerId);
+      } catch {
+        /* no-op */
+      }
+    }
+    dragRef.current = null;
+    setDragging(false);
+  };
 
   return (
     <div
+      ref={containerRef}
       className="proxe-coverflow"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      data-dragging={dragging}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
       aria-label={`PROXe listens on ${CHANNELS.map((c) => c.name).join(', ')}`}
     >
       <div className="proxe-coverflow-stage">
@@ -434,7 +500,9 @@ export default function ProxeLanding() {
           />
         </a>
         <a href="#book-demo" className="proxe-float-cta">
-          Deploy PROXe
+          {/* Two labels — full on top, short when [data-scrolled='true']. */}
+          <span className="proxe-float-cta-full">Deploy PROXe</span>
+          <span className="proxe-float-cta-short" aria-hidden="true">Deploy</span>
         </a>
       </div>
 
@@ -508,7 +576,7 @@ export default function ProxeLanding() {
       <section className="proxe-problem">
         <div className="proxe-container">
           <h2 className="proxe-problem-line">Leads don&rsquo;t wait. Neither does PROXe.</h2>
-          <p className="proxe-problem-sub">PROXe Captures, Follows up, and push leads to close across channel. One AI brain. Full Context Always on.</p>
+          <p className="proxe-problem-sub">PROXe captures, follows up, and pushes leads to close across channels. One AI brain. Full context. Always on.</p>
           <ChannelCoverflow />
         </div>
       </section>

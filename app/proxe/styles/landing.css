@@ -135,8 +135,9 @@ body:has(.proxe-root) {
   top: 18px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 32px);
-  max-width: 1200px;
+  /* More breathing room on the sides — 64px combined inset */
+  width: calc(100% - 64px);
+  max-width: 1160px;
   z-index: 60;
   display: flex;
   align-items: center;
@@ -156,31 +157,58 @@ body:has(.proxe-root) {
   color: var(--proxe-fg);
 }
 
-/* Small calm Deploy pill — no scroll-collapse, no hover lift */
+/* Deploy pill — glass-blur in both states. Top: full label "Deploy PROXe".
+   Scrolled: short label "Deploy" (collapse mirrors the logo→icon swap). */
 .proxe-float-header .proxe-float-cta {
   display: inline-flex;
   align-items: center;
   padding: 8px 16px;
   min-height: 34px;
-  background: rgba(255, 255, 255, 0.95);
-  color: #0a0a0a;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 999px;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.005em;
   white-space: nowrap;
-  box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.4);
-  transition: background 0.2s ease, color 0.2s ease;
+  box-shadow: 0 4px 18px -8px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 .proxe-float-header .proxe-float-cta:hover {
-  background: #ffffff;
-  color: #6B2FE8;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+
+/* Two labels stack on each other; only one is visible at a time. */
+.proxe-float-cta-full,
+.proxe-float-cta-short {
+  display: inline-block;
+  transition: opacity 0.2s ease;
+}
+.proxe-float-cta-short {
+  display: none;
+}
+
+/* Scrolled — only difference is the label collapses to "Deploy".
+   Both states share the same glass-blur treatment. */
+.proxe-float-header[data-scrolled='true'] .proxe-float-cta-full {
+  display: none;
+}
+.proxe-float-header[data-scrolled='true'] .proxe-float-cta-short {
+  display: inline-block;
 }
 
 @media (max-width: 768px) {
   .proxe-float-header {
-    width: calc(100% - 16px);
+    width: calc(100% - 32px);
   }
   .proxe-float-header .proxe-float-cta {
     padding: 7px 14px;
@@ -982,32 +1010,49 @@ body:has(.proxe-root) {
   padding-bottom: 0;
 }
 
+/* Sticky-stack — each card pins as you scroll, with later cards sliding up
+   over earlier ones. The stagger (top-offset per pillar-index) is sized so
+   the card "below" peeks just enough icon+title to read; the description
+   underneath gets cleanly covered. Uniform min-height keeps the math
+   predictable across cards with different copy lengths. */
 .proxe-pillars-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: block;
   position: relative;
+  /* Big scroll runway *after* the stack forms so the user has time to
+     read the topmost card before the stack releases. */
+  padding-bottom: 90vh;
 }
 
-/* Pillars are simple vertical cards for now — sticky stack pulled out per
-   user feedback. Tinted with brand electric-purple so they read consistent
-   across the gradient (no `saturate` boost that amplifies warm patches). */
+/* Sticky-stack — each card pins as you scroll, slightly staggered, with
+   later cards covering most of earlier ones. Cards sit packed together in
+   natural flow (no margin-bottom) so all three reach their pin positions
+   in quick succession; the stack forms within a few hundred px of scroll. */
 .proxe-pillar-row {
-  position: relative;
+  position: sticky;
+  top: calc(18vh + var(--pillar-index, 0) * 88px);
+  z-index: calc(var(--pillar-index, 0) + 1);
   display: grid;
   grid-template-columns: 88px 1fr 2fr;
   align-items: center;
   gap: 32px;
   padding: 32px 36px;
+  /* Uniform size so the stagger reads the same on each card. */
+  min-height: 220px;
+  /* Small visual gap between cards in natural flow (kept so unstacked
+     cards don't look glued together). */
+  margin-bottom: 16px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 24px;
-  /* Layered tint: deep brand purple base + a subtle white-glass top */
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 60%),
-    rgba(46, 30, 107, 0.78);
+    rgba(46, 30, 107, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.55);
+}
+
+.proxe-pillar-row:last-child {
+  margin-bottom: 0;
 }
 
 .proxe-pillar-row:last-child {
@@ -1046,15 +1091,20 @@ body:has(.proxe-root) {
 
 @media (max-width: 768px) {
   .proxe-pillars-list {
-    /* Tight gap between cards on mobile — sticky-stack runway is no longer
-       needed since pillars are plain vertical flow. */
-    gap: 12px;
+    padding-bottom: 70vh;
   }
   .proxe-pillar-row {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
     padding: 20px 18px;
     border-radius: 18px;
+    /* Smaller stagger on mobile — cards are vertical-layout, the peek-zone
+       is icon + title which is ~72px tall. */
+    top: calc(12vh + var(--pillar-index, 0) * 72px);
+    min-height: 200px;
+    /* Cards packed tight in natural flow so all three reach their pin
+       positions quickly. Tiny visual gap only. */
+    margin-bottom: 12px;
   }
   .proxe-pillar-title {
     font-size: 28px;
