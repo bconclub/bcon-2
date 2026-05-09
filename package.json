@@ -1,6 +1,6 @@
 {
   "name": "bcon-new-website",
-  "version": "1.94.0",
+  "version": "1.95.0",
   "homepage": ".",
   "private": true,
   "dependencies": {
