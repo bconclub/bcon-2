@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { FiGlobe, FiPhone } from 'react-icons/fi';
+import { FiGlobe, FiMail, FiMessageSquare, FiPhone, FiRefreshCw, FiDatabase } from 'react-icons/fi';
 import { SiInstagram, SiMessenger, SiWhatsapp } from 'react-icons/si';
 import Grainient from './Grainient';
 import VapiOrb from './VapiOrb';
@@ -369,6 +369,112 @@ function ChannelCoverflow() {
   );
 }
 
+/* ============ Integration Hub ============ */
+const HUB_NODES = [
+  { label: 'WhatsApp',  icon: <SiWhatsapp />,      x: 268, y: 38,  accent: 'rgba(37,211,102,0.18)',  dot: '#25D366' },
+  { label: 'Instagram', icon: <SiInstagram />,     x: 424, y: 128, accent: 'rgba(225,48,108,0.18)',  dot: '#E1306C' },
+  { label: 'Messenger', icon: <SiMessenger />,     x: 424, y: 308, accent: 'rgba(0,132,255,0.18)',   dot: '#0084FF' },
+  { label: 'Voice',     icon: <FiPhone />,          x: 268, y: 398, accent: 'rgba(255,255,255,0.08)', dot: 'rgba(255,255,255,0.85)' },
+  { label: 'Web Chat',  icon: <FiGlobe />,          x: 112, y: 308, accent: 'rgba(255,255,255,0.08)', dot: 'rgba(255,255,255,0.85)' },
+  { label: 'Email',     icon: <FiMail />,           x: 112, y: 128, accent: 'rgba(255,255,255,0.08)', dot: 'rgba(255,255,255,0.85)' },
+];
+
+const HUB_CHIPS = [
+  { text: 'CRM Sync',       x: 386, y: 232 },
+  { text: 'Auto Follow-up', x: 122, y: 256 },
+  { text: '24/7 Capture',   x: 234, y: 138 },
+];
+
+function IntegrationHub() {
+  const W = 600, H = 500;
+  const cx = 300, cy = 250;
+
+  return (
+    <div className="proxe-hub-outer">
+      <div className="proxe-hub-canvas">
+        {/* SVG connection lines */}
+        <svg
+          className="proxe-hub-svg"
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+        >
+          <defs>
+            <radialGradient id="hubCenterGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(124,58,237,0.35)" />
+              <stop offset="100%" stopColor="rgba(124,58,237,0)" />
+            </radialGradient>
+          </defs>
+          <circle cx={cx} cy={cy} r={100} fill="url(#hubCenterGlow)" />
+          {HUB_NODES.map((node, i) => {
+            const nx = node.x + 32;
+            const ny = node.y + 32;
+            const pathD = `M ${cx} ${cy} L ${nx} ${ny}`;
+            return (
+              <g key={i}>
+                <line
+                  x1={cx} y1={cy} x2={nx} y2={ny}
+                  stroke="rgba(255,255,255,0.13)"
+                  strokeWidth={1}
+                  strokeDasharray="4 7"
+                />
+                <path id={`hub-path-${i}`} d={pathD} stroke="none" fill="none" />
+                <circle r={3.5} fill={node.dot} opacity={0.9}>
+                  <animateMotion
+                    dur={`${2.8 + i * 0.45}s`}
+                    repeatCount="indefinite"
+                    begin={`${i * 0.55}s`}
+                  >
+                    <mpath href={`#hub-path-${i}`} />
+                  </animateMotion>
+                </circle>
+              </g>
+            );
+          })}
+        </svg>
+
+        {/* Orbit nodes */}
+        {HUB_NODES.map((node, i) => (
+          <div
+            key={i}
+            className="proxe-hub-node"
+            style={{
+              left: node.x,
+              top: node.y,
+              '--hub-accent': node.accent,
+              '--hub-delay': `${i * 0.5}s`,
+            } as React.CSSProperties}
+          >
+            <div className="proxe-hub-node-icon">{node.icon}</div>
+            <div className="proxe-hub-node-label">{node.label}</div>
+          </div>
+        ))}
+
+        {/* Floating feature chips */}
+        {HUB_CHIPS.map((chip, i) => (
+          <div
+            key={i}
+            className="proxe-hub-chip"
+            style={{
+              left: chip.x,
+              top: chip.y,
+              '--hub-delay': `${0.25 + i * 0.35}s`,
+            } as React.CSSProperties}
+          >
+            <span className="proxe-hub-chip-dot" aria-hidden="true" />
+            {chip.text}
+          </div>
+        ))}
+
+        {/* Center Proxe icon */}
+        <div className="proxe-hub-center" aria-label="PROXe">
+          <img src="/proxe/brand/proxe-icon-white.webp" alt="PROXe" width={46} height={46} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ============ Main Landing ============ */
 export default function ProxeLanding() {
   const pillarsRef = useRef<HTMLElement | null>(null);
@@ -572,6 +678,18 @@ export default function ProxeLanding() {
         </div>
       </section>
 
+      {/* ===== Integration Hub ===== */}
+      <section className="proxe-section proxe-hub-section">
+        <div className="proxe-container" style={{ textAlign: 'center' }}>
+          <div className="proxe-section-label">How It Works</div>
+          <h2 className="proxe-hub-heading">One AI. Every Channel.</h2>
+          <p className="proxe-hub-sub">
+            PROXe sits at the center — capturing, nurturing, and closing leads across every channel through a single intelligent brain.
+          </p>
+        </div>
+        <IntegrationHub />
+      </section>
+
       {/* ===== 6. Channel dial ===== */}
       <section className="proxe-problem">
         <div className="proxe-container">
@@ -586,27 +704,61 @@ export default function ProxeLanding() {
         <div className="proxe-container">
           <div className="proxe-section-label">The PROXe System</div>
           <div className="proxe-pillars-list">
-            <div className="proxe-pillar-row" style={{ '--pillar-index': 0 } as React.CSSProperties}>
-              <div className="proxe-pillar-icon">
-                <Icon.Capture />
+            {([
+              {
+                icon: <Icon.Capture />,
+                title: 'Capture',
+                desc: 'Every inquiry, every channel, 24/7. Nothing slips through.',
+                videoSrc: null as string | null,
+                gradient: 'linear-gradient(135deg, rgba(124,58,237,0.35) 0%, rgba(30,10,80,0.55) 100%)',
+              },
+              {
+                icon: <Icon.Remember />,
+                title: 'Nurture',
+                desc: 'Stay in every conversation. One thread across channels. Customers never repeat themselves.',
+                videoSrc: null as string | null,
+                gradient: 'linear-gradient(135deg, rgba(76,29,149,0.4) 0%, rgba(20,10,60,0.55) 100%)',
+              },
+              {
+                icon: <Icon.Close />,
+                title: 'Close',
+                desc: 'Auto follow-ups until they book, buy, or say no.',
+                videoSrc: null as string | null,
+                gradient: 'linear-gradient(135deg, rgba(99,40,180,0.35) 0%, rgba(15,8,50,0.55) 100%)',
+              },
+            ] as const).map((pillar, i) => (
+              <div
+                key={pillar.title}
+                className="proxe-pillar-row"
+                style={{ '--pillar-index': i } as React.CSSProperties}
+              >
+                <div className="proxe-pillar-content">
+                  <div className="proxe-pillar-icon">{pillar.icon}</div>
+                  <h3 className="proxe-pillar-title">{pillar.title}</h3>
+                  <p className="proxe-pillar-desc">{pillar.desc}</p>
+                </div>
+                <div className="proxe-pillar-video">
+                  {pillar.videoSrc ? (
+                    <iframe
+                      src={pillar.videoSrc}
+                      title={`PROXe ${pillar.title} demo`}
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      frameBorder={0}
+                      allowFullScreen
+                    />
+                  ) : (
+                    <div className="proxe-pillar-video-placeholder" style={{ background: pillar.gradient }}>
+                      <div className="proxe-pillar-video-play">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                      <span className="proxe-pillar-video-caption">{pillar.title} in action</span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <h3 className="proxe-pillar-title">Capture</h3>
-              <p className="proxe-pillar-desc">Every inquiry, every channel, 24/7. Nothing slips through.</p>
-            </div>
-            <div className="proxe-pillar-row" style={{ '--pillar-index': 1 } as React.CSSProperties}>
-              <div className="proxe-pillar-icon">
-                <Icon.Remember />
-              </div>
-              <h3 className="proxe-pillar-title">Nurture</h3>
-              <p className="proxe-pillar-desc">Stay in every conversation. One thread across channels. Customers never repeat themselves.</p>
-            </div>
-            <div className="proxe-pillar-row" style={{ '--pillar-index': 2 } as React.CSSProperties}>
-              <div className="proxe-pillar-icon">
-                <Icon.Close />
-              </div>
-              <h3 className="proxe-pillar-title">Close</h3>
-              <p className="proxe-pillar-desc">Auto follow-ups until they book, buy, or say no.</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>

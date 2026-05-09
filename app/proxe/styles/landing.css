@@ -1000,111 +1000,162 @@ body:has(.proxe-root) {
   line-height: 1.55;
 }
 
-/* ===== 7. Three pillars — sticky stacking cards (centered) =====
-   The sticky-parent trick: each card is position: sticky inside
-   `.proxe-pillars-list`. The last sticky child releases when the
-   parent's bottom reaches it, so we give the LIST itself a large
-   `padding-bottom` — this guarantees card 1 stays docked long enough
-   for all three to overlap before the section ends. */
+/* ===== 7. Three pillars — sticky stacking glass cards ===== */
 .proxe-pillars-section {
   padding-bottom: 0;
 }
 
-/* Sticky-stack — each card pins as you scroll, with later cards sliding up
-   over earlier ones. The stagger (top-offset per pillar-index) is sized so
-   the card "below" peeks just enough icon+title to read; the description
-   underneath gets cleanly covered. Uniform min-height keeps the math
-   predictable across cards with different copy lengths. */
 .proxe-pillars-list {
   display: block;
   position: relative;
-  /* Modest scroll runway *after* the stack forms — enough to hold the
-     stacked view briefly without showing dead space once cards release. */
   padding-bottom: 30vh;
 }
 
-/* Sticky-stack — each card pins as you scroll, slightly staggered, with
-   later cards covering most of earlier ones. Cards sit packed together in
-   natural flow (no margin-bottom) so all three reach their pin positions
-   in quick succession; the stack forms within a few hundred px of scroll. */
 .proxe-pillar-row {
   position: sticky;
-  top: calc(18vh + var(--pillar-index, 0) * 88px);
+  top: calc(14vh + var(--pillar-index, 0) * 96px);
   z-index: calc(var(--pillar-index, 0) + 1);
   display: grid;
-  grid-template-columns: 88px 1fr 2fr;
+  grid-template-columns: 1fr 1.05fr;
   align-items: center;
-  gap: 32px;
-  padding: 32px 36px;
-  /* Uniform size so the stagger reads the same on each card. */
-  min-height: 220px;
-  /* Small visual gap between cards in natural flow (kept so unstacked
-     cards don't look glued together). */
+  gap: 40px;
+  padding: 40px 44px;
+  min-height: 300px;
   margin-bottom: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 24px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 60%),
-    rgba(46, 30, 107, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  box-shadow:
+    0 2px 0 0 rgba(255, 255, 255, 0.14) inset,
+    0 24px 64px -20px rgba(0, 0, 0, 0.38),
+    0 1px 0 0 rgba(0, 0, 0, 0.12);
 }
 
 .proxe-pillar-row:last-child {
   margin-bottom: 0;
 }
 
-.proxe-pillar-row:last-child {
-  margin-bottom: 0;
+.proxe-pillar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .proxe-pillar-icon {
-  width: 60px;
-  height: 60px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--proxe-border-strong);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 14px;
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .proxe-pillar-title {
   font-family: var(--proxe-font-heading);
-  font-size: clamp(32px, 4.2vw, 56px);
+  font-size: clamp(38px, 4.8vw, 64px);
   font-weight: 400;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   margin: 0;
   line-height: 1;
   color: #ffffff;
 }
 
 .proxe-pillar-desc {
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 18px;
-  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 17px;
+  line-height: 1.6;
   margin: 0;
-  max-width: 52ch;
+  max-width: 38ch;
 }
 
-@media (max-width: 768px) {
+/* Video panel */
+.proxe-pillar-video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 40px -12px rgba(0, 0, 0, 0.55);
+}
+
+.proxe-pillar-video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.proxe-pillar-video-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.proxe-pillar-video-play {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.9);
+  padding-left: 3px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.proxe-pillar-video-placeholder:hover .proxe-pillar-video-play {
+  background: rgba(255, 255, 255, 0.22);
+  transform: scale(1.06);
+}
+
+.proxe-pillar-video-caption {
+  font-family: var(--proxe-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 900px) {
+  .proxe-pillar-row {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 28px 28px;
+    min-height: auto;
+    top: calc(10vh + var(--pillar-index, 0) * 80px);
+  }
+  .proxe-pillar-title {
+    font-size: clamp(30px, 6vw, 44px);
+  }
+}
+
+@media (max-width: 640px) {
   .proxe-pillars-list {
     padding-bottom: 25vh;
   }
   .proxe-pillar-row {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 20px 18px;
-    border-radius: 18px;
-    /* Smaller stagger on mobile — cards are vertical-layout, the peek-zone
-       is icon + title which is ~72px tall. */
-    top: calc(12vh + var(--pillar-index, 0) * 72px);
-    min-height: 200px;
-    /* Cards packed tight in natural flow so all three reach their pin
-       positions quickly. Tiny visual gap only. */
+    padding: 22px 20px;
+    border-radius: 20px;
+    top: calc(10vh + var(--pillar-index, 0) * 76px);
     margin-bottom: 12px;
+    gap: 18px;
   }
   .proxe-pillar-title {
     font-size: 28px;
@@ -2187,5 +2238,203 @@ body:has(.proxe-root) {
 @media (max-width: 480px) {
   .proxe-footer-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Integration Hub section ===== */
+.proxe-hub-section {
+  padding-top: 80px;
+  padding-bottom: 40px;
+}
+
+.proxe-hub-heading {
+  font-family: var(--proxe-font-heading);
+  font-weight: 300;
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0 auto 20px;
+}
+
+.proxe-hub-sub {
+  margin: 0 auto 0;
+  max-width: 52ch;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Outer wrapper — constrains height on mobile via scale */
+.proxe-hub-outer {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  overflow: visible;
+}
+
+/* Fixed-coordinate canvas — 600×500 at full size */
+.proxe-hub-canvas {
+  position: relative;
+  width: 600px;
+  height: 500px;
+  flex-shrink: 0;
+}
+
+/* SVG overlay for lines + animated dots */
+.proxe-hub-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Orbit channel nodes */
+.proxe-hub-node {
+  position: absolute;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  animation: proxeHubFloat 4s ease-in-out infinite;
+  animation-delay: var(--hub-delay, 0s);
+}
+
+.proxe-hub-node-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: var(--hub-accent, rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #ffffff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.proxe-hub-node:hover .proxe-hub-node-icon {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.proxe-hub-node-label {
+  font-family: var(--proxe-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+@keyframes proxeHubFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+
+/* Floating feature chip pills */
+.proxe-hub-chip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px 7px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  font-size: 12px;
+  font-family: var(--proxe-font-sans);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: nowrap;
+  animation: proxeHubFloat 5s ease-in-out infinite;
+  animation-delay: var(--hub-delay, 0s);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+.proxe-hub-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(167, 139, 250, 1);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(167, 139, 250, 0.8);
+}
+
+/* Center Proxe icon */
+.proxe-hub-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 88px;
+  height: 88px;
+  border-radius: 26px;
+  background: linear-gradient(145deg, #7c3aed 0%, #4c1d95 60%, #2e1065 100%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 0 14px rgba(124, 58, 237, 0.1),
+    0 0 0 28px rgba(124, 58, 237, 0.05),
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: proxeHubCenterPulse 3.5s ease-in-out infinite;
+  z-index: 2;
+}
+
+.proxe-hub-center img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+}
+
+@keyframes proxeHubCenterPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 14px rgba(124, 58, 237, 0.1),
+      0 0 0 28px rgba(124, 58, 237, 0.05),
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 0 18px rgba(124, 58, 237, 0.14),
+      0 0 0 36px rgba(124, 58, 237, 0.07),
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proxe-hub-node,
+  .proxe-hub-chip,
+  .proxe-hub-center {
+    animation: none;
+  }
+}
+
+/* Mobile: scale down the canvas to fit viewport */
+@media (max-width: 640px) {
+  .proxe-hub-outer {
+    /* Scale the 600px canvas to ~95vw */
+    --hub-s: calc(95vw / 600px);
+    height: calc(500px * var(--hub-s));
+    align-items: flex-start;
+  }
+  .proxe-hub-canvas {
+    transform: scale(var(--hub-s));
+    transform-origin: top center;
   }
 }
