@@ -293,14 +293,28 @@ const CHANNELS: Array<{ name: string; icon: React.ReactNode; accent: string; mes
 function ChannelCoverflow() {
   const [active, setActive] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [manualLock, setManualLock] = useState(false);
   const dragRef = useRef<{ startX: number; startActive: number; pointerId: number } | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const len = CHANNELS.length;
   const STEP_PX = 70;
 
+  // After a manual nav (arrow click), pause scroll-driven cycling so the user
+  // can read the chat they selected.
+  const lockManual = () => {
+    setManualLock(true);
+    if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
+    lockTimerRef.current = setTimeout(() => setManualLock(false), 6000);
+  };
+  const goPrev = () => { setActive((a) => (a - 1 + len) % len); lockManual(); };
+  const goNext = () => { setActive((a) => (a + 1) % len); lockManual(); };
+
+  useEffect(() => () => { if (lockTimerRef.current) clearTimeout(lockTimerRef.current); }, []);
+
   useEffect(() => {
-    if (dragging) return;
+    if (dragging || manualLock) return;
     const el = containerRef.current;
     if (!el) return;
     const update = () => {
@@ -316,7 +330,7 @@ function ChannelCoverflow() {
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     return () => { window.removeEventListener('scroll', update); window.removeEventListener('resize', update); };
-  }, [dragging, len]);
+  }, [dragging, manualLock, len]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
@@ -340,25 +354,37 @@ function ChannelCoverflow() {
 
   return (
     <div ref={containerRef} className="proxe-coverflow-wrap" aria-label={`PROXe on ${CHANNELS.map(c => c.name).join(', ')}`}>
-      {/* Icon picker */}
-      <div className="proxe-coverflow" data-dragging={dragging}
-        onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
-        onPointerUp={endDrag} onPointerCancel={endDrag}
-      >
-        <div className="proxe-coverflow-stage">
-          {CHANNELS.map((c, i) => {
-            let offset = i - active;
-            if (offset > len / 2) offset -= len;
-            if (offset < -len / 2) offset += len;
-            const visible = Math.abs(offset) <= 2;
-            return (
-              <div key={c.name} className="proxe-coverflow-tile" data-offset={offset} data-visible={visible} aria-hidden={offset !== 0}>
-                {c.icon}
-              </div>
-            );
-          })}
+      {/* Icon picker with cycle arrows */}
+      <div className="proxe-coverflow-row">
+        <button type="button" className="proxe-coverflow-arrow" onClick={goPrev} aria-label="Previous channel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <div className="proxe-coverflow" data-dragging={dragging}
+          onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
+          onPointerUp={endDrag} onPointerCancel={endDrag}
+        >
+          <div className="proxe-coverflow-stage">
+            {CHANNELS.map((c, i) => {
+              let offset = i - active;
+              if (offset > len / 2) offset -= len;
+              if (offset < -len / 2) offset += len;
+              const visible = Math.abs(offset) <= 2;
+              return (
+                <div key={c.name} className="proxe-coverflow-tile" data-offset={offset} data-visible={visible} aria-hidden={offset !== 0}>
+                  {c.icon}
+                </div>
+              );
+            })}
+          </div>
+          <div className="proxe-coverflow-label" aria-live="polite">{channel.name.toUpperCase()}</div>
         </div>
-        <div className="proxe-coverflow-label" aria-live="polite">{channel.name.toUpperCase()}</div>
+        <button type="button" className="proxe-coverflow-arrow" onClick={goNext} aria-label="Next channel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
       </div>
 
       {/* Native-looking chat preview — re-mounts on channel change to re-animate */}
@@ -870,18 +896,6 @@ export default function ProxeLanding() {
             </button>
           </div>
         </div>
-      </section>
-
-      {/* ===== Integration Hub ===== */}
-      <section className="proxe-section proxe-hub-section">
-        <div className="proxe-container" style={{ textAlign: 'center' }}>
-          <div className="proxe-section-label">How It Works</div>
-          <h2 className="proxe-hub-heading">One AI. Every Channel.</h2>
-          <p className="proxe-hub-sub">
-            PROXe sits at the center — capturing, nurturing, and closing leads across every channel through a single intelligent brain.
-          </p>
-        </div>
-        <IntegrationHub />
       </section>
 
       {/* ===== 6. Channel dial ===== */}
