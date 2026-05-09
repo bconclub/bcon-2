@@ -323,7 +323,9 @@ function ChannelCoverflow() {
       const center = rect.top + rect.height / 2;
       const progress = 1 - center / vh;
       const clamped = Math.max(0, Math.min(0.9999, progress));
-      const next = Math.floor(clamped * len * 1.4) % len;
+      // 0.45 multiplier means a full pass through the section advances ~2 channels.
+      // Slow enough to read each scenario without forcing manual nav.
+      const next = Math.floor(clamped * len * 0.45) % len;
       setActive(next);
     };
     update();
@@ -477,30 +479,58 @@ function InstagramChat({ channel }: { channel: typeof CHANNELS[number] }) {
   );
 }
 
-/* ===== Messenger ===== */
+/* ===== Messenger (matches real Messenger: avatar-on-bubble + grouping) ===== */
 function MessengerChat({ channel }: { channel: typeof CHANNELS[number] }) {
+  // Group consecutive same-sender messages so bubble corners read as a thread,
+  // and only the LAST bubble in an AI run carries the avatar.
+  const isLastInRun = (i: number, from: ChatMsg['from']) =>
+    i === channel.messages.length - 1 || channel.messages[i + 1].from !== from;
+  const isFirstInRun = (i: number, from: ChatMsg['from']) =>
+    i === 0 || channel.messages[i - 1].from !== from;
+
   return (
     <div className="ms-chat">
       <div className="ms-header">
-        <div className="ms-avatar"><SiMessenger /></div>
-        <div className="ms-meta">
-          <div className="ms-name">PROXe</div>
-          <div className="ms-status">Active now</div>
+        <div className="ms-h-left">
+          <svg className="ms-h-back" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0084FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+          <div className="ms-h-avatar">
+            <SiMessenger />
+            <span className="ms-h-online" />
+          </div>
+          <div className="ms-meta">
+            <div className="ms-name">PROXe</div>
+            <div className="ms-status">Active now</div>
+          </div>
         </div>
         <div className="ms-icons">
-          <span>📞</span><span>📹</span><span>ⓘ</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0084FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0084FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
         </div>
       </div>
       <div className="ms-body">
-        {channel.messages.map((m, i) => (
-          <div key={i} className={`ms-row ms-row--${m.from}`} style={{ '--i': i } as React.CSSProperties}>
-            <div className="ms-bubble">{m.text}</div>
+        {channel.messages.map((m, i) => {
+          const last = isLastInRun(i, m.from);
+          const first = isFirstInRun(i, m.from);
+          return (
+            <div
+              key={i}
+              className={`ms-row ms-row--${m.from} ${last ? 'is-last' : ''} ${first ? 'is-first' : ''}`}
+              style={{ '--i': i } as React.CSSProperties}
+            >
+              {m.from === 'ai' && (
+                <div className="ms-bubble-avatar">
+                  {last && <div className="ms-h-avatar ms-h-avatar--small"><SiMessenger /></div>}
+                </div>
+              )}
+              <div className="ms-bubble">{m.text}</div>
+            </div>
+          );
+        })}
+        <div className="ms-row ms-row--ai is-last is-first" style={{ '--i': channel.messages.length } as React.CSSProperties}>
+          <div className="ms-bubble-avatar">
+            <div className="ms-h-avatar ms-h-avatar--small"><SiMessenger /></div>
           </div>
-        ))}
-        <div className="ms-row ms-row--ai" style={{ '--i': channel.messages.length } as React.CSSProperties}>
-          <div className="ms-bubble ms-bubble--typing">
-            <span /><span /><span />
-          </div>
+          <div className="ms-bubble ms-bubble--typing"><span /><span /><span /></div>
         </div>
       </div>
       <div className="ms-input">
