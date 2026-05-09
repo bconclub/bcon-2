@@ -361,35 +361,198 @@ function ChannelCoverflow() {
         <div className="proxe-coverflow-label" aria-live="polite">{channel.name.toUpperCase()}</div>
       </div>
 
-      {/* Live chat preview — key on active so it re-mounts and re-animates */}
-      <div key={active} className="proxe-channel-chat" style={{ '--ch-accent': channel.accent } as React.CSSProperties}>
-        <div className="proxe-channel-chat-header">
-          <span className="proxe-channel-chat-icon">{channel.icon}</span>
-          <span className="proxe-channel-chat-name">{channel.name}</span>
-          <span className="proxe-channel-chat-live">
-            <span className="proxe-channel-chat-dot" />
-            Live
-          </span>
+      {/* Native-looking chat preview — re-mounts on channel change to re-animate */}
+      <div key={active} className="proxe-chat-shell" data-channel={channel.name.toLowerCase()}>
+        <PlatformChat channel={channel} />
+      </div>
+    </div>
+  );
+}
+
+/* ============ Platform-native chat UIs ============
+   Each platform mimics its real-world app chrome — WhatsApp Web, Instagram DM,
+   Messenger, Voice call, web widget. Wrapped by .proxe-chat-shell which adds
+   the PROXe glass-card outer chrome (electric violet shadow + frosted edge). */
+
+function PlatformChat({ channel }: { channel: typeof CHANNELS[number] }) {
+  switch (channel.name) {
+    case 'WhatsApp':  return <WhatsAppChat channel={channel} />;
+    case 'Instagram': return <InstagramChat channel={channel} />;
+    case 'Messenger': return <MessengerChat channel={channel} />;
+    case 'Voice':     return <VoiceChat channel={channel} />;
+    case 'Web':       return <WebChat channel={channel} />;
+    default:          return null;
+  }
+}
+
+/* ===== WhatsApp Web ===== */
+function WhatsAppChat({ channel }: { channel: typeof CHANNELS[number] }) {
+  return (
+    <div className="wa-chat">
+      <div className="wa-header">
+        <div className="wa-avatar"><SiWhatsapp /></div>
+        <div className="wa-meta">
+          <div className="wa-name">PROXe</div>
+          <div className="wa-status"><span className="wa-online" />online</div>
         </div>
-        <div className="proxe-channel-chat-body">
-          {channel.messages.map((msg, i) => (
-            <div key={i} className={`proxe-ch-msg proxe-ch-msg--${msg.from}`} style={{ '--i': i } as React.CSSProperties}>
-              {msg.from === 'ai' && (
-                <div className="proxe-ch-msg-avatar">
-                  <img src="/proxe/brand/proxe-icon-white.webp" alt="PROXe" width={18} height={18} />
-                </div>
-              )}
-              <div className="proxe-ch-msg-bubble">
-                <span className="proxe-ch-msg-text">{msg.text}</span>
-                <span className="proxe-ch-msg-time">{msg.time}</span>
-              </div>
+      </div>
+      <div className="wa-body">
+        <div className="wa-day">TODAY</div>
+        {channel.messages.map((m, i) => (
+          <div key={i} className={`wa-row wa-row--${m.from}`} style={{ '--i': i } as React.CSSProperties}>
+            <div className="wa-bubble">
+              <span className="wa-text">{m.text}</span>
+              <span className="wa-meta-line">
+                <span className="wa-time">{m.time}</span>
+                {m.from === 'customer' && (
+                  <svg className="wa-ticks" viewBox="0 0 16 11" fill="none" aria-hidden="true">
+                    <path d="M11.07.6 5.42 6.27 3.2 4.05l-.95.95 3.17 3.17L12.02 1.55z" fill="#53BDEB"/>
+                    <path d="M15.06.6 9.41 6.27 7.18 4.04l-.95.95 3.18 3.18L16.01 1.55z" fill="#53BDEB"/>
+                  </svg>
+                )}
+              </span>
             </div>
-          ))}
+          </div>
+        ))}
+      </div>
+      <div className="wa-input">
+        <span className="wa-input-pill">Type a message</span>
+      </div>
+    </div>
+  );
+}
+
+/* ===== Instagram DM (dark) ===== */
+function InstagramChat({ channel }: { channel: typeof CHANNELS[number] }) {
+  return (
+    <div className="ig-chat">
+      <div className="ig-header">
+        <div className="ig-avatar"><SiInstagram /></div>
+        <div className="ig-meta">
+          <div className="ig-name">proxe.ai <span className="ig-verified">✓</span></div>
+          <div className="ig-status">Active now</div>
         </div>
-        <div className="proxe-channel-chat-footer">
-          <span className="proxe-channel-chat-typing"><span /><span /><span /></span>
-          <span className="proxe-channel-chat-footer-label">PROXe is replying…</span>
+      </div>
+      <div className="ig-body">
+        {channel.messages.map((m, i) => (
+          <div key={i} className={`ig-row ig-row--${m.from}`} style={{ '--i': i } as React.CSSProperties}>
+            <div className="ig-bubble">{m.text}</div>
+          </div>
+        ))}
+        <div className="ig-seen">Seen {channel.messages[channel.messages.length - 1].time}</div>
+      </div>
+      <div className="ig-input">
+        <span className="ig-input-pill">Message…</span>
+        <span className="ig-actions">♡  ⌃</span>
+      </div>
+    </div>
+  );
+}
+
+/* ===== Messenger ===== */
+function MessengerChat({ channel }: { channel: typeof CHANNELS[number] }) {
+  return (
+    <div className="ms-chat">
+      <div className="ms-header">
+        <div className="ms-avatar"><SiMessenger /></div>
+        <div className="ms-meta">
+          <div className="ms-name">PROXe</div>
+          <div className="ms-status">Active now</div>
         </div>
+        <div className="ms-icons">
+          <span>📞</span><span>📹</span><span>ⓘ</span>
+        </div>
+      </div>
+      <div className="ms-body">
+        {channel.messages.map((m, i) => (
+          <div key={i} className={`ms-row ms-row--${m.from}`} style={{ '--i': i } as React.CSSProperties}>
+            <div className="ms-bubble">{m.text}</div>
+          </div>
+        ))}
+        <div className="ms-row ms-row--ai" style={{ '--i': channel.messages.length } as React.CSSProperties}>
+          <div className="ms-bubble ms-bubble--typing">
+            <span /><span /><span />
+          </div>
+        </div>
+      </div>
+      <div className="ms-input">
+        <span className="ms-plus">+</span>
+        <span className="ms-input-pill">Aa</span>
+        <span className="ms-thumb">👍</span>
+      </div>
+    </div>
+  );
+}
+
+/* ===== Voice call ===== */
+function VoiceChat({ channel }: { channel: typeof CHANNELS[number] }) {
+  return (
+    <div className="vc-chat">
+      <div className="vc-header">
+        <span className="vc-eyebrow">ON CALL</span>
+        <span className="vc-timer">00:42</span>
+      </div>
+      <div className="vc-stage">
+        <div className="vc-orb">
+          <div className="vc-orb-pulse" />
+          <div className="vc-orb-pulse vc-orb-pulse--2" />
+          <div className="vc-orb-core">
+            <FiPhone />
+          </div>
+        </div>
+        <div className="vc-name">PROXe Voice</div>
+        <div className="vc-sub">AI agent · Live transcript</div>
+      </div>
+      <div className="vc-transcript">
+        {channel.messages.map((m, i) => (
+          <div key={i} className={`vc-line vc-line--${m.from}`} style={{ '--i': i } as React.CSSProperties}>
+            <span className="vc-speaker">{m.from === 'ai' ? 'PROXe' : 'Caller'}</span>
+            <span className="vc-text">{m.text}</span>
+          </div>
+        ))}
+      </div>
+      <div className="vc-controls">
+        <button className="vc-btn" aria-label="Mute"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></button>
+        <button className="vc-btn vc-btn--end" aria-label="End"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></button>
+        <button className="vc-btn" aria-label="Speaker"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
+      </div>
+    </div>
+  );
+}
+
+/* ===== Web chat widget (PROXe-branded glass) ===== */
+function WebChat({ channel }: { channel: typeof CHANNELS[number] }) {
+  return (
+    <div className="web-chat">
+      <div className="web-header">
+        <div className="web-brand">
+          <img src="/proxe/brand/proxe-icon-white.webp" alt="PROXe" width={24} height={24} />
+          <div className="web-brand-text">
+            <div className="web-name">PROXe</div>
+            <div className="web-status"><span className="web-dot" />AI · online now</div>
+          </div>
+        </div>
+        <span className="web-min">—</span>
+      </div>
+      <div className="web-body">
+        {channel.messages.map((m, i) => (
+          <div key={i} className={`web-row web-row--${m.from}`} style={{ '--i': i } as React.CSSProperties}>
+            {m.from === 'ai' && (
+              <div className="web-avatar">
+                <img src="/proxe/brand/proxe-icon-white.webp" alt="" width={20} height={20} />
+              </div>
+            )}
+            <div className="web-bubble">{m.text}</div>
+          </div>
+        ))}
+      </div>
+      <div className="web-quick">
+        <button className="web-pill">Book a Demo</button>
+        <button className="web-pill">Pricing</button>
+      </div>
+      <div className="web-input">
+        <span className="web-input-pill">Reply to PROXe…</span>
+        <span className="web-send">↑</span>
       </div>
     </div>
   );
