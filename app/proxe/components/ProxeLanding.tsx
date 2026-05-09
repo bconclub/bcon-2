@@ -397,12 +397,12 @@ function ChannelCoverflow() {
 
 /* ============ Integration Hub ============ */
 const HUB_NODES = [
-  { label: 'WhatsApp',  icon: <SiWhatsapp />,      x: 268, y: 38,  accent: 'rgba(37,211,102,0.18)',  dot: '#25D366' },
-  { label: 'Instagram', icon: <SiInstagram />,     x: 424, y: 128, accent: 'rgba(225,48,108,0.18)',  dot: '#E1306C' },
-  { label: 'Messenger', icon: <SiMessenger />,     x: 424, y: 308, accent: 'rgba(0,132,255,0.18)',   dot: '#0084FF' },
-  { label: 'Voice',     icon: <FiPhone />,          x: 268, y: 398, accent: 'rgba(255,255,255,0.08)', dot: 'rgba(255,255,255,0.85)' },
-  { label: 'Web Chat',  icon: <FiGlobe />,          x: 112, y: 308, accent: 'rgba(255,255,255,0.08)', dot: 'rgba(255,255,255,0.85)' },
-  { label: 'Email',     icon: <FiMail />,           x: 112, y: 128, accent: 'rgba(255,255,255,0.08)', dot: 'rgba(255,255,255,0.85)' },
+  { label: 'WhatsApp',  icon: <SiWhatsapp />,  x: 268, y: 30,  color: '#25D366' },
+  { label: 'Instagram', icon: <SiInstagram />, x: 424, y: 120, color: '#E1306C' },
+  { label: 'Messenger', icon: <SiMessenger />, x: 424, y: 320, color: '#0084FF' },
+  { label: 'Voice',     icon: <FiPhone />,     x: 268, y: 410, color: '#A78BFA' },
+  { label: 'Web Chat',  icon: <FiGlobe />,     x: 112, y: 320, color: '#7DD3FC' },
+  { label: 'Email',     icon: <FiMail />,      x: 112, y: 120, color: '#FBBF24' },
 ];
 
 const HUB_CHIPS = [
@@ -433,24 +433,29 @@ function IntegrationHub() {
           </defs>
           <circle cx={cx} cy={cy} r={100} fill="url(#hubCenterGlow)" />
           {HUB_NODES.map((node, i) => {
-            const nx = node.x + 32;
-            const ny = node.y + 32;
+            const nx = node.x + 40;
+            const ny = node.y + 40;
             const pathD = `M ${cx} ${cy} L ${nx} ${ny}`;
             return (
               <g key={i}>
+                {/* Brand-tinted glow under each connecting line */}
                 <line
                   x1={cx} y1={cy} x2={nx} y2={ny}
-                  stroke="rgba(255,255,255,0.13)"
+                  stroke={node.color}
+                  strokeWidth={2}
+                  strokeOpacity={0.18}
+                  strokeLinecap="round"
+                />
+                {/* Crisp dashed line on top */}
+                <line
+                  x1={cx} y1={cy} x2={nx} y2={ny}
+                  stroke="rgba(255,255,255,0.28)"
                   strokeWidth={1}
-                  strokeDasharray="4 7"
+                  strokeDasharray="3 6"
                 />
                 <path id={`hub-path-${i}`} d={pathD} stroke="none" fill="none" />
-                <circle r={3.5} fill={node.dot} opacity={0.9}>
-                  <animateMotion
-                    dur={`${2.8 + i * 0.45}s`}
-                    repeatCount="indefinite"
-                    begin={`${i * 0.55}s`}
-                  >
+                <circle r={4} fill={node.color} opacity={0.95}>
+                  <animateMotion dur={`${2.6 + i * 0.4}s`} repeatCount="indefinite" begin={`${i * 0.5}s`}>
                     <mpath href={`#hub-path-${i}`} />
                   </animateMotion>
                 </circle>
@@ -459,7 +464,7 @@ function IntegrationHub() {
           })}
         </svg>
 
-        {/* Orbit nodes */}
+        {/* Orbit nodes — bare brand icons, no container */}
         {HUB_NODES.map((node, i) => (
           <div
             key={i}
@@ -467,7 +472,7 @@ function IntegrationHub() {
             style={{
               left: node.x,
               top: node.y,
-              '--hub-accent': node.accent,
+              color: node.color,
               '--hub-delay': `${i * 0.5}s`,
             } as React.CSSProperties}
           >
