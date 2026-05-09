@@ -239,131 +239,157 @@ function ScrollPopup({ triggerRef }: { triggerRef: React.RefObject<HTMLElement |
   );
 }
 
-/* ============ Channel Coverflow ============
-   Auto-rotating carousel. Five tiles visible — center one focused, two on
-   each side scaled down and faded. setInterval advances the active index;
-   hover pauses rotation. Distance offsets are signed and wrapped so the
-   carousel feels circular. */
-// Brand glyphs from react-icons / simple-icons (`si`) for messengers,
-// generic outlines from feather (`fi`) for the non-brand items. Tree-shaken
-// imports — only the named icons we use ship to the client.
-const CHANNELS: Array<{ name: string; icon: React.ReactNode }> = [
-  { name: 'Voice',     icon: <FiPhone /> },
-  { name: 'WhatsApp',  icon: <SiWhatsapp /> },
-  { name: 'Messenger', icon: <SiMessenger /> },
-  { name: 'Instagram', icon: <SiInstagram /> },
-  { name: 'Web',       icon: <FiGlobe /> },
+/* ============ Channel Coverflow + Live Chat Preview ============ */
+interface ChatMsg { from: 'customer' | 'ai'; text: string; time: string; }
+
+const CHANNELS: Array<{ name: string; icon: React.ReactNode; accent: string; messages: ChatMsg[] }> = [
+  {
+    name: 'Voice', icon: <FiPhone />, accent: 'rgba(255,255,255,0.85)',
+    messages: [
+      { from: 'customer', text: 'I came across your product — curious about pricing.', time: '2:31 PM' },
+      { from: 'ai',       text: 'Happy to help! Starter is $99/mo for 1,000 conversations. How many leads do you get monthly?', time: '2:31 PM' },
+      { from: 'customer', text: 'Around 200–300 a month.', time: '2:32 PM' },
+      { from: 'ai',       text: "Starter covers that easily. Want me to set up your free trial right now? Takes 2 minutes.", time: '2:32 PM' },
+    ],
+  },
+  {
+    name: 'WhatsApp', icon: <SiWhatsapp />, accent: '#25D366',
+    messages: [
+      { from: 'customer', text: 'Hi, I filled a form 3 days ago but no one called me.', time: '10:14 AM' },
+      { from: 'ai',       text: "Hi! I can see your enquiry from May 6th. Are you free for a quick call today at 3pm or 5pm?", time: '10:14 AM' },
+      { from: 'customer', text: '3pm works!', time: '10:15 AM' },
+      { from: 'ai',       text: "Confirmed! Booked you in at 3pm — you'll get a reminder 15 min before. 🎯", time: '10:15 AM' },
+    ],
+  },
+  {
+    name: 'Messenger', icon: <SiMessenger />, accent: '#0084FF',
+    messages: [
+      { from: 'customer', text: 'Do you offer a free trial?', time: '4:02 PM' },
+      { from: 'ai',       text: "Yes! 14-day free trial, no card needed. I can start you in 5 minutes. What's your business email?", time: '4:02 PM' },
+      { from: 'customer', text: "Great — it's john@acme.com", time: '4:03 PM' },
+      { from: 'ai',       text: "Trial account created! Check your inbox — login link and setup guide sent. 🎉", time: '4:03 PM' },
+    ],
+  },
+  {
+    name: 'Instagram', icon: <SiInstagram />, accent: '#E1306C',
+    messages: [
+      { from: 'customer', text: 'Saw your reel — how does this actually work?', time: '7:18 PM' },
+      { from: 'ai',       text: 'PROXe catches every DM, replies in seconds, qualifies leads, and follows up until they buy. Want a live demo?', time: '7:18 PM' },
+      { from: 'customer', text: 'Yes! How do I sign up?', time: '7:19 PM' },
+      { from: 'ai',       text: "Drop your email here or tap the link in bio — you'll be set up in 2 minutes. 🚀", time: '7:19 PM' },
+    ],
+  },
+  {
+    name: 'Web', icon: <FiGlobe />, accent: '#A78BFA',
+    messages: [
+      { from: 'customer', text: 'What channels do you support?', time: '11:45 AM' },
+      { from: 'ai',       text: 'WhatsApp, Instagram, Messenger, Voice, web chat, and email — all from one dashboard with shared memory.', time: '11:45 AM' },
+      { from: 'customer', text: 'Does it sync with HubSpot?', time: '11:46 AM' },
+      { from: 'ai',       text: 'Yes — native HubSpot integration. Every conversation and lead score syncs automatically. Want to see it live?', time: '11:46 AM' },
+    ],
+  },
 ];
 
 function ChannelCoverflow() {
   const [active, setActive] = useState(0);
   const [dragging, setDragging] = useState(false);
-  // Drag tracking — anchored on the position when the pointer went down so
-  // the index follows the finger 1:1, not cumulative across small moves.
   const dragRef = useRef<{ startX: number; startActive: number; pointerId: number } | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const len = CHANNELS.length;
-  const STEP_PX = 70; // distance one icon-step on the carousel
+  const STEP_PX = 70;
 
-  // Scroll-driven progression — as the user scrolls past the section, the
-  // active icon advances. Drag overrides this (paused while dragging).
   useEffect(() => {
     if (dragging) return;
     const el = containerRef.current;
     if (!el) return;
-
     const update = () => {
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight;
-      // 0 when carousel center is at viewport bottom, 1 at top.
       const center = rect.top + rect.height / 2;
       const progress = 1 - center / vh;
       const clamped = Math.max(0, Math.min(0.9999, progress));
-      // Multiplier > 1 lets us cycle through the icons more than once
-      // during the section's traverse for a livelier feel.
-      const cycles = 1.4;
-      const next = Math.floor(clamped * len * cycles) % len;
+      const next = Math.floor(clamped * len * 1.4) % len;
       setActive(next);
     };
-
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
-    return () => {
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
-    };
+    return () => { window.removeEventListener('scroll', update); window.removeEventListener('resize', update); };
   }, [dragging, len]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     setDragging(true);
-    dragRef.current = {
-      startX: e.clientX,
-      startActive: active,
-      pointerId: e.pointerId,
-    };
-    try {
-      containerRef.current?.setPointerCapture(e.pointerId);
-    } catch {
-      /* no-op */
-    }
+    dragRef.current = { startX: e.clientX, startActive: active, pointerId: e.pointerId };
+    try { containerRef.current?.setPointerCapture(e.pointerId); } catch { /* no-op */ }
   };
-
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!dragRef.current) return;
     const dx = e.clientX - dragRef.current.startX;
-    const stepsRaw = Math.round(-dx / STEP_PX);
-    const next = ((dragRef.current.startActive + stepsRaw) % len + len) % len;
+    const next = ((dragRef.current.startActive + Math.round(-dx / STEP_PX)) % len + len) % len;
     if (next !== active) setActive(next);
   };
-
   const endDrag = (e?: React.PointerEvent<HTMLDivElement>) => {
-    if (dragRef.current && e) {
-      try {
-        containerRef.current?.releasePointerCapture(dragRef.current.pointerId);
-      } catch {
-        /* no-op */
-      }
-    }
+    if (dragRef.current && e) { try { containerRef.current?.releasePointerCapture(dragRef.current.pointerId); } catch { /* no-op */ } }
     dragRef.current = null;
     setDragging(false);
   };
 
+  const channel = CHANNELS[active];
+
   return (
-    <div
-      ref={containerRef}
-      className="proxe-coverflow"
-      data-dragging={dragging}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
-      aria-label={`PROXe listens on ${CHANNELS.map((c) => c.name).join(', ')}`}
-    >
-      <div className="proxe-coverflow-stage">
-        {CHANNELS.map((c, i) => {
-          // Shortest signed distance to active, wrapped — keeps motion circular.
-          let offset = i - active;
-          if (offset > len / 2) offset -= len;
-          if (offset < -len / 2) offset += len;
-          const visible = Math.abs(offset) <= 2;
-          return (
-            <div
-              key={c.name}
-              className="proxe-coverflow-tile"
-              data-offset={offset}
-              data-visible={visible}
-              aria-hidden={offset !== 0}
-            >
-              {c.icon}
-            </div>
-          );
-        })}
+    <div ref={containerRef} className="proxe-coverflow-wrap" aria-label={`PROXe on ${CHANNELS.map(c => c.name).join(', ')}`}>
+      {/* Icon picker */}
+      <div className="proxe-coverflow" data-dragging={dragging}
+        onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
+        onPointerUp={endDrag} onPointerCancel={endDrag}
+      >
+        <div className="proxe-coverflow-stage">
+          {CHANNELS.map((c, i) => {
+            let offset = i - active;
+            if (offset > len / 2) offset -= len;
+            if (offset < -len / 2) offset += len;
+            const visible = Math.abs(offset) <= 2;
+            return (
+              <div key={c.name} className="proxe-coverflow-tile" data-offset={offset} data-visible={visible} aria-hidden={offset !== 0}>
+                {c.icon}
+              </div>
+            );
+          })}
+        </div>
+        <div className="proxe-coverflow-label" aria-live="polite">{channel.name.toUpperCase()}</div>
       </div>
-      <div className="proxe-coverflow-label" aria-live="polite">
-        {CHANNELS[active].name.toUpperCase()}
+
+      {/* Live chat preview — key on active so it re-mounts and re-animates */}
+      <div key={active} className="proxe-channel-chat" style={{ '--ch-accent': channel.accent } as React.CSSProperties}>
+        <div className="proxe-channel-chat-header">
+          <span className="proxe-channel-chat-icon">{channel.icon}</span>
+          <span className="proxe-channel-chat-name">{channel.name}</span>
+          <span className="proxe-channel-chat-live">
+            <span className="proxe-channel-chat-dot" />
+            Live
+          </span>
+        </div>
+        <div className="proxe-channel-chat-body">
+          {channel.messages.map((msg, i) => (
+            <div key={i} className={`proxe-ch-msg proxe-ch-msg--${msg.from}`} style={{ '--i': i } as React.CSSProperties}>
+              {msg.from === 'ai' && (
+                <div className="proxe-ch-msg-avatar">
+                  <img src="/proxe/brand/proxe-icon-white.webp" alt="PROXe" width={18} height={18} />
+                </div>
+              )}
+              <div className="proxe-ch-msg-bubble">
+                <span className="proxe-ch-msg-text">{msg.text}</span>
+                <span className="proxe-ch-msg-time">{msg.time}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="proxe-channel-chat-footer">
+          <span className="proxe-channel-chat-typing"><span /><span /><span /></span>
+          <span className="proxe-channel-chat-footer-label">PROXe is replying…</span>
+        </div>
       </div>
     </div>
   );
