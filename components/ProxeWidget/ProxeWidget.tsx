@@ -3,7 +3,9 @@
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 
-const HIDDEN_ROUTES = ['/proxe', '/proxe-cfs'];
+// /proxe now lives at goproxe.com (standalone). /proxe-cfs still hides the
+// embed widget so the security/platform page reads cleanly.
+const HIDDEN_ROUTES = ['/proxe-cfs'];
 
 export default function ProxeWidget() {
   const pathname = usePathname();

@@ -13,6 +13,23 @@ const nextConfig = {
   poweredByHeader: false,
   generateEtags: false,
   
+  // /proxe was extracted to its own standalone Next app at goproxe.com.
+  // Permanent redirect (308) preserves SEO and any external inbound links.
+  async redirects() {
+    return [
+      {
+        source: '/proxe',
+        destination: 'https://goproxe.com',
+        permanent: true,
+      },
+      {
+        source: '/proxe/:path*',
+        destination: 'https://goproxe.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   // Image optimization
   images: {
     remotePatterns: [
