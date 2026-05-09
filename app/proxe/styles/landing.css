@@ -533,7 +533,7 @@ body:has(.proxe-root) {
    ======================================================== */
 .proxe-chat-shell {
   width: 100%;
-  max-width: 440px;
+  max-width: 580px;
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.06);
@@ -568,7 +568,7 @@ body:has(.proxe-root) {
     radial-gradient(circle at 25% 20%, rgba(0,0,0,0.025) 1px, transparent 1px),
     radial-gradient(circle at 75% 60%, rgba(0,0,0,0.025) 1px, transparent 1px);
   background-size: 28px 28px, 32px 32px;
-  height: 540px;
+  height: 600px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }
 .wa-header {
@@ -666,7 +666,7 @@ body:has(.proxe-root) {
 .ig-chat {
   display: flex; flex-direction: column;
   background: #000;
-  height: 540px;
+  height: 600px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   color: #fff;
 }
@@ -753,7 +753,7 @@ body:has(.proxe-root) {
 .ms-chat {
   display: flex; flex-direction: column;
   background: #fff;
-  height: 540px;
+  height: 600px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   color: #050505;
 }
@@ -842,7 +842,7 @@ body:has(.proxe-root) {
 /* ===== Voice call ===== */
 .vc-chat {
   display: flex; flex-direction: column;
-  height: 540px;
+  height: 600px;
   background:
     radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.45) 0%, transparent 55%),
     radial-gradient(circle at 50% 100%, rgba(20, 10, 60, 0.6) 0%, transparent 55%),
@@ -964,7 +964,7 @@ body:has(.proxe-root) {
 /* ===== Web chat (PROXe-branded glass) ===== */
 .web-chat {
   display: flex; flex-direction: column;
-  height: 540px;
+  height: 600px;
   background:
     linear-gradient(180deg, rgba(124, 58, 237, 0.16) 0%, rgba(76, 29, 149, 0.08) 100%),
     rgba(15, 8, 50, 0.55);
