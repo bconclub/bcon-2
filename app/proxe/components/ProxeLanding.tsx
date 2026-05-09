@@ -246,19 +246,19 @@ const CHANNELS: Array<{ name: string; icon: React.ReactNode; accent: string; mes
   {
     name: 'Voice', icon: <FiPhone />, accent: 'rgba(255,255,255,0.85)',
     messages: [
-      { from: 'customer', text: 'I came across your product — curious about pricing.', time: '2:31 PM' },
+      { from: 'customer', text: 'I saw your product online. Curious about pricing.', time: '2:31 PM' },
       { from: 'ai',       text: 'Happy to help! Starter is $99/mo for 1,000 conversations. How many leads do you get monthly?', time: '2:31 PM' },
-      { from: 'customer', text: 'Around 200–300 a month.', time: '2:32 PM' },
-      { from: 'ai',       text: "Starter covers that easily. Want me to set up your free trial right now? Takes 2 minutes.", time: '2:32 PM' },
+      { from: 'customer', text: 'Around 200 to 300 a month.', time: '2:32 PM' },
+      { from: 'ai',       text: 'Starter covers that easily. Want me to set up your free trial right now? Takes 2 minutes.', time: '2:32 PM' },
     ],
   },
   {
     name: 'WhatsApp', icon: <SiWhatsapp />, accent: '#25D366',
     messages: [
       { from: 'customer', text: 'Hi, I filled a form 3 days ago but no one called me.', time: '10:14 AM' },
-      { from: 'ai',       text: "Hi! I can see your enquiry from May 6th. Are you free for a quick call today at 3pm or 5pm?", time: '10:14 AM' },
+      { from: 'ai',       text: 'Hi! I can see your enquiry from May 6th. Are you free for a quick call today at 3pm or 5pm?', time: '10:14 AM' },
       { from: 'customer', text: '3pm works!', time: '10:15 AM' },
-      { from: 'ai',       text: "Confirmed! Booked you in at 3pm — you'll get a reminder 15 min before. 🎯", time: '10:15 AM' },
+      { from: 'ai',       text: "Confirmed! Booked you in at 3pm. You'll get a reminder 15 min before. 🎯", time: '10:15 AM' },
     ],
   },
   {
@@ -266,26 +266,26 @@ const CHANNELS: Array<{ name: string; icon: React.ReactNode; accent: string; mes
     messages: [
       { from: 'customer', text: 'Do you offer a free trial?', time: '4:02 PM' },
       { from: 'ai',       text: "Yes! 14-day free trial, no card needed. I can start you in 5 minutes. What's your business email?", time: '4:02 PM' },
-      { from: 'customer', text: "Great — it's john@acme.com", time: '4:03 PM' },
-      { from: 'ai',       text: "Trial account created! Check your inbox — login link and setup guide sent. 🎉", time: '4:03 PM' },
+      { from: 'customer', text: "Great. It's john@acme.com", time: '4:03 PM' },
+      { from: 'ai',       text: 'Trial account created! Check your inbox. Login link and setup guide sent. 🎉', time: '4:03 PM' },
     ],
   },
   {
     name: 'Instagram', icon: <SiInstagram />, accent: '#E1306C',
     messages: [
-      { from: 'customer', text: 'Saw your reel — how does this actually work?', time: '7:18 PM' },
+      { from: 'customer', text: 'Saw your reel. How does this actually work?', time: '7:18 PM' },
       { from: 'ai',       text: 'PROXe catches every DM, replies in seconds, qualifies leads, and follows up until they buy. Want a live demo?', time: '7:18 PM' },
       { from: 'customer', text: 'Yes! How do I sign up?', time: '7:19 PM' },
-      { from: 'ai',       text: "Drop your email here or tap the link in bio — you'll be set up in 2 minutes. 🚀", time: '7:19 PM' },
+      { from: 'ai',       text: "Drop your email here or tap the link in bio. You'll be set up in 2 minutes. 🚀", time: '7:19 PM' },
     ],
   },
   {
     name: 'Web', icon: <FiGlobe />, accent: '#A78BFA',
     messages: [
       { from: 'customer', text: 'What channels do you support?', time: '11:45 AM' },
-      { from: 'ai',       text: 'WhatsApp, Instagram, Messenger, Voice, web chat, and email — all from one dashboard with shared memory.', time: '11:45 AM' },
+      { from: 'ai',       text: 'WhatsApp, Instagram, Messenger, Voice, web chat, and email. All from one dashboard with shared memory.', time: '11:45 AM' },
       { from: 'customer', text: 'Does it sync with HubSpot?', time: '11:46 AM' },
-      { from: 'ai',       text: 'Yes — native HubSpot integration. Every conversation and lead score syncs automatically. Want to see it live?', time: '11:46 AM' },
+      { from: 'ai',       text: 'Yes. Native HubSpot integration. Every conversation and lead score syncs automatically. Want to see it live?', time: '11:46 AM' },
     ],
   },
 ];
@@ -419,7 +419,7 @@ function WhatsAppChat({ channel }: { channel: typeof CHANNELS[number] }) {
         <div className="wa-avatar"><SiWhatsapp /></div>
         <div className="wa-meta">
           <div className="wa-name">PROXe</div>
-          <div className="wa-status"><span className="wa-online" />online</div>
+          <div className="wa-status">typing<span className="wa-typing-ellipsis"><span /><span /><span /></span></div>
         </div>
       </div>
       <div className="wa-body">
@@ -465,7 +465,9 @@ function InstagramChat({ channel }: { channel: typeof CHANNELS[number] }) {
             <div className="ig-bubble">{m.text}</div>
           </div>
         ))}
-        <div className="ig-seen">Seen {channel.messages[channel.messages.length - 1].time}</div>
+        <div className="ig-row ig-row--ai" style={{ '--i': channel.messages.length } as React.CSSProperties}>
+          <div className="ig-bubble ig-bubble--typing"><span /><span /><span /></div>
+        </div>
       </div>
       <div className="ig-input">
         <span className="ig-input-pill">Message…</span>
@@ -536,6 +538,12 @@ function VoiceChat({ channel }: { channel: typeof CHANNELS[number] }) {
             <span className="vc-text">{m.text}</span>
           </div>
         ))}
+        <div className="vc-line vc-line--ai vc-line--speaking" style={{ '--i': channel.messages.length } as React.CSSProperties}>
+          <span className="vc-speaker">PROXe is speaking</span>
+          <div className="vc-wave">
+            {Array.from({ length: 14 }).map((_, i) => <span key={i} style={{ '--bar-i': i } as React.CSSProperties} />)}
+          </div>
+        </div>
       </div>
       <div className="vc-controls">
         <button className="vc-btn" aria-label="Mute"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></button>
@@ -546,39 +554,47 @@ function VoiceChat({ channel }: { channel: typeof CHANNELS[number] }) {
   );
 }
 
-/* ===== Web chat widget (PROXe-branded glass) ===== */
+/* ===== Web chat widget (matches the real PROXe deploy widget) ===== */
 function WebChat({ channel }: { channel: typeof CHANNELS[number] }) {
   return (
     <div className="web-chat">
       <div className="web-header">
         <div className="web-brand">
-          <img src="/proxe/brand/proxe-icon-white.webp" alt="PROXe" width={24} height={24} />
-          <div className="web-brand-text">
-            <div className="web-name">PROXe</div>
-            <div className="web-status"><span className="web-dot" />AI · online now</div>
-          </div>
+          <img src="/proxe/brand/proxe-icon-white.webp" alt="" width={20} height={20} />
+          <div className="web-name">PROXe</div>
         </div>
-        <span className="web-min">—</span>
+        <div className="web-header-actions">
+          <button className="web-icon-btn" aria-label="Toggle theme">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          </button>
+          <button className="web-icon-btn" aria-label="Close">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
       </div>
       <div className="web-body">
         {channel.messages.map((m, i) => (
           <div key={i} className={`web-row web-row--${m.from}`} style={{ '--i': i } as React.CSSProperties}>
-            {m.from === 'ai' && (
-              <div className="web-avatar">
-                <img src="/proxe/brand/proxe-icon-white.webp" alt="" width={20} height={20} />
-              </div>
-            )}
             <div className="web-bubble">{m.text}</div>
           </div>
         ))}
+        <div className="web-quick">
+          <button className="web-pill">Book a Demo</button>
+          <button className="web-pill">Pricing</button>
+        </div>
+        <div className="web-row web-row--ai" style={{ '--i': channel.messages.length + 1 } as React.CSSProperties}>
+          <div className="web-bubble web-bubble--typing"><span /><span /><span /></div>
+        </div>
       </div>
-      <div className="web-quick">
-        <button className="web-pill">Book a Demo</button>
-        <button className="web-pill">Pricing</button>
-      </div>
+      <div className="web-powered">Powered by <strong>PROXe</strong></div>
       <div className="web-input">
-        <span className="web-input-pill">Reply to PROXe…</span>
-        <span className="web-send">↑</span>
+        <button className="web-circle-btn web-circle-btn--phone" aria-label="Call">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
+        <span className="web-input-pill">Type your message…</span>
+        <button className="web-circle-btn web-circle-btn--send" aria-label="Send">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
       </div>
     </div>
   );

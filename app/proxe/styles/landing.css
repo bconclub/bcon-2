@@ -586,8 +586,10 @@ body:has(.proxe-root) {
     inset 0 1px 0 rgba(255, 255, 255, 0.10);
   overflow: hidden;
   animation: proxeChatShellIn 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-  /* The inner platform components paint their own surface — give them room */
   position: relative;
+  /* Override the parent .proxe-problem text-align: center so chat content
+     reads naturally inside bubbles. */
+  text-align: left;
 }
 
 @keyframes proxeChatShellIn {
@@ -1115,6 +1117,186 @@ body:has(.proxe-root) {
   font-size: 16px; font-weight: 700;
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+/* ===== Per-platform "PROXe is responding right now" indicators =====
+   Every chat shows PROXe actively engaged so the preview feels live. */
+
+/* WhatsApp: header status changes from "online" → "typing…" with anim dots */
+.wa-typing-ellipsis {
+  display: inline-flex; gap: 2px; margin-left: 2px;
+}
+.wa-typing-ellipsis span {
+  width: 3px; height: 3px; border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  animation: msTypingDot 1.3s cubic-bezier(0.4,0,0.2,1) infinite;
+}
+.wa-typing-ellipsis span:nth-child(2) { animation-delay: 0.15s; }
+.wa-typing-ellipsis span:nth-child(3) { animation-delay: 0.3s; }
+
+/* Instagram: typing bubble with three pulsing dots */
+.ig-bubble--typing {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 12px 14px;
+}
+.ig-bubble--typing span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  animation: msTypingDot 1.3s cubic-bezier(0.4,0,0.2,1) infinite;
+}
+.ig-bubble--typing span:nth-child(2) { animation-delay: 0.15s; }
+.ig-bubble--typing span:nth-child(3) { animation-delay: 0.3s; }
+
+/* Voice: speaking waveform — bars rise/fall as if PROXe is mid-utterance */
+.vc-line--speaking { gap: 6px; }
+.vc-wave {
+  display: flex; align-items: center; gap: 3px;
+  height: 22px;
+  margin-top: 2px;
+}
+.vc-wave span {
+  flex: 1;
+  background: linear-gradient(180deg, #C4B5FD, #7C3AED);
+  border-radius: 2px;
+  animation: vcWaveBar 1s ease-in-out infinite;
+  animation-delay: calc(var(--bar-i, 0) * 80ms);
+}
+@keyframes vcWaveBar {
+  0%, 100% { height: 20%; opacity: 0.5; }
+  50%      { height: 90%; opacity: 1; }
+}
+
+/* ===== Web chat — redesigned to match the real PROXe deploy widget =====
+   Dark surface, violet brand accents, "Powered by PROXe" footer, circular
+   action buttons flanking the input. */
+.web-chat {
+  display: flex; flex-direction: column;
+  height: 600px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(124, 58, 237, 0.22) 0%, transparent 55%),
+    #0F0A24;
+  color: #fff;
+  font-family: 'Exo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.web-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.web-brand { display: flex; align-items: center; gap: 8px; }
+.web-name {
+  font-size: 14px; font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+.web-header-actions { display: flex; gap: 8px; }
+.web-icon-btn {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.web-icon-btn:hover { background: rgba(255,255,255,0.12); }
+.web-body {
+  flex: 1; overflow: hidden;
+  padding: 16px 14px 8px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.web-row {
+  display: flex;
+  animation: proxeMsgFlyIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation-delay: calc(var(--i, 0) * 110ms + 100ms);
+}
+.web-row--ai { justify-content: flex-start; }
+.web-row--customer { justify-content: flex-end; }
+.web-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13.5px; line-height: 1.45;
+  word-wrap: break-word;
+}
+.web-row--ai .web-bubble {
+  background: #1F1638;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92);
+}
+.web-row--customer .web-bubble {
+  background: linear-gradient(135deg, #7C3AED, #4C1D95);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.web-bubble--typing {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 12px 14px;
+}
+.web-bubble--typing span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  animation: msTypingDot 1.3s cubic-bezier(0.4,0,0.2,1) infinite;
+}
+.web-bubble--typing span:nth-child(2) { animation-delay: 0.15s; }
+.web-bubble--typing span:nth-child(3) { animation-delay: 0.3s; }
+.web-quick {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  justify-content: flex-end;
+  margin: 4px 0 4px;
+  animation: proxeMsgFlyIn 0.4s ease-out 0.6s both;
+}
+.web-pill {
+  padding: 8px 14px; border-radius: 10px;
+  background: #1F1638;
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  color: #fff; font-size: 12.5px; font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.web-pill:hover {
+  background: #2A1B4D;
+  border-color: rgba(167, 139, 250, 0.7);
+}
+.web-powered {
+  text-align: center;
+  padding: 6px 0;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.35);
+  flex-shrink: 0;
+}
+.web-powered strong { color: rgba(255,255,255,0.7); font-weight: 700; }
+.web-input {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px 14px;
+  flex-shrink: 0;
+}
+.web-input-pill {
+  flex: 1;
+  background: #1F1638;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-size: 13px; color: rgba(255,255,255,0.45);
+}
+.web-circle-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C3AED, #4C1D95);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.14);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
+}
+.web-circle-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(124, 58, 237, 0.45);
 }
 
 @media (prefers-reduced-motion: reduce) {
